@@ -4,12 +4,15 @@ import { useState } from 'react'
 /** Panel with an optional title and subtitle. */
 export function Card({ title, subtitle, action, children, className = '', pad = true }) {
   return (
-    <section className={`card ${pad ? 'card-pad' : ''} ${className}`}>
+    <section className={`corner-bracket tethered-bento border-none relative bg-surface-1 shadow-lg ${pad ? 'p-6' : ''} ${className}`}>
+      {/* 1px SVG wire connecting cards */}
+      <div className="tether-line tether-line-bottom"></div>
+      
       {(title || action) && (
-        <header className={`flex items-start justify-between gap-4 ${children ? 'mb-4' : ''}`}>
+        <header className={`flex items-start justify-between gap-4 ${children ? 'mb-4 border-b pb-4' : ''}`} style={{ borderColor: 'var(--border-subtle)' }}>
           <div>
-            {title && <h2 className="panel-title">{title}</h2>}
-            {subtitle && <p className="panel-sub">{subtitle}</p>}
+            {title && <h2 className="text-sm font-bold tracking-tight text-ink-primary font-mono uppercase">{title}</h2>}
+            {subtitle && <p className="text-xs text-ink-muted mt-1">{subtitle}</p>}
           </div>
           {action}
         </header>
@@ -150,8 +153,41 @@ export function EmptyState({ icon: Icon, title, detail, action }) {
       )}
       <p className="font-semibold text-ink-primary">{title}</p>
       {detail && <p className="mt-1 max-w-sm text-[0.8125rem] text-ink-muted">{detail}</p>}
-      {action && <div className="mt-5">{action}</div>}
+      {action && <div className="mt-6">{action}</div>}
     </div>
+  )
+}
+
+export function SplitLoupeOverlay({ url, alt, inspectZoom }) {
+  const [sliderPos, setSliderPos] = useState(50)
+
+  return (
+    <>
+      <div 
+        className="relative w-full h-full pointer-events-none" 
+        style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+      >
+        <img src={url} alt={alt} className={`w-full h-full object-contain transition-transform duration-300 origin-center ${inspectZoom ? 'min-w-[1200px] scale-[1.5]' : 'max-h-[580px]'}`} />
+      </div>
+
+      <div 
+        className="absolute top-0 bottom-0 w-px bg-accent pointer-events-none drop-shadow-[0_0_8px_rgba(0,229,255,0.8)] z-20"
+        style={{ left: `calc(${sliderPos}%)` }}
+      >
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-accent bg-black/40 backdrop-blur-md flex items-center justify-center cursor-ew-resize pointer-events-auto shadow-[0_0_15px_rgba(0,229,255,0.5)]">
+           <div className="w-0.5 h-3 bg-accent rounded-full"></div>
+        </div>
+      </div>
+
+      <input 
+        type="range" 
+        min="0" 
+        max="100" 
+        value={sliderPos}
+        onChange={(e) => setSliderPos(e.target.value)}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30 m-0 p-0"
+      />
+    </>
   )
 }
 

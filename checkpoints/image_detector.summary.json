@@ -1,0 +1,35 @@
+{
+  "best_val_loss": 0.0006616624198625903,
+  "best_val_metrics": {
+    "threshold": 0.5,
+    "accuracy": 0.9997743902439025,
+    "precision": 0.999609884550209,
+    "recall": 0.999939024390244,
+    "specificity": 0.999609756097561,
+    "f1": 0.999774427380858,
+    "auc_roc": 0.9999991672367639,
+    "eer": 0.00014634146341463428,
+    "eer_threshold": 0.78662109375,
+    "false_positive_rate": 0.0003902439024390244,
+    "false_negative_rate": 6.097560975609756e-05,
+    "confusion_matrix": {
+      "tn": 81968,
+      "fp": 32,
+      "fn": 5,
+      "tp": 81995
+    },
+    "support": {
+      "real": 82000,
+      "fake": 82000
+    }
+  },
+  "epochs_run": 1,
+  "amp_used": true,
+  "checkpoint": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\checkpoints\\image_detector.pt",
+  "model_version": "image-detector-v2.1.0-b4-expanded",
+  "gpu": "NVIDIA GeForce RTX 5070",
+  "backbone": "efficientnet_b4",
+  "input_size": 224,
+  "training_dataset_size": 936009,
+  "validation_dataset_size": 164000
+}

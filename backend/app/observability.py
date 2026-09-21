@@ -64,6 +64,10 @@ def configure_logging(debug: bool, json_logs: bool) -> None:
     root.addHandler(handler)
     root.setLevel(logging.DEBUG if debug else logging.INFO)
 
+    # Silence extremely chatty third-party loggers that block I/O
+    for quiet_name in ("numba", "httpcore", "httpx", "asyncio", "PIL", "urllib3", "matplotlib"):
+        logging.getLogger(quiet_name).setLevel(logging.WARNING)
+
     # Uvicorn installs its own handlers; route them through ours so every line
     # carries the request id.
     for name in ("uvicorn", "uvicorn.access", "uvicorn.error"):

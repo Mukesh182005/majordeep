@@ -46,7 +46,7 @@ def main() -> None:
     from app.ml.models_arch import build_audio_model
     from torch.utils.data import DataLoader
 
-    from ml.training.datasets import AudioWindowDataset, collate_spectrograms
+    from ml.training.datasets import AudioWindowDataset
     from ml.training.engine import TrainConfig, train_model
 
     manifest = args.data / "manifest.csv"
@@ -55,8 +55,8 @@ def main() -> None:
             f"No manifest at {manifest}. Run ml/preprocessing/build_audio_dataset.py first."
         )
 
-    train_set = AudioWindowDataset(manifest, "train", sample_rate=args.sample_rate)
-    val_set = AudioWindowDataset(manifest, "val", sample_rate=args.sample_rate)
+    train_set = AudioWindowDataset(manifest, "train")
+    val_set = AudioWindowDataset(manifest, "val")
     print(f"train: {len(train_set)} windows | val: {len(val_set)} windows")
 
     train_loader = DataLoader(
@@ -64,7 +64,6 @@ def main() -> None:
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=args.workers,
-        collate_fn=collate_spectrograms,
         drop_last=True,
     )
     val_loader = DataLoader(
@@ -72,7 +71,6 @@ def main() -> None:
         batch_size=args.batch_size,
         shuffle=False,
         num_workers=args.workers,
-        collate_fn=collate_spectrograms,
     )
 
     model = build_audio_model()

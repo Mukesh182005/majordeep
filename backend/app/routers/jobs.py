@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from fastapi.responses import FileResponse
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -137,12 +138,24 @@ def job_result(
 
     evidence = dict(job.evidence or {})
     # Rewrite bare filenames into URLs the browser can load.
-    if evidence.get("heatmap_file"):
-        evidence["heatmap_url"] = f"{settings.api_v1_prefix}/jobs/{job.id}/evidence/heatmap"
-    if evidence.get("spectrogram_file"):
-        evidence["spectrogram_url"] = f"{settings.api_v1_prefix}/jobs/{job.id}/evidence/spectrogram"
-    if evidence.get("timeline_file"):
-        evidence["timeline_url"] = f"{settings.api_v1_prefix}/jobs/{job.id}/evidence/timeline"
+    evidence_map = {
+        "heatmap": "heatmap_file",
+        "spectrogram": "spectrogram_file",
+        "timeline": "timeline_file",
+        "ela": "ela_file",
+        "noise": "noise_file",
+        "tampering": "tampering_file",
+        "stego": "stego_file",
+        "watermark": "watermark_file",
+        "combined": "combined_file",
+        "lfcc": "lfcc_scalogram_file",
+        "cqt": "cqt_scalogram_file",
+        "waveform": "waveform_file",
+        "multi": "multi_resolution_plate_file",
+    }
+    for kind, key in evidence_map.items():
+        if evidence.get(key):
+            evidence[f"{kind}_url"] = f"{settings.api_v1_prefix}/jobs/{job.id}/evidence/{kind}"
 
     payload = JobResultOut.model_validate(job, from_attributes=True)
     return payload.model_copy(update={"evidence": evidence, "disclaimer": RESULT_DISCLAIMER})
@@ -155,9 +168,24 @@ def job_evidence(
     db: Session = Depends(get_db),
     user: User | None = Depends(get_current_user_optional),
 ) -> FileResponse:
-    """Serve a generated evidence image (Grad-CAM heatmap or spectrogram)."""
+    """Serve a generated evidence image (Grad-CAM heatmap, spectrogram, or scalogram)."""
     job = _get_job(job_id, db, user)
-    key = {"heatmap": "heatmap_file", "spectrogram": "spectrogram_file", "timeline": "timeline_file"}.get(kind)
+    evidence_map = {
+        "heatmap": "heatmap_file",
+        "spectrogram": "spectrogram_file",
+        "timeline": "timeline_file",
+        "ela": "ela_file",
+        "noise": "noise_file",
+        "tampering": "tampering_file",
+        "stego": "stego_file",
+        "watermark": "watermark_file",
+        "combined": "combined_file",
+        "lfcc": "lfcc_scalogram_file",
+        "cqt": "cqt_scalogram_file",
+        "waveform": "waveform_file",
+        "multi": "multi_resolution_plate_file",
+    }
+    key = evidence_map.get(kind)
     if key is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown evidence type.")
 
@@ -190,6 +218,20 @@ def create_report(
             detail="A report can only be generated for a completed analysis.",
         )
 
+    # If a report already exists for this job and the PDF exists on disk, reuse it
+    existing = _find_by_reference(db, f"DFR-{job.case_reference}")
+    if existing is None:
+        existing = db.scalar(select(Report).where(Report.job_id == job.id))
+    if existing is not None:
+        file_path = Path(existing.file_path)
+        if not file_path.exists():
+            file_path = Path(settings.report_dir) / f"{existing.report_reference}.pdf"
+        if file_path.exists():
+            existing.file_path = str(file_path.resolve())
+            db.commit()
+            db.refresh(existing)
+            return _to_report_out(existing)
+
     artifacts = generate_report(job, requester=user.email if user else None)
 
     # The reference is derived from the case id, so regenerating rewrites the
@@ -197,13 +239,37 @@ def create_report(
     # hash no longer matches the PDF now on disk.
     report = _find_by_reference(db, artifacts.report_reference)
     if report is None:
+        report = db.scalar(select(Report).where(Report.job_id == job.id))
+    if report is None:
         report = Report(job_id=job.id, report_reference=artifacts.report_reference)
         db.add(report)
-    report.file_path = str(artifacts.path)
+
+    report.report_reference = artifacts.report_reference
+    report.file_path = str(artifacts.path.resolve())
     report.sha256 = artifacts.sha256
     report.generated_at = artifacts.generated_at
-    db.commit()
-    db.refresh(report)
+
+    try:
+        db.commit()
+        db.refresh(report)
+    except IntegrityError:
+        db.rollback()
+        report = _find_by_reference(db, artifacts.report_reference)
+        if report is None:
+            report = db.scalar(select(Report).where(Report.job_id == job.id))
+        if report is not None:
+            report.report_reference = artifacts.report_reference
+            report.file_path = str(artifacts.path.resolve())
+            report.sha256 = artifacts.sha256
+            report.generated_at = artifacts.generated_at
+            db.commit()
+            db.refresh(report)
+
+    if report is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate or retrieve report record.",
+        )
 
     return _to_report_out(report)
 
@@ -227,12 +293,47 @@ def download_report(
         )
 
     report = job.reports[-1] if job.reports else None
-    if report is None or not Path(report.file_path).exists():
-        created = create_report(job_id, db=db, user=user)
-        report = _find_by_reference(db, created.report_reference)
+    if report is None:
+        report = _find_by_reference(db, f"DFR-{job.case_reference}")
+    if report is None:
+        report = db.scalar(select(Report).where(Report.job_id == job.id))
+
+    report_path = Path(report.file_path) if report and report.file_path else None
+    if report_path is None or not report_path.exists():
+        fallback = Path(settings.report_dir) / f"DFR-{job.case_reference}.pdf"
+        if fallback.exists() and report is not None:
+            report_path = fallback
+            report.file_path = str(fallback.resolve())
+            db.commit()
+            db.refresh(report)
+        else:
+            created = create_report(job_id, db=db, user=user)
+            report = _find_by_reference(db, created.report_reference)
+            if report is None:
+                report = db.scalar(select(Report).where(Report.job_id == job.id))
+
+    if report is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report record not found.",
+        )
+
+    report_path = Path(report.file_path)
+    if not report_path.exists():
+        fallback = Path(settings.report_dir) / f"{report.report_reference}.pdf"
+        if fallback.exists():
+            report_path = fallback
+            report.file_path = str(fallback.resolve())
+            db.commit()
+            db.refresh(report)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Report PDF file not found on server.",
+            )
 
     return FileResponse(
-        report.file_path,
+        str(report_path.resolve()),
         media_type="application/pdf",
         filename=f"{report.report_reference}.pdf",
         headers={"X-Report-SHA256": report.sha256},

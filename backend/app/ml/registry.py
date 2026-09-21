@@ -118,15 +118,29 @@ def _build_image_model() -> LoadedModel:
     from app.ml.models_arch import build_image_model
 
     device = resolve_device()
-    module = build_image_model(settings.image_model_backbone, pretrained=True)
-    status, metadata = _load_checkpoint(module, checkpoint_path("image"))
+    ckpt_path = checkpoint_path("image")
+    backbone = settings.image_model_backbone
+    metadata = {}
+    if ckpt_path.exists():
+        try:
+            payload = load_checkpoint(ckpt_path)
+            metadata = extract_metadata(payload)
+            if "backbone" in metadata and metadata["backbone"]:
+                backbone = str(metadata["backbone"])
+        except Exception as exc:
+            logger.warning("Could not read checkpoint metadata: %s", exc)
+
+    module = build_image_model(backbone, pretrained=True)
+    status, loaded_meta = _load_checkpoint(module, ckpt_path)
+    if loaded_meta:
+        metadata.update(loaded_meta)
     module.eval().to(device)
     return LoadedModel(
         module=module,
         device=device,
         weights_status=status,
         version=str(metadata.get("version", settings.image_model_version)),
-        name=f"{settings.image_model_backbone}-binary-head",
+        name=f"{backbone}-binary-head",
         metadata=metadata,
     )
 

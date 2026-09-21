@@ -1,0 +1,33 @@
+{
+  "best_val_loss": 0.00022479363306344977,
+  "best_val_metrics": {
+    "threshold": 0.5,
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "f1": 1.0,
+    "auc_roc": 1.0,
+    "eer": 0.0,
+    "eer_threshold": 0.9996947050094604,
+    "false_positive_rate": 0.0,
+    "false_negative_rate": 0.0,
+    "confusion_matrix": {
+      "tn": 12582,
+      "fp": 0,
+      "fn": 0,
+      "tp": 12582
+    },
+    "support": {
+      "real": 12582,
+      "fake": 12582
+    }
+  },
+  "epochs_run": 10,
+  "amp_used": true,
+  "checkpoint": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\checkpoints\\audio_detector.pt",
+  "model_version": "audio-lcnn-v1.0.0",
+  "gpu": "NVIDIA GeForce RTX 5070",
+  "architecture": "LCNN",
+  "sample_rate": 16000
+}

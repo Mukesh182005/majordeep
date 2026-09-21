@@ -78,6 +78,7 @@ class EvidenceOut(BaseModel):
     segment_scores: list[dict] | None = None
     faces_detected: int | None = None
     notes: list[str] = Field(default_factory=list)
+    mopci: dict | None = None
 
 
 class JobResultOut(BaseModel):

@@ -88,7 +88,11 @@ export const api = {
   jobResult: (id) => request(`/jobs/${id}/result`),
   createReport: (id) => request(`/jobs/${id}/report`, { method: 'POST' }),
   reportUrl: (id) => `${API}/jobs/${id}/report`,
-  evidenceUrl: (path) => `${BASE}${path}`,
+  evidenceUrl: (path) => {
+    if (!path) return ''
+    if (path.startsWith('http://') || path.startsWith('https://')) return path
+    return `${BASE}${path.startsWith('/') ? path : `/${path}`}`
+  },
   verifyReport: (reference) => request(`/reports/${reference}/verify`),
 
   history: (limit = 20, offset = 0) => request(`/history?limit=${limit}&offset=${offset}`),

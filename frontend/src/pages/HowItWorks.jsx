@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Card, Notice } from '../components/ui'
-import { Image, Video, Waveform } from '../components/ui/Icons'
+import { Image } from '../components/ui/Icons'
 import { api } from '../lib/api'
 
 const PIPELINES = [

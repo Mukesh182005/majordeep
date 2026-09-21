@@ -154,7 +154,9 @@ def train_model(
 def _run_epoch(model, loader, criterion, optimizer, scaler, device, use_amp, max_grad_norm) -> float:
     model.train()
     total_loss, seen = 0.0, 0
-    for inputs, targets in loader:
+    t0 = time.perf_counter()
+    n_batches = len(loader)
+    for batch_idx, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
 
@@ -170,6 +172,14 @@ def _run_epoch(model, loader, criterion, optimizer, scaler, device, use_amp, max
 
         total_loss += loss.item() * inputs.size(0)
         seen += inputs.size(0)
+
+        if (batch_idx + 1) % 250 == 0 or (batch_idx + 1) == n_batches:
+            elapsed = time.perf_counter() - t0
+            speed = (batch_idx + 1) / max(elapsed, 0.001)
+            eta_sec = (n_batches - (batch_idx + 1)) / max(speed, 0.001)
+            avg_loss = total_loss / max(seen, 1)
+            print(f"    [batch {batch_idx+1:4d}/{n_batches}] loss: {avg_loss:.4f} | {speed:.1f} it/s | ETA: {eta_sec:.0f}s", flush=True)
+
     return total_loss / max(seen, 1)
 
 
@@ -178,14 +188,17 @@ def _evaluate(model, loader, criterion, device) -> tuple[float, np.ndarray, np.n
     model.eval()
     total_loss, seen = 0.0, 0
     all_probs, all_labels = [], []
+    n_batches = len(loader)
 
-    for inputs, targets in loader:
+    for batch_idx, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
         outputs = model(inputs)
         total_loss += criterion(outputs, targets).item() * inputs.size(0)
         seen += inputs.size(0)
         all_probs.append(torch.sigmoid(outputs).cpu().float().numpy().ravel())
         all_labels.append(targets.cpu().float().numpy().ravel())
+        if (batch_idx + 1) % 150 == 0 or (batch_idx + 1) == n_batches:
+            print(f"    [val {batch_idx+1:4d}/{n_batches}] evaluating...", flush=True)
 
     return (
         total_loss / max(seen, 1),

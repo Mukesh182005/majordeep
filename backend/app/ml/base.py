@@ -63,15 +63,16 @@ def torch_available() -> bool:
 
 
 def resolve_device(preferred: str | None = None) -> str:
-    """Pick a torch device, strictly enforcing CUDA if requested."""
+    """Pick a torch device, falling back to CPU if CUDA is not available."""
     preferred = preferred or settings.device
     if not preferred.startswith("cuda"):
         return preferred
 
     import torch
     if not torch.cuda.is_available():
-        raise RuntimeError(
-            "CUDA was requested (DEVICE=cuda) but torch.cuda.is_available() is False. "
-            "Refusing to silently fall back to the CPU."
+        import logging
+        logging.getLogger(__name__).warning(
+            "CUDA was requested but torch.cuda.is_available() is False. Falling back to CPU."
         )
+        return "cpu"
     return preferred

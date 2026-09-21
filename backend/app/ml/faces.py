@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import threading
 from dataclasses import dataclass
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ _detector_failed = False
 
 @dataclass
 class FaceCrop:
-    image: object  # PIL.Image.Image
+    image: Image.Image
     box: tuple[int, int, int, int] | None  # (x1, y1, x2, y2) in source coordinates
     confidence: float | None
 

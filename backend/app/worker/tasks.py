@@ -58,17 +58,18 @@ def analyze_job(self, job_id: str) -> dict:
         job.error_message = None
         session.commit()
 
+        verdict_value = job.verdict.value if job.verdict else None
         logger.info(
             "Job %s complete: %s (p=%.4f) in %d ms",
             job_id,
-            job.verdict.value,
+            verdict_value,
             job.fake_probability,
             job.processing_ms,
         )
         return {
             "job_id": job_id,
             "status": job.status.value,
-            "verdict": job.verdict.value,
+            "verdict": verdict_value,
             "fake_probability": job.fake_probability,
         }
     finally:

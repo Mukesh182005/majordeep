@@ -5,7 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
+    port: 3000,
+    strictPort: true,
     // Proxy /api to the backend in development so the browser sees one origin
     // and no CORS preflight is needed while developing.
     proxy: {

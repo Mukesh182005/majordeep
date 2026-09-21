@@ -57,12 +57,12 @@ class Settings(BaseSettings):
     max_upload_mb: int = 100
 
     # --- Rate limiting ---
-    upload_rate_limit_per_hour: int = 20
-    guest_rate_limit_per_hour: int = 3
+    upload_rate_limit_per_hour: int = 500
+    guest_rate_limit_per_hour: int = 500
 
     # --- Models ---
     checkpoint_dir: Path = ROOT_DIR / "checkpoints"
-    image_model_backbone: str = "efficientnet_b0"
+    image_model_backbone: str = "efficientnet_b4"
     image_model_version: str = "image-detector-v1.0.0"
     audio_model_version: str = "audio-lcnn-v1.0.0"
     video_model_version: str = "video-frame-agg-v1.0.0"
@@ -74,7 +74,7 @@ class Settings(BaseSettings):
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5
-    uncertain_band: float = 0.15
+    uncertain_band: float = 0.08
 
     # --- Frontend ---
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
@@ -86,6 +86,12 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
+
+    @field_validator("storage_dir", "evidence_dir", "report_dir", "checkpoint_dir", mode="after")
+    @classmethod
+    def _anchor_path(cls, value: Path) -> Path:
+        """Ensure directories are absolute and anchored to the project root."""
+        return value if value.is_absolute() else (ROOT_DIR / value).resolve()
 
     @model_validator(mode="after")
     def _reject_unsafe_production(self) -> Settings:

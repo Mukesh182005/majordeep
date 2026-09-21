@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
+from typing import Any
 
 import numpy as np
+from PIL import Image
 
 from app.config import settings
 
@@ -19,10 +21,9 @@ IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
 
 # --------------------------------------------------------------------------- image
-def preprocess_image(image, size: int = IMAGE_SIZE):
+def preprocess_image(image: Image.Image, size: int = IMAGE_SIZE):
     """PIL image -> normalised ``(1, 3, size, size)`` float tensor."""
     import torch
-    from PIL import Image
 
     resized = image.convert("RGB").resize((size, size), Image.BILINEAR)
     array = np.asarray(resized, dtype=np.float32) / 255.0
@@ -36,7 +37,7 @@ def sample_video_frames(
     path: str | Path,
     target_fps: float | None = None,
     max_frames: int | None = None,
-) -> tuple[list[tuple[float, object]], dict]:
+) -> tuple[list[tuple[float, Image.Image]], dict[str, Any]]:
     """Sample frames at ``target_fps``, returning ``[(timestamp_s, PIL image)]``.
 
     Sampling rather than decoding every frame keeps long videos tractable —
@@ -68,7 +69,7 @@ def sample_video_frames(
             picks = np.linspace(0, len(indices) - 1, max_frames).round().astype(int)
             indices = [indices[i] for i in dict.fromkeys(picks.tolist())]
 
-        frames: list[tuple[float, object]] = []
+        frames: list[tuple[float, Image.Image]] = []
         if indices:
             for index in indices:
                 capture.set(cv2.CAP_PROP_POS_FRAMES, index)

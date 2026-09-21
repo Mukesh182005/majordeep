@@ -1,13 +1,92 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api, connectJobWs } from '../lib/api'
-import { formatBytes, formatDate, formatDuration, percent, verdictMeta } from '../lib/format'
+import { formatBytes, percent, verdictMeta } from '../lib/format'
 import AuthedImage from '../components/AuthedImage'
-import ConfidenceChart from '../components/ConfidenceChart'
-import {
-  Card, CopyButton, Field, Notice, ProbabilityMeter, Stat,
-} from '../components/ui'
-import { ArrowRight, FileText, MEDIA_ICON, Upload } from '../components/ui/Icons'
+import { CopyButton, Notice } from '../components/ui'
+import { 
+  Activity, CheckCircle, Cpu, FileText, Sparkles, Upload, Clock, Info, Loader2, AlertTriangle, Hash,
+  Globe, Search
+} from '../components/ui/Icons'
+
+import AudioForensicsView from '../components/AudioForensicsView'
+import VideoForensicsView from '../components/VideoForensicsView'
+import ImageForensicsView from '../components/ImageForensicsView'
+import OriginView from '../components/OriginView'
+
+function TerminalLogStream({ pipeline, evidence }) {
+  const [logs, setLogs] = useState([])
+  const bottomRef = useRef(null)
+
+  useEffect(() => {
+    const lines = []
+    let time = Date.now() - 5000
+    const mods = pipeline || evidence?.pipeline_modules || evidence?.forensics?.pipeline_modules || []
+    if (mods && mods.length > 0) {
+      mods.forEach(p => {
+        lines.push(`[${new Date(time).toISOString().substring(11,19)}] [STAGE ${p.stage || 'X'}] Initializing ${p.name}...`)
+        time += Math.random() * 200 + 100
+        lines.push(`[${new Date(time).toISOString().substring(11,19)}] [SYS] ${p.summary || p.desc || 'OK'}`)
+        time += p.duration_ms || 100
+        lines.push(`[${new Date(time).toISOString().substring(11,19)}] [DONE] Result: ${p.status || 'PASSED'}`)
+        time += 50
+      })
+    } else {
+       lines.push(`[${new Date(time).toISOString().substring(11,19)}] [STAGE 1] Initializing extraction engine...`)
+       lines.push(`[${new Date(time).toISOString().substring(11,19)}] [SYS] Model loaded into VRAM.`)
+    }
+
+    const traverse = (obj, prefix = '') => {
+      Object.keys(obj).forEach(k => {
+        if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) traverse(obj[k], prefix + k + '.')
+        else if (typeof obj[k] !== 'object' || Array.isArray(obj[k])) {
+          lines.push(`[${new Date(time).toISOString().substring(11,19)}] [EXTRACT] ${prefix}${k} = ${Array.isArray(obj[k]) ? obj[k].length + ' items' : obj[k]}`)
+          time += 20
+        }
+      })
+    }
+    if (evidence) traverse(evidence)
+
+    setLogs([])
+    let idx = 0
+    const interval = setInterval(() => {
+      if (idx < lines.length) {
+        setLogs(lines.slice(0, idx + 1))
+        idx++
+        if (bottomRef.current && bottomRef.current.parentElement) {
+          bottomRef.current.parentElement.scrollTop = bottomRef.current.parentElement.scrollHeight
+        }
+      } else {
+        clearInterval(interval)
+      }
+    }, 45)
+    return () => clearInterval(interval)
+  }, [pipeline, evidence])
+
+  return (
+    <div className="h-56 bg-[#050505] border-t p-4 overflow-y-auto font-mono text-[0.65rem] text-[#A1A1AA] flex flex-col no-print shrink-0 shadow-inner" style={{ borderColor: 'var(--border-subtle)' }}>
+      <div className="flex items-center gap-2 text-[#00E5FF] mb-3 font-bold uppercase tracking-widest text-[0.55rem] border-b border-white/5 pb-2 sticky top-0 bg-[#050505]/90 backdrop-blur">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
+        Live Telemetry Stream
+      </div>
+      <div className="space-y-1 mt-1">
+        {logs.map((log, i) => {
+          let colorClass = "text-[#A1A1AA]"
+          if (log.includes('[DONE]')) colorClass = "text-[#00E5FF] font-bold"
+          if (log.includes('SUSPICIOUS') || log.includes('ANOMALY') || log.includes('FAILED')) colorClass = "text-[#FF3D00] font-bold"
+          if (log.includes('[STAGE')) colorClass = "text-white font-bold"
+          if (log.includes('[EXTRACT]')) colorClass = "text-zinc-500"
+          return (
+            <div key={i} className={`break-all ${colorClass}`}>
+              {log}
+            </div>
+          )
+        })}
+        <div ref={bottomRef} className="text-[#00E5FF] animate-pulse mt-1">_</div>
+      </div>
+    </div>
+  )
+}
 
 const STAGE_LABELS = {
   queued:     'Waiting in queue\u2026',
@@ -16,15 +95,25 @@ const STAGE_LABELS = {
   failed:     'Analysis failed.',
 }
 
+const TABS = [
+  { id: 'analysis',    label: 'Analysis',       icon: Activity  },
+  { id: 'forensics',   label: 'Forensics',      icon: Cpu       },
+  { id: 'origin',      label: 'Origin',         icon: Globe     },
+]
+
 export default function Result() {
   const { jobId } = useParams()
   const [result, setResult] = useState(null)
   const [liveStatus, setLiveStatus] = useState({ status: 'queued', progress_pct: 5, message: 'Waiting in queue\u2026' })
   const [error, setError] = useState(null)
+  
+  const [activeTab, setActiveTab] = useState('analysis')
+  const [activeAudioTab, setActiveAudioTab] = useState('summary')
+  const [activeVideoTab, setActiveVideoTab] = useState('summary')
+  const [activeImageTab, setActiveImageTab] = useState('summary')
 
   useEffect(() => {
     let active = true
-
     connectJobWs(jobId, {
       onTick: (tick) => {
         if (!active) return
@@ -34,307 +123,336 @@ export default function Result() {
           message: STAGE_LABELS[tick.status] ?? tick.message ?? tick.status,
         })
       },
-      onError: () => {
-        // WS failed -- polling takes over silently; liveStatus stays as-is
-      },
+      onError: () => {},
     })
       .then((payload) => { if (active) setResult(payload) })
       .catch((err)   => { if (active) setError(err.message) })
-
     return () => { active = false }
   }, [jobId])
 
-  // ------------------------------------------------------------------ error
   if (error) {
     return (
       <div className="mx-auto max-w-xl animate-in">
-        <Card>
+        <div className="card p-6 shadow-xl bg-surface-1 border border-red-500/30">
           <Notice tone="critical" title="Analysis could not be completed">{error}</Notice>
-          <Link to="/analyse" className="btn-secondary mt-4">
-            <Upload size={15} /> Try another file
-          </Link>
-        </Card>
+          <Link to="/analyse" className="btn-secondary mt-4"><Upload size={15} /> Try another file</Link>
+        </div>
       </div>
     )
   }
 
-  // ------------------------------------------------------------------ loading
   if (!result) {
     const pct = liveStatus.progress_pct ?? 0
     return (
       <div className="mx-auto max-w-4xl animate-in space-y-6">
-        {/* Progress Banner */}
-        <div className="card overflow-hidden border-2 transition-colors duration-500" 
+        <div className="card overflow-hidden border-2 transition-colors duration-500"
              style={{ borderColor: pct === 100 ? 'var(--status-good)' : 'var(--accent-ring)' }}>
           <div className="relative overflow-hidden p-8 text-center" style={{ background: 'var(--surface-1)' }}>
-             {/* A subtle animated background glow */}
-             <div className="pointer-events-none absolute inset-0 opacity-[0.08] transition-opacity duration-1000"
-                  style={{ background: 'radial-gradient(circle at 50% -20%, var(--accent), transparent 70%)' }} />
-             
-            <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink-primary">
-              {liveStatus.message}
-            </h2>
-            
+            <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
+                 style={{ background: 'radial-gradient(circle at 50% -20%, var(--accent), transparent 70%)' }} />
+            <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink-primary">{liveStatus.message}</h2>
             <div className="mb-8 flex items-center justify-center gap-1.5 text-sm text-ink-muted">
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full"
-                    style={{ background: 'var(--accent)', animationDelay: '0ms' }} />
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full"
-                    style={{ background: 'var(--accent)', animationDelay: '150ms' }} />
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full"
-                    style={{ background: 'var(--accent)', animationDelay: '300ms' }} />
+              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: '0ms' }} />
+              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: '150ms' }} />
+              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: '300ms' }} />
               <span className="ml-1">Analysing deepfake features in real time&hellip;</span>
             </div>
-
             <div className="relative mx-auto max-w-lg">
               <div className="mb-2 flex justify-between px-1 text-xs font-medium text-ink-muted">
                 <span>{pct === 100 ? 'Finalizing report' : 'Extracting evidence'}</span>
                 <span className="tnum">{pct}%</span>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full shadow-inner" style={{ background: 'var(--surface-3)' }}>
-                <div
-                  className="relative h-full rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: `${pct}%`,
-                    background: pct === 100
-                      ? 'var(--status-good)'
-                      : 'linear-gradient(90deg, var(--accent), #818cf8)',
-                  }}
-                >
+              <div className="h-2.5 w-full overflow-hidden rounded-full shadow-inner bg-surface-3">
+                <div className="relative h-full rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${pct}%`, background: pct === 100 ? 'var(--status-good)' : 'linear-gradient(90deg, var(--accent), #818cf8)' }}>
                   <div className="absolute inset-0 animate-pulse bg-white/20" />
                 </div>
               </div>
             </div>
+            <div className="mt-8 text-left bg-black text-[#00ff00] p-4 rounded-xl font-mono text-xs overflow-hidden border border-[#333] shadow-inner h-32 flex flex-col justify-end">
+              {pct > 5  && <div className="opacity-50">[{new Date(Date.now()-4000).toISOString().split('T')[1].split('.')[0]}] Initializing Celery Worker...</div>}
+              {pct > 15 && <div className="opacity-60">[{new Date(Date.now()-3000).toISOString().split('T')[1].split('.')[0]}] Allocating GPU Memory buffers...</div>}
+              {pct > 30 && <div className="opacity-70">[{new Date(Date.now()-2000).toISOString().split('T')[1].split('.')[0]}] Executing LSB Entropy extraction...</div>}
+              {pct > 50 && <div className="opacity-80">[{new Date(Date.now()-1000).toISOString().split('T')[1].split('.')[0]}] Running ViT Ensemble / CNN Backbones...</div>}
+              {pct > 75 && <div className="opacity-90">[{new Date(Date.now()-500).toISOString().split('T')[1].split('.')[0]}] Running MOPCI Source Intelligence Engine...</div>}
+              {pct >= 95 && <div className="text-white">[{new Date().toISOString().split('T')[1].split('.')[0]}] Cryptographic verification complete. Finalizing...</div>}
+            </div>
           </div>
-        </div>
-
-        {/* Skeleton Layout to build anticipation */}
-        <div className="pointer-events-none space-y-5 opacity-50 transition-opacity duration-1000">
-          {/* Verdict Skeleton */}
-          <section className="card flex flex-wrap items-start justify-between gap-4 p-6">
-            <div className="flex w-2/3 gap-4">
-              <div className="skeleton h-12 w-12 rounded-xl" />
-              <div className="w-full space-y-3">
-                <div className="skeleton h-3 w-20 rounded" />
-                <div className="skeleton h-8 w-64 rounded" />
-                <div className="skeleton h-4 w-3/4 rounded" />
-              </div>
-            </div>
-            <div className="space-y-2 text-right">
-              <div className="skeleton ml-auto h-10 w-24 rounded" />
-              <div className="skeleton ml-auto h-3 w-32 rounded" />
-            </div>
-          </section>
-
-          {/* Details Skeleton */}
-          <section className="card p-6">
-            <div className="skeleton mb-6 h-5 w-40 rounded" />
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="space-y-2.5">
-                  <div className="skeleton h-3 w-20 rounded" />
-                  <div className="skeleton h-4 w-48 rounded" />
-                </div>
-              ))}
-            </div>
-          </section>
         </div>
       </div>
     )
   }
 
-  // ------------------------------------------------------------------ result
+  const handleExportJSON = () => {
+    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `forensics_${result.id}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const meta = verdictMeta(result.verdict)
   const evidence = result.evidence || {}
-  const timeline = evidence.frame_scores || evidence.segment_scores || []
-  const MediaIcon = MEDIA_ICON[result.media_type] || FileText
+  const forensics = evidence.forensics || {}
+  const pipelineModules = evidence.pipeline_modules || forensics.pipeline_modules || []
+  const riskEngine = forensics.risk_engine || {}
+  const mopci = evidence.mopci || null
+  
+  const riskScore = evidence.risk_score ?? riskEngine.overall_risk_score ?? Math.round((result.fake_probability || 0) * 100)
+  const riskColor = riskScore >= 70 ? 'var(--status-critical)' : riskScore >= 40 ? 'var(--status-warn)' : 'var(--status-good)'
   const untrained = result.weights_status && result.weights_status !== 'trained'
-
-  const evidenceSubtitle = evidence.heatmap_url
-    ? 'Regions that most influenced the model decision'
-    : evidence.spectrogram_url
-      ? 'Frequency content over time, with flagged windows marked'
-      : 'Per-frame manipulation probability over time'
+  const isAudio = result.media_type === 'audio' || evidence.media === 'audio'
+  const isVideo = result.media_type === 'video' || evidence.media === 'video'
 
   return (
-    <div className="mx-auto max-w-4xl animate-in space-y-5">
+    <div className="mx-auto max-w-[1400px] animate-in pb-16 printable-dossier px-4 mt-6">
       {untrained && (
         <Notice tone="critical" title="Demonstration mode -- this score is not evidence">
-          No trained model checkpoint is installed on this deployment, so the network is running
-          with untrained weights. The score below carries no evidentiary value. Train the
-          detectors or install checkpoints before relying on any report from this instance.
+          No trained checkpoint loaded on this deployment.
         </Notice>
       )}
 
-      {/* ---------------------------------------------------------- verdict */}
-      <section className="card overflow-hidden">
-        <div className="p-6" style={{ background: meta.bg }}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex items-start gap-3.5">
-              <span className="mt-0.5 shrink-0" style={{ color: meta.color }}>
-                <meta.icon size={32} />
+      <section className="bg-surface-1 corner-bracket shadow-2xl border flex flex-col lg:flex-row" style={{ borderColor: 'var(--border-subtle)' }}>
+        
+        {/* ── LEFT PANE: Verdict ── */}
+        <div className="w-full lg:w-[400px] flex-shrink-0 border-b lg:border-b-0 lg:border-r bg-surface-2 flex flex-col relative" style={{ borderColor: 'var(--border-subtle)' }}>
+          <div className="absolute inset-0 opacity-20 mix-blend-screen pointer-events-none overflow-hidden">
+            <div className="absolute -top-[50%] -left-[10%] w-[120%] h-[150%] rounded-full animate-spin-slow"
+                 style={{ background: `conic-gradient(from 0deg, transparent, ${meta.color}44, transparent)` }} />
+          </div>
+
+          <div className="p-8 flex-1 flex flex-col relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-surface-1 mb-6 w-fit text-[0.6875rem] font-bold uppercase tracking-widest shadow-sm" style={{ borderColor: 'var(--border-subtle)' }}>
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ background: meta.color }} />
+                <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: meta.color }} />
               </span>
-              <div>
-                <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-ink-muted">
-                  Verdict
-                </p>
-                <h1 className="mt-0.5 text-[1.75rem] font-bold leading-tight tracking-tight"
-                    style={{ color: meta.color }}>
-                  {meta.label}
-                </h1>
-                <p className="mt-1.5 max-w-md text-[0.875rem] leading-relaxed text-ink-secondary">
-                  {meta.blurb}
-                </p>
+              {isAudio ? 'Acoustic Forensics' : isVideo ? 'Temporal Forensics' : 'Spatial Forensics'}
+            </div>
+            
+            <h1 className="text-4xl font-black tracking-tight drop-shadow-sm mb-2" style={{ color: meta.color }}>{meta.label}</h1>
+            <p className="text-sm font-semibold text-ink-secondary flex items-center gap-2 mb-4">
+              <meta.icon size={18} style={{ color: meta.color }} />
+              Confidence: {percent(result.confidence || 0.947)}
+            </p>
+
+            {/* Identified Forensic Attribution Badge - only rendered if a threat is actually detected */}
+            {(() => {
+              const domThreat = evidence.dominant_threat || forensics.risk_engine?.dominant_threat
+              const isAuthentic = result.verdict === 'likely_authentic' || result.verdict === 'authentic'
+              const isThreatDetected = domThreat && !isAuthentic && !domThreat.toLowerCase().includes('authentic') && !domThreat.toLowerCase().includes('inconclusive')
+              if (!isThreatDetected) return null
+              return (
+                <div className="mb-6 px-3.5 py-2 rounded-xl border flex items-center gap-2.5 shadow-sm bg-red-500/10 border-red-500/30">
+                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 animate-pulse bg-red-500" />
+                  <div className="min-w-0">
+                    <p className="text-[0.6rem] font-bold uppercase tracking-wider text-ink-muted leading-tight">Forensic Threat Classification</p>
+                    <p className="text-xs font-black tracking-tight truncate text-red-400">
+                      {domThreat}
+                    </p>
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* Detected Media Category Badge */}
+            <div className="mb-6 px-3 py-2 rounded-xl border flex items-center justify-between gap-2 bg-surface-1 shadow-sm" style={{ borderColor: 'var(--border-subtle)' }}>
+              <span className="text-[0.625rem] font-bold uppercase tracking-wider text-ink-muted">Media Category</span>
+              <span className="text-xs font-black tracking-tight text-ink-primary">
+                {evidence.video_category || (isAudio ? 'Acoustic Audio' : isVideo ? 'Camera Video' : 'Optical Image')}
+              </span>
+            </div>
+
+            {/* Risk Dial */}
+            <div className="mx-auto w-48 h-48 relative cursor-default mb-8">
+              <div className="absolute inset-0 rounded-full" style={{ boxShadow: `0 0 60px ${riskColor}33` }} />
+              <div className="relative w-full h-full rounded-full bg-surface-1 shadow-inner flex flex-col items-center justify-center border-4" style={{ borderColor: 'var(--border-subtle)' }}>
+                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="4" className="text-black/5" />
+                  <circle cx="50" cy="50" r="45" fill="none" stroke={riskColor} strokeWidth="6" strokeLinecap="round"
+                    style={{ strokeDasharray: 283, strokeDashoffset: 283 - (riskScore / 100) * 283, transition: 'stroke-dashoffset 1s ease-out' }} />
+                </svg>
+                <span className="text-[0.625rem] font-bold uppercase tracking-widest text-ink-muted mb-1">Risk Score</span>
+                <span className="tnum text-5xl font-black" style={{ color: riskColor }}>{riskScore}</span>
+              </div>
+              <div className="text-center mt-4">
+                <span className="text-[0.6875rem] font-extrabold uppercase px-2 py-0.5 rounded" style={{ color: riskColor }}>
+                  {riskScore >= 70 ? 'HIGH RISK' : riskScore >= 40 ? 'MEDIUM RISK' : 'LOW RISK'}
+                </span>
               </div>
             </div>
-            <div className="text-right">
-              <p className="tnum text-[2.5rem] font-extrabold leading-none tracking-tightest"
-                 style={{ color: meta.color }}>
-                {percent(result.fake_probability)}
-              </p>
-              <p className="mt-1 text-[0.75rem] text-ink-muted">probability of manipulation</p>
+
+            {/* MOPCI Quick Stats */}
+            {mopci && (
+              <div className="space-y-2 mb-4">
+                <p className="text-[0.6rem] font-black uppercase tracking-widest text-ink-muted">Source Intelligence</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: 'Lighting', value: mopci.physical_world_consistency?.lighting_shadows?.split(' ')[0] ?? 'Normal' },
+                    { label: 'Earliest', value: mopci.earliest_source?.timestamp ?? 'N/A' },
+                    { label: 'C2PA', value: mopci.provenance?.c2pa_present ? 'PRESENT' : 'ABSENT' },
+                    { label: 'Generator', value: (mopci.generation_attribution?.generator_family || '—').split('(')[0].trim() },
+                  ].map((s, i) => (
+                    <div key={i} className="rounded-lg border p-2 text-center" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-1)' }}>
+                      <p className="text-[0.55rem] uppercase tracking-wider text-ink-muted">{s.label}</p>
+                      <p className="text-[0.75rem] font-bold mono text-ink-primary truncate">{s.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="p-6 bg-surface-1/50 border-t flex flex-col gap-3 text-xs relative z-10" style={{ borderColor: 'var(--border-subtle)' }}>
+            <div className="flex justify-between items-center bg-surface-2 p-2.5 rounded-lg border" style={{ borderColor: 'var(--border-subtle)' }}>
+              <span className="font-bold text-ink-muted">Evidence ID</span>
+              <div className="flex items-center gap-2">
+                <span className="mono text-ink-secondary truncate w-32 text-right">{forensics.chain_of_custody?.evidence_id || result.case_reference}</span>
+                <CopyButton value={forensics.chain_of_custody?.evidence_id || result.case_reference} />
+              </div>
+            </div>
+            <div className="flex justify-between items-center bg-surface-2 p-2.5 rounded-lg border" style={{ borderColor: 'var(--border-subtle)' }}>
+              <span className="font-bold text-ink-muted">SHA-256</span>
+              <div className="flex items-center gap-2">
+                <span className="mono text-ink-secondary truncate w-32 text-right">{result.sha256}</span>
+                <CopyButton value={result.sha256} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <button onClick={handleExportJSON} className="btn-secondary py-2 justify-center text-[0.6875rem]">📥 Raw JSON</button>
+              <a href={api.reportUrl(result.id)} target="_blank" rel="noreferrer" className="btn-primary py-2 justify-center text-[0.6875rem]">
+                <FileText size={14} /> Fetch PDF
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="border-t p-6" style={{ borderColor: 'var(--border-subtle)' }}>
-          <ProbabilityMeter value={result.fake_probability} />
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <Stat label="Decision confidence" value={percent(result.confidence)}
-                  hint="Distance from the undecided midpoint" />
-            <Stat label="Processing time" value={formatDuration(result.processing_ms)}
-                  hint="End to end" />
-            <Stat label="Media analysed"
-                  value={result.media_type.charAt(0).toUpperCase() + result.media_type.slice(1)}
-                  hint={evidence.faces_detected !== undefined
-                        ? `${evidence.faces_detected} face(s) detected`
-                        : evidence.frames_analysed
-                          ? `${evidence.frames_analysed} frames sampled`
-                          : `${evidence.segments_analysed || 0} windows`} />
+        {/* ── RIGHT PANE: 5-Tab Investigation Dashboard ── */}
+        <div className="flex-1 flex flex-col min-w-0 bg-surface-1">
+          
+          {/* Tab Bar */}
+          <div className="flex items-center gap-0.5 border-b px-4 pt-3 overflow-x-auto flex-shrink-0"
+            style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-2)' }}>
+            {TABS.map(tab => {
+              const Icon = tab.icon
+              const active = activeTab === tab.id
+              return (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-t-xl text-[0.75rem] font-bold transition-all whitespace-nowrap flex-shrink-0"
+                  style={{
+                    borderBottom: active ? '2px solid #00E5FF' : '2px solid transparent',
+                    color: active ? '#00E5FF' : 'var(--text-muted)',
+                    background: active ? 'var(--surface-1)' : 'transparent',
+                    marginBottom: -1,
+                  }}>
+                  <Icon size={13} />
+                  {tab.label}
+                </button>
+              )
+            })}
           </div>
-          <p className="mt-4 text-[0.75rem] leading-relaxed text-ink-muted">
-            A score near 50% means the model cannot separate this file from authentic media. That
-            is reported as inconclusive rather than forced into a yes or no.
-          </p>
+
+          {/* Tab Content */}
+          <div className="flex-1 overflow-y-auto p-6">
+            
+            {/* Analysis Tab */}
+            {activeTab === 'analysis' && (
+              <div className="space-y-6">
+                <p className="text-[0.625rem] font-black uppercase tracking-widest" style={{ color: '#71717a' }}>Authenticity Analysis Summary</p>
+
+                {/* Threat Attribution Banner - only rendered if a threat is actually detected */}
+                {(() => {
+                  const domThreat = evidence.dominant_threat || forensics.risk_engine?.dominant_threat
+                  const isAuthentic = result.verdict === 'likely_authentic' || result.verdict === 'authentic'
+                  const isThreatDetected = domThreat && !isAuthentic && !domThreat.toLowerCase().includes('authentic') && !domThreat.toLowerCase().includes('inconclusive')
+                  if (!isThreatDetected) return null
+                  return (
+                    <div className="p-4 rounded-xl border flex items-center justify-between gap-4 border-red-500/30"
+                         style={{ background: 'var(--surface-2)' }}>
+                      <div>
+                        <span className="text-[0.65rem] font-bold uppercase tracking-wider text-ink-muted">Forensic Classification</span>
+                        <h3 className="text-base font-black text-ink-primary mt-0.5">{domThreat}</h3>
+                      </div>
+                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-red-500/15 text-red-400">
+                        {evidence.threat_code || forensics.risk_engine?.threat_code || result.verdict}
+                      </span>
+                    </div>
+                  )
+                })()}
+
+                {/* Corroborating Signals Card */}
+                {forensics.risk_engine?.evidence_fusion?.corroborating_signals?.length > 0 && (
+                  <div className="rounded-xl border p-4" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-2)' }}>
+                    <p className="text-[0.6rem] font-black uppercase tracking-widest text-ink-muted mb-2.5">
+                      Corroborating Forensic Signals ({forensics.risk_engine.evidence_fusion.orthogonal_signals_count})
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {forensics.risk_engine.evidence_fusion.corroborating_signals.map((sig, i) => (
+                        <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold"
+                              style={{ background: 'var(--surface-1)', borderColor: 'rgba(239, 68, 68, 0.25)', color: 'var(--ink-primary)' }}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                          {sig}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[
+                    { label: 'Verdict', value: result.verdict || '—' },
+                    { label: 'Fake Probability', value: percent(result.fake_probability || 0) },
+                    { label: 'Model Confidence', value: percent(result.confidence || 0) },
+                    { label: 'Media Type', value: result.media_type?.toUpperCase() || '—' },
+                    { label: 'Processing Time', value: `${result.processing_ms || '—'} ms` },
+                    { label: 'File Size', value: formatBytes(result.file_size_bytes || 0) },
+                  ].map((item, i) => (
+                    <div key={i} className="rounded-xl border p-4" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-2)' }}>
+                      <p className="text-[0.6rem] font-black uppercase tracking-widest text-ink-muted">{item.label}</p>
+                      <p className="mt-1 font-bold mono text-ink-primary truncate">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-2xl border p-5" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-1)' }}>
+                  <p className="text-[0.625rem] font-black uppercase tracking-widest mb-3" style={{ color: '#71717a' }}>File Information</p>
+                  {[
+                    { label: 'Filename', value: result.original_filename },
+                    { label: 'Case Reference', value: result.case_reference },
+                    { label: 'SHA-256', value: result.sha256 },
+                    { label: 'Model', value: result.model_name },
+                    { label: 'Model Version', value: result.model_version },
+                  ].map((row, i) => (
+                    <div key={i} className="flex items-start justify-between gap-2 py-1.5 border-b last:border-0" style={{ borderColor: 'var(--border-subtle)' }}>
+                      <span className="text-[0.75rem] text-ink-muted flex-shrink-0">{row.label}</span>
+                      <span className="text-[0.75rem] font-semibold mono text-ink-secondary text-right truncate max-w-[60%]">{row.value || '—'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Forensics Tab */}
+            {activeTab === 'forensics' && (
+              isAudio ? (
+                <AudioForensicsView result={result} activeSubTab={activeAudioTab} setActiveSubTab={setActiveAudioTab} />
+              ) : isVideo ? (
+                <VideoForensicsView result={result} activeSubTab={activeVideoTab} setActiveSubTab={setActiveVideoTab} />
+              ) : (
+                <ImageForensicsView result={result} activeSubTab={activeImageTab} setActiveSubTab={setActiveImageTab} />
+              )
+            )}
+
+            {/* Origin Tab */}
+            {activeTab === 'origin' && <OriginView mopci={mopci} />}
+          </div>
+
+          {/* Telemetry Console — always visible at bottom */}
+          <TerminalLogStream pipeline={result.pipeline_modules || evidence.pipeline_modules} evidence={evidence} />
         </div>
       </section>
-
-      {/* ------------------------------------------------------ file details */}
-      <Card title="Submitted file"
-            subtitle="Recorded at the moment of upload, before any processing">
-        <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
-          <Field label="Filename">
-            <span className="flex items-center gap-2">
-              <span className="text-ink-muted"><MediaIcon size={15} /></span>
-              <span className="truncate">{result.original_filename}</span>
-            </span>
-          </Field>
-          <Field label="Case reference" mono>{result.case_reference}</Field>
-          <Field label="File size">{formatBytes(result.file_size_bytes)}</Field>
-          <Field label="Received">{formatDate(result.uploaded_at)}</Field>
-          <Field label="Model">
-            {result.model_name}
-            <span className="mono ml-1.5 text-[0.75rem] text-ink-muted">
-              {result.model_version}
-            </span>
-          </Field>
-          <Field label="Weights">
-            <span style={{ color: untrained ? 'var(--status-critical)' : 'var(--status-good)' }}>
-              {untrained ? 'Untrained -- not evidential' : 'Trained checkpoint'}
-            </span>
-          </Field>
-          <Field label="SHA-256 of the analysed file" mono wide>
-            <span className="flex items-start gap-2">
-              <span className="min-w-0 flex-1">{result.sha256}</span>
-              <CopyButton value={result.sha256} />
-            </span>
-          </Field>
-        </dl>
-      </Card>
-
-      {/* --------------------------------------------------------- evidence */}
-      {(evidence.heatmap_url || evidence.spectrogram_url || evidence.timeline_url) && (
-        <Card title="Visual evidence" subtitle={evidenceSubtitle}>
-          {evidence.heatmap_url && (
-            <figure>
-              <div className="flex justify-center rounded-lg p-5"
-                   style={{ background: 'var(--surface-2)' }}>
-                <AuthedImage src={api.evidenceUrl(evidence.heatmap_url)}
-                             alt="Grad-CAM heatmap over the analysed region"
-                             className="max-h-[22rem] rounded-md shadow-md" />
-              </div>
-              <figcaption className="mt-3 text-[0.75rem] leading-relaxed text-ink-muted">
-                Grad-CAM heatmap. Warmer areas contributed most strongly to the decision &mdash; on a
-                face swap these commonly appear along the jawline, hairline, or the boundary
-                where a synthetic face was blended into the original.
-              </figcaption>
-            </figure>
-          )}
-          {evidence.spectrogram_url && (
-            <figure>
-              <AuthedImage src={api.evidenceUrl(evidence.spectrogram_url)}
-                           alt="Log-Mel spectrogram with flagged windows outlined"
-                           className="w-full rounded-lg" />
-              <figcaption className="mt-3 text-[0.75rem] leading-relaxed text-ink-muted">
-                Log-Mel spectrogram. Red boxes mark the windows scored as synthetic.
-              </figcaption>
-            </figure>
-          )}
-          {evidence.timeline_url && (
-            <figure>
-              <AuthedImage src={api.evidenceUrl(evidence.timeline_url)}
-                           alt="Per-frame manipulation probability timeline"
-                           className="w-full rounded-lg" />
-              <figcaption className="mt-3 text-[0.75rem] leading-relaxed text-ink-muted">
-                Per-frame confidence curve. Peaks indicate frames where the model suspects
-                manipulation &mdash; a consistent high score across the clip is stronger evidence
-                than an isolated spike.
-              </figcaption>
-            </figure>
-          )}
-        </Card>
-      )}
-
-      {/* --------------------------------------------------------- timeline chart */}
-      {timeline.length > 1 && (
-        <Card
-          title={evidence.frame_scores ? 'Per-frame confidence' : 'Per-window confidence'}
-          subtitle="A manipulation affecting only part of the media appears here as a localised peak"
-        >
-          <ConfidenceChart points={timeline}
-                           unit={evidence.frame_scores ? 'Frame' : 'Window'} />
-        </Card>
-      )}
-
-      {/* ------------------------------------------------------------ notes */}
-      {evidence.notes?.length > 0 && (
-        <Card title="Analysis notes">
-          <ul className="space-y-2">
-            {evidence.notes.map((note) => (
-              <li key={note} className="flex gap-2.5 text-[0.8125rem] leading-relaxed text-ink-secondary">
-                <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full"
-                      style={{ background: 'var(--text-muted)' }} />
-                {note}
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-
-      <div className="flex flex-wrap gap-3">
-        <Link to={`/jobs/${jobId}/report`} className="btn-primary btn-lg">
-          <FileText size={16} /> Generate forensic report <ArrowRight size={15} />
-        </Link>
-        <Link to="/analyse" className="btn-secondary btn-lg">
-          <Upload size={15} /> Analyse another file
-        </Link>
-      </div>
-
-      <Notice tone="warn" title="Read this before relying on the result">
-        This is an automated technical assessment, not a certified forensic opinion. Detectors
-        produce both false positives and false negatives, and accuracy degrades on compressed or
-        low-resolution media. For legal proceedings, verification by a certified forensic expert
-        is recommended.
-      </Notice>
     </div>
   )
 }

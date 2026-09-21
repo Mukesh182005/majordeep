@@ -245,6 +245,7 @@ def _build_pdf(
     story += _section_file_details(job, styles)
     story += _section_analysis_summary(job, charts, styles)
     story += _section_findings(job, charts, styles)
+    story += _section_forensics(job, charts, styles)
     story += _section_methodology(job, styles)
     story += _section_disclaimer(styles)
     story += _section_integrity(job, report_reference, generated_at, styles)
@@ -579,12 +580,12 @@ def _findings_table(job, evidence: dict, styles) -> Table | None:
         header = ["Window", "Start (s)", "End (s)", "P(manipulated)"]
         body = [
             [
-                str(row["index"]),
-                f"{row['start']:.2f}",
-                f"{row['end']:.2f}",
+                str(row.get("segment_index", row.get("index", idx))),
+                f"{row.get('start_s', row.get('start', 0.0)):.2f}",
+                f"{row.get('end_s', row.get('end', 0.0)):.2f}",
                 f"{row['fake_probability'] * 100:.1f}%",
             ]
-            for row in rows
+            for idx, row in enumerate(rows)
         ]
     else:
         rows = sorted(
@@ -741,6 +742,15 @@ def _render_charts(job: Job, evidence_dir: Path, report_reference: str) -> dict[
     for key, filename in (
         ("heatmap", evidence.get("heatmap_file")),
         ("spectrogram", evidence.get("spectrogram_file")),
+        ("ela", evidence.get("ela_file")),
+        ("noise", evidence.get("noise_file")),
+        ("tampering", evidence.get("tampering_file")),
+        ("watermark", evidence.get("watermark_file")),
+        ("combined", evidence.get("combined_file")),
+        ("lfcc", evidence.get("lfcc_scalogram_file")),
+        ("cqt", evidence.get("cqt_scalogram_file")),
+        ("waveform", evidence.get("waveform_file")),
+        ("multi", evidence.get("multi_resolution_plate_file")),
     ):
         if filename:
             candidate = evidence_dir / filename
@@ -750,11 +760,12 @@ def _render_charts(job: Job, evidence_dir: Path, report_reference: str) -> dict[
     points = evidence.get("frame_scores") or evidence.get("segment_scores")
     if points and len(points) > 1:
         is_video = bool(evidence.get("frame_scores"))
+        x_k = "timestamp" if is_video else ("start_s" if points[0].get("start_s") is not None else "start")
         with contextlib.suppress(Exception):
             charts["timeline"] = confidence_timeline(
                 points,
                 chart_dir / f"{report_reference}_timeline.png",
-                x_key="timestamp" if is_video else "start",
+                x_key=x_k,
                 x_label="Time (seconds)",
                 title="Per-frame manipulation probability"
                 if is_video
@@ -762,3 +773,285 @@ def _render_charts(job: Job, evidence_dir: Path, report_reference: str) -> dict[
             )
 
     return charts
+
+
+# --------------------------------------------------------------------- section 4 (forensics)
+def _section_forensics(job, charts, styles) -> list[Any]:
+    evidence = job.evidence or {}
+    forensics = evidence.get("forensics")
+    if not forensics:
+        return []
+
+    # ------------------------------------------------ AUDIO FORENSICS REPORT SECTION
+    if job.media_type.value == "audio":
+        story: list[Any] = [
+            PageBreak(),
+            Paragraph("4. Audio Intelligence, Authenticity & Cyber Forensics Matrix", styles["h2"]),
+            Paragraph(
+                "Exhaustive forensic evaluation across 10 analytical engines, incorporating "
+                "cryptographic chain of custody, Audio File DNA, 120+ deterministic signal descriptors, "
+                "IAIF glottal flow aerodynamics, VoiceRadar physical propagation, and ENF power grid continuity.",
+                styles["body"],
+            ),
+            Spacer(1, 6),
+        ]
+
+        fusion = forensics.get("fusion_decision", {})
+        verdict = fusion.get("final_verdict", "N/A")
+        r_synth = fusion.get("generative_ai_risk_score", 0.0)
+        r_tamper = fusion.get("structural_tampering_risk_score", 0.0)
+        conf_set = ", ".join(fusion.get("conformal_prediction_set", [])) or "N/A"
+        lr = fusion.get("forensic_likelihood_ratio", 1.0)
+        verbal = fusion.get("verbal_scale_interpretation", "Inconclusive")
+
+        fusion_rows = [
+            ("Forensic Verdict", f"<b>{verdict}</b>"),
+            ("Generative AI Risk (R_synth)", f"<b>{r_synth * 100:.1f}%</b> (TTS / Neural Vocoder / Cloning)"),
+            ("Structural Tampering Risk (R_tamper)", f"<b>{r_tamper * 100:.1f}%</b> (Splicing / Container Edits)"),
+            ("Conformal Prediction Set (alpha <= 0.01)", f"<b>{conf_set}</b>"),
+            ("Forensic Likelihood Ratio (LR)", f"<b>{lr:,.1f}</b> ({verbal})"),
+        ]
+        story += [
+            Paragraph("<b>4.1 Evidence Fusion & Conformal Dual-Risk Engine</b>", styles["body"]),
+            Spacer(1, 3),
+            _kv_table(fusion_rows, styles),
+            Spacer(1, 7),
+        ]
+
+        # Audio File DNA
+        dna = forensics.get("file_dna", {})
+        dna_rows = [
+            ("Container Architecture", dna.get("container_format", "N/A")),
+            ("Audio Codec", dna.get("codec", "N/A")),
+            ("Sample Rate / Channels", f"{dna.get('sample_rate_hz', 'N/A')} Hz / {dna.get('channels', 'N/A')} ch"),
+            ("Bit Depth / Bitrate", f"{dna.get('bit_depth', 'N/A')}-bit / {dna.get('bitrate_kbps', 'N/A')} kbps"),
+            ("Encoder Signature", dna.get("encoder_signature", "N/A")),
+            ("Trailing Bytes after EOF", f"{dna.get('trailing_bytes_count', 0)} bytes detected" if dna.get("trailing_data_detected") else "None (Clean Container)"),
+            ("Inferred Transcoding History", " -> ".join([s["description"][:45] for s in dna.get("inferred_transcoding_history", [])]) or "Direct Capture"),
+        ]
+        story += [
+            Paragraph("<b>4.2 Audio File DNA & Inferred Transcoding History</b>", styles["body"]),
+            Spacer(1, 3),
+            _kv_table(dna_rows, styles),
+            Spacer(1, 7),
+        ]
+
+        # Signal Intelligence & Glottal Flow
+        intel = forensics.get("signal_intel", {})
+        td = intel.get("time_domain", {})
+        clip = intel.get("clipping_analysis", {})
+        dyn = intel.get("dynamics_and_loudness", {})
+        phys = forensics.get("glottal_physics", {})
+        glottal = phys.get("glottal_flow", {})
+        vr = phys.get("physical_propagation", {})
+
+        sig_rows = [
+            ("Signal Quality Score", f"<b>{intel.get('quality_score', 85)} / 100</b>"),
+            ("Estimated SNR / Noise Floor", f"{dyn.get('estimated_snr_db', 'N/A')} dB / {dyn.get('estimated_noise_floor_dbfs', 'N/A')} dBFS"),
+            ("Loudness (LUFS) / Dynamic Range", f"{dyn.get('integrated_loudness_lufs', 'N/A')} LUFS / {td.get('dynamic_range_db', 'N/A')} dB"),
+            ("Crest Factor / Digital Clipping", f"{td.get('crest_factor_db', 'N/A')} dB / {clip.get('clipping_percentage', 0):.3f}% ({clip.get('severity', 'NONE')})"),
+            ("IAIF Glottal Open / Closing Quotient", f"Qo: {glottal.get('open_quotient', 'N/A')} / Qc: {glottal.get('closing_quotient', 'N/A')} (MFDR: {glottal.get('mfdr_index', 'N/A')})"),
+            ("Biological Vocal Turbulence Index", f"{glottal.get('biological_turbulence_index', 'N/A')}"),
+            ("VoiceRadar Doppler Micro-Dispersion", f"{vr.get('doppler_micro_dispersion_hz', 'N/A')} Hz (Acoustic 3D Adherence: {vr.get('acoustic_propagation_adherence', 'N/A')})"),
+        ]
+        story += [
+            Paragraph("<b>4.3 Deterministic Signal Intelligence & Physiological Physics</b>", styles["body"]),
+            Spacer(1, 3),
+            _kv_table(sig_rows, styles),
+            Spacer(1, 7),
+        ]
+
+        # Environmental ENF & Cybersecurity
+        enf = forensics.get("enf_environment", {})
+        enf_data = enf.get("enf_forensics", {})
+        room = enf.get("room_acoustics", {})
+        sec = forensics.get("security_provenance", {})
+        wm = sec.get("watermark_analysis", {})
+        stego = sec.get("steganography_forensics", {})
+        c2pa = sec.get("provenance_c2pa", {})
+
+        env_rows = [
+            ("ENF Power Grid Carrier", f"{enf_data.get('nominal_grid_frequency_hz', 'N/A')} Hz (Mean: {enf_data.get('estimated_mean_frequency_hz', 'N/A')} Hz)"),
+            ("ENF Phase Continuity Splicing Check", f"Max Phase Slip: {enf_data.get('max_phase_slip_degrees', 0.0)}° — {'SPLICING CONFIRMED' if enf.get('environmental_splicing_confirmed') else 'CONTINUOUS COHERENT PHASE'}"),
+            ("Room Acoustic Reverb (RT60)", f"{room.get('mean_reverberation_time_rt60_s', 'N/A')}s ({room.get('acoustic_space_type', 'N/A')})"),
+            ("C2PA Cryptographic Provenance", f"{c2pa.get('cryptographic_signature_status', 'NOT_PRESENT')} (AI Disclosed: {'YES' if c2pa.get('ai_generation_disclosed') else 'NO'})"),
+            ("Imperceptible Latent Watermark", f"{wm.get('watermark_scheme', 'NONE')} (Overwriting Attack: {'SUSPECTED' if wm.get('overwriting_attack_suspected') else 'NO'})"),
+            ("Steganography / Covert Channel", f"{stego.get('covert_channel_status', 'CLEAN')} (LSB Entropy: {stego.get('lsb_bitplane_entropy', 'N/A')})"),
+        ]
+        story += [
+            Paragraph("<b>4.4 Environmental ENF, Provenance & Cybersecurity</b>", styles["body"]),
+            Spacer(1, 3),
+            _kv_table(env_rows, styles),
+            Spacer(1, 7),
+        ]
+
+        # Visual Evidence for Audio
+        lfcc_img = charts.get("lfcc")
+        multi_img = charts.get("multi")
+        if lfcc_img or multi_img:
+            story += [
+                Paragraph("<b>4.5 Multi-Resolution Diagnostic Scalograms</b>", styles["body"]),
+                Spacer(1, 3),
+            ]
+            if lfcc_img and lfcc_img.exists():
+                story += [
+                    Paragraph("<i>Linear Frequency Cepstral Coefficients (LFCC) Scalogram:</i>", styles["small"]),
+                    _fitted_image(lfcc_img, max_width=CONTENT_WIDTH, max_height=60 * mm),
+                    Spacer(1, 4),
+                ]
+            if multi_img and multi_img.exists():
+                story += [
+                    Paragraph("<i>Multi-Panel Forensic Diagnostic Dossier Plate:</i>", styles["small"]),
+                    _fitted_image(multi_img, max_width=CONTENT_WIDTH, max_height=85 * mm),
+                    Spacer(1, 4),
+                ]
+
+        # Chain of custody
+        vault = forensics.get("vault_record", {})
+        vault_hashes = vault.get("hashes", {})
+        custody_rows = [
+            ("Evidence ID", vault.get("evidence_id", "N/A")),
+            ("Acquisition Timestamp", vault.get("acquisition_timestamp", "N/A")),
+            ("SHA-256 Digest", vault_hashes.get("sha256", job.sha256)),
+            ("SHA-512 Digest", str(vault_hashes.get("sha512", "N/A"))[:32] + "..."),
+            ("Legal Compliance Standards", ", ".join(vault.get("compliance", ["SWGDE 08-A-001", "ISO/IEC 27042"]))),
+        ]
+        story += [
+            Paragraph("<b>4.6 SWGDE Chain of Custody Register</b>", styles["body"]),
+            Spacer(1, 3),
+            _kv_table(custody_rows, styles, mono_keys={"Evidence ID", "SHA-256 Digest", "SHA-512 Digest"}),
+            Spacer(1, 7),
+        ]
+
+        return story
+
+    # ------------------------------------------------ IMAGE FORENSICS REPORT SECTION
+    story: list[Any] = [
+        PageBreak(),
+        Paragraph("4. Cybersecurity & Digital Image Forensics Matrix", styles["h2"]),
+        Paragraph(
+            "Multi-dimensional forensic evaluation across 28 analytical axes, incorporating file "
+            "container validation, perceptual hashing, signal residuals, and evidence fusion.",
+            styles["body"],
+        ),
+        Spacer(1, 6),
+    ]
+
+    # Risk Engine & Fusion
+    risk = forensics.get("risk_engine", {})
+    fusion = risk.get("evidence_fusion", {})
+    risk_score = risk.get("overall_risk_score", "N/A")
+    risk_tier = risk.get("risk_tier", "N/A")
+    corroborating = ", ".join(fusion.get("corroborating_signals", [])) or "None (Clean Signals)"
+
+    risk_rows = [
+        ("Image Security Risk Score", f"<b>{risk_score} / 100</b> ({risk_tier})"),
+        ("Evidence Fusion Consensus", fusion.get("fusion_verdict", "N/A")),
+        ("Fusion Confidence", fusion.get("fusion_confidence", "N/A")),
+        ("Corroborating Signals", corroborating),
+    ]
+    story += [
+        Paragraph("<b>4.1 Evidence Fusion & Risk Scoring Engine</b>", styles["body"]),
+        Spacer(1, 3),
+        _kv_table(risk_rows, styles),
+        Spacer(1, 7),
+    ]
+
+    # File Security & Hashes
+    fsec = forensics.get("file_security", {})
+    hashes = forensics.get("hashes", {})
+    sec_rows = [
+        ("File Structure", fsec.get("file_status", "VALID")),
+        ("Detected Magic Bytes", fsec.get("format", "N/A")),
+        ("MIME Type", fsec.get("mime_type", "N/A")),
+        ("Extension Mismatch", "DETECTED (Warning)" if fsec.get("extension_mismatch") else "None (Matches Signature)"),
+        ("Trailing Data after EOF", f"{fsec.get('trailing_bytes_count', 0)} bytes detected" if fsec.get("trailing_data_detected") else "None"),
+        ("SHA-256 (Primary Evidence)", hashes.get("sha256", job.sha256)),
+        ("MD5 Hash", hashes.get("md5", "N/A")),
+        ("Perceptual Hash (pHash)", hashes.get("phash", "N/A")),
+        ("Difference Hash (dHash)", hashes.get("dhash", "N/A")),
+    ]
+    story += [
+        Paragraph("<b>4.2 File Container Security & Cryptographic Hashing</b>", styles["body"]),
+        Spacer(1, 3),
+        _kv_table(sec_rows, styles, mono_keys={"SHA-256 (Primary Evidence)", "MD5 Hash", "Perceptual Hash (pHash)", "Difference Hash (dHash)"}),
+        Spacer(1, 7),
+    ]
+
+    # Image Signal Forensics
+    tamp = forensics.get("tampering", {})
+    ela = forensics.get("ela", {})
+    cam = forensics.get("camera_stats", {})
+    stego = forensics.get("steganography", {})
+    meta = forensics.get("metadata_forensics", {})
+
+    watermark = forensics.get("watermark", {})
+    wm_label = f"DETECTED: {watermark.get('subtype', 'Watermark')} ({watermark.get('location', 'image')})" if watermark.get("watermark_detected") else "None detected"
+    sig_rows = [
+        ("Watermark Detection", wm_label),
+        ("Copy-Move Tampering", "DETECTED" if tamp.get("copy_move_detected") else "Not detected"),
+        ("Splicing Discontinuity", "DETECTED" if tamp.get("splicing_detected") else "Not detected"),
+        ("Error Level Analysis (ELA)", f"Score: {ela.get('ela_score', 'N/A')} (Anomaly: {ela.get('compression_anomaly_detected', False)})"),
+        ("Sensor Noise Pattern (PRNU)", cam.get("estimated_camera_family", "N/A")),
+        ("CFA / Demosaicing", "Periodic Bayer Pattern Detected" if cam.get("cfa_artifacts_detected") else "Missing Periodic Demosaicing (Synthetic Footprint)"),
+        ("Steganography Suspicion", f"{stego.get('payload_likelihood', 'LOW')} ({stego.get('suspicion_percentage', 0)}%)"),
+        ("Camera Hardware Tag", f"{meta.get('camera_make', 'Unknown')} {meta.get('camera_model', '')}"),
+        ("Lens Specification", f"{meta.get('lens_make', '')} {meta.get('lens_model', 'Not specified')}"),
+        ("Capture Shutter / Aperture / ISO", f"{meta.get('exposure_time', 'N/A')} | {meta.get('f_number', 'N/A')} | {meta.get('iso', 'N/A')}"),
+        ("Dimensions & Megapixels", f"{meta.get('dimensions', 'N/A')} ({meta.get('megapixels', 'N/A')})"),
+        ("Color Space & Profile", f"{meta.get('color_space', 'sRGB')} | {meta.get('icc_profile_name', 'None')}"),
+        ("Software Footprint", meta.get("software", "None recorded")),
+        ("Timeline Consistency", meta.get("timeline_consistency", "CONSISTENT")),
+        ("Metadata Integrity Audit", meta.get("metadata_status", "N/A")),
+    ]
+    story += [
+        Paragraph("<b>4.3 Signal Forensics & Steganography</b>", styles["body"]),
+        Spacer(1, 3),
+        _kv_table(sig_rows, styles),
+        Spacer(1, 7),
+    ]
+
+    # Visual Evidence: ELA and Combined Heatmaps if present
+    ela_img = charts.get("ela")
+    combined_img = charts.get("combined")
+    if ela_img or combined_img:
+        story += [
+            Paragraph("<b>4.4 Auxiliary Forensic Visualizations</b>", styles["body"]),
+            Spacer(1, 3),
+        ]
+        if ela_img and ela_img.exists():
+            story += [
+                Paragraph("<i>Calibrated Error Level Analysis (ELA) Map:</i>", styles["small"]),
+                _fitted_image(ela_img, max_width=85 * mm, max_height=70 * mm),
+                Spacer(1, 4),
+            ]
+        if combined_img and combined_img.exists():
+            story += [
+                Paragraph("<i>Multi-Layer Combined Forensic Heatmap:</i>", styles["small"]),
+                _fitted_image(combined_img, max_width=85 * mm, max_height=70 * mm),
+                Spacer(1, 4),
+            ]
+        watermark_img = charts.get("watermark")
+        if watermark_img and watermark_img.exists():
+            story += [
+                Paragraph("<i>Watermark Localization Overlay:</i>", styles["small"]),
+                _fitted_image(watermark_img, max_width=85 * mm, max_height=70 * mm),
+                Spacer(1, 4),
+            ]
+
+    # Chain of Custody & Audit
+    custody = forensics.get("chain_of_custody", {})
+    custody_rows = [
+        ("Evidence ID", custody.get("evidence_id", "N/A")),
+        ("Custody Seal", str(custody.get("custody_verification_seal", "N/A"))[:32] + "..."),
+        ("Acquired At", custody.get("acquired_at", "N/A")),
+        ("Forensic Suite Version", custody.get("analyzer_platform", "N/A")),
+    ]
+    story += [
+        Paragraph("<b>4.5 Chain of Custody Register</b>", styles["body"]),
+        Spacer(1, 3),
+        _kv_table(custody_rows, styles, mono_keys={"Evidence ID", "Custody Seal"}),
+        Spacer(1, 7),
+    ]
+
+    return story

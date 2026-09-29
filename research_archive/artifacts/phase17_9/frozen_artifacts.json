@@ -1,0 +1,19 @@
+{
+    "phase": "17.9",
+    "parent_phase": "17.8R",
+    "status": "FROZEN",
+    "resnet_checkpoint": "training/V2-PHASE17/experiment_A/checkpoint.pt",
+    "resnet_sha256": "d79f4fc492e6077eb6d470341c00cdd0cd298f228e738f982e97e4f15ed667ef",
+    "vit1_model": "umm-maybe/AI-image-detector",
+    "vit2_model": "umm-maybe/AI-image-detector (sdxl)",
+    "fusion_model": "logistic_regression",
+    "fusion_sha256": "6fa78e1b3d688cf2f41bb92f398e4f16b24d775191e4ab61234c9f1165da00f7",
+    "feature_order": [
+        "resnet",
+        "vit_1",
+        "vit_2"
+    ],
+    "calibration": "logistic_platt_scaling",
+    "thresholds": "frozen_v2_default",
+    "ood_config": "frozen_v2_default"
+}

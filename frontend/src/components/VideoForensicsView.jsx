@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, SplitLoupeOverlay } from './ui'
 import AuthedImage from './AuthedImage'
@@ -7,19 +7,20 @@ import {
   Hash, Info, ShieldAlert, ShieldCheck, Video as VideoIcon, Zap,
 } from './ui/Icons'
 import { percent } from '../lib/format'
+import VideoPipelineVisualizer from './VideoPipelineVisualizer'
 
 export const VIDEO_PIPELINE_STAGES = [
-  { id: 1, name: 'Container & Bitstream Forensics',          desc: 'Binary parsing of ISO Base Media boxes (ftyp, moov, trak, mdat) and metadata' },
-  { id: 2, name: 'Scene & Shot Boundary Segmentation',      desc: 'Bhattacharyya color/edge delta boundary segmentation for independent scene evaluation' },
-  { id: 3, name: 'Spatial Neural & Generative AI Backbone', desc: 'Running neural facial detector and ViT full-scene generative artifact backbones' },
-  { id: 4, name: '28-Module Image Forensic Engine',         desc: 'Evaluated CFA Bayer periodicity, Fourier radial slope alpha, ELA, and synthetic background matte voids on keyframes' },
-  { id: 5, name: 'Temporal Jitter & Facial Dynamics',       desc: 'Measuring bounding box acceleration, facial landmark trajectory, and ocular blink synchrony' },
-  { id: 6, name: 'Remote Photoplethysmography (rPPG)',       desc: 'Cardiovascular Blood Volume Pulse (BVP) extraction from capillary reflectance (0.75-2.5 Hz)' },
-  { id: 7, name: 'Spatio-Temporal 4D Tensor Dynamics',      desc: 'TimeSformer divided space-time patch variance, latent denoise jumps, and SlowFast boundary vibration' },
-  { id: 8, name: 'LipForensics Articulatory Kinematics',    desc: 'Oral kinematic velocity, 2nd-derivative articulatory jerk, and phonetic coarticulation smoothness' },
-  { id: 9, name: 'Optical Flow Motion Decomposition',       desc: 'Farneback dense optical flow computing motion vector divergence at composition seams' },
-  { id: 10, name: 'Acoustic Speech & Cross-Modal Lip-Sync',  desc: 'Audio demuxing, LCNN Voice AI, glottal IAIF flow physics, and speech-to-lip aperture correlation' },
-  { id: 11, name: 'AI Generator Attribution Engine',         desc: 'Intrinsic physical & latent diffusion matching (Sora, Gemini/Veo, Kling, Runway, Luma) without watermarks' },
+  { id: 1,  stage: 1,  name: 'Container & Bitstream Forensics',          desc: 'Binary parsing of ISO Base Media boxes (ftyp, moov, trak, mdat) and metadata' },
+  { id: 2,  stage: 2,  name: 'Scene & Shot Boundary Segmentation',      desc: 'Bhattacharyya color/edge delta boundary segmentation for independent scene evaluation' },
+  { id: 3,  stage: 3,  name: 'Spatial Neural & Generative AI Backbone', desc: 'Running neural facial detector and ViT full-scene generative artifact backbones' },
+  { id: 4,  stage: 4,  name: '28-Module Image Forensic Engine',         desc: 'Evaluated CFA Bayer periodicity, Fourier radial slope alpha, ELA, and synthetic background matte voids on keyframes' },
+  { id: 5,  stage: 5,  name: 'Temporal Jitter & Facial Dynamics',       desc: 'Measuring bounding box acceleration, facial landmark trajectory, and ocular blink synchrony' },
+  { id: 6,  stage: 6,  name: 'Remote Photoplethysmography (rPPG)',       desc: 'Cardiovascular Blood Volume Pulse (BVP) extraction from capillary reflectance (0.75-2.5 Hz)' },
+  { id: 7,  stage: 7,  name: 'Spatio-Temporal 4D Tensor Dynamics',      desc: 'TimeSformer divided space-time patch variance, latent denoise jumps, and SlowFast boundary vibration' },
+  { id: 8,  stage: 8,  name: 'LipForensics Articulatory Kinematics',    desc: 'Oral kinematic velocity, 2nd-derivative articulatory jerk, and phonetic coarticulation smoothness' },
+  { id: 9,  stage: 9,  name: 'Optical Flow Motion Decomposition',       desc: 'Farneback dense optical flow computing motion vector divergence at composition seams' },
+  { id: 10, stage: 10, name: 'Acoustic Speech & Cross-Modal Lip-Sync',  desc: 'Audio demuxing, LCNN Voice AI, glottal IAIF flow physics, and speech-to-lip aperture correlation' },
+  { id: 11, stage: 11, name: 'AI Generator Attribution Engine',         desc: 'Intrinsic physical & latent diffusion matching (Sora, Gemini/Veo, Kling, Runway, Luma) without watermarks' },
 ]
 
 function VideoScoreBar({ value = 0, color = '#ef4444', label, sub }) {
@@ -321,17 +322,18 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
           >
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {(evidence.pipeline_modules?.length ? evidence.pipeline_modules : VIDEO_PIPELINE_STAGES).map((mod, idx) => {
-                const stageNum = mod.stage || idx + 1
+                const stageNum = mod.stage || mod.id || idx + 1
                 const st = mod.status || 'PASSED'
                 const isBad = ['SUSPICIOUS', 'AI_FLAGGED', 'ANOMALY_DETECTED', 'FAILED'].includes(st)
+                const isWarn = ['INCONCLUSIVE', 'INSUFFICIENT_FACE_FRAMES', 'INSUFFICIENT_FACE_SAMPLES', 'SKIPPED'].includes(st)
                 return (
                   <div
                     key={stageNum}
                     onClick={() => setActiveSubTab('pipeline')}
                     className="cursor-pointer rounded-xl border p-3 flex flex-col justify-between transition hover:border-accent hover:shadow-sm"
                     style={{
-                      borderColor: isBad ? 'rgba(239,68,68,0.35)' : 'var(--border-subtle)',
-                      background: isBad ? 'rgba(239,68,68,0.04)' : 'var(--surface-2)',
+                      borderColor: isBad ? 'rgba(239,68,68,0.35)' : isWarn ? 'rgba(245,158,11,0.35)' : 'var(--border-subtle)',
+                      background: isBad ? 'rgba(239,68,68,0.04)' : isWarn ? 'rgba(245,158,11,0.04)' : 'var(--surface-2)',
                     }}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -339,8 +341,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                         <span
                           className="flex h-5 w-5 items-center justify-center rounded-full text-[0.625rem] font-black"
                           style={{
-                            background: isBad ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
-                            color: isBad ? 'var(--status-critical)' : 'var(--status-good)',
+                            background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(245,158,11,0.15)' : 'var(--status-good-bg)',
+                            color: isBad ? 'var(--status-critical)' : isWarn ? 'var(--status-warn)' : 'var(--status-good)',
                           }}
                         >
                           {stageNum}
@@ -352,11 +354,11 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                       <span
                         className="text-[0.5625rem] font-bold uppercase px-1.5 py-0.5 rounded mono"
                         style={{
-                          background: isBad ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
-                          color: isBad ? 'var(--status-critical)' : 'var(--status-good)',
+                          background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(245,158,11,0.15)' : 'var(--status-good-bg)',
+                          color: isBad ? 'var(--status-critical)' : isWarn ? 'var(--status-warn)' : 'var(--status-good)',
                         }}
                       >
-                        {st.replace('_', ' ')}
+                        {st.replace(/_/g, ' ')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-[0.625rem] text-ink-muted mt-2 pt-1.5 border-t border-subtle">
@@ -706,195 +708,10 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
 
       {/* ── TAB 3: Pipeline Stages ────────────────────────────────────────── */}
       {currentTab === 'pipeline' && (
-        <div className="space-y-6">
-          {/* Executive Pipeline Audit Header */}
-          <div className="p-5 rounded-2xl border bg-surface-2 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm" style={{ borderColor: 'var(--border-subtle)' }}>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
-                <span className="text-[0.6875rem] font-bold uppercase tracking-wider text-ink-muted">Sequential Multi-Modal Architecture</span>
-              </div>
-              <h2 className="text-xl font-black text-ink-primary tracking-tight">
-                11-Stage Video Forensic Pipeline Audit
-              </h2>
-              <p className="text-xs text-ink-secondary mt-1">
-                End-to-end execution log across ISO container, spatial neural backbones, rPPG biometrics, 4D tensor dynamics, and AI generator attribution.
-              </p>
-            </div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="rounded-xl border px-3.5 py-2 bg-surface-1 flex flex-col items-center" style={{ borderColor: 'var(--border-subtle)' }}>
-                <span className="text-[0.625rem] font-bold uppercase text-ink-muted">Total Pipeline Latency</span>
-                <span className="text-sm font-black mono text-accent">{evidence.processing_ms ? `${evidence.processing_ms} ms` : 'Sub-Second'}</span>
-              </div>
-              <div className="rounded-xl border px-3.5 py-2 bg-surface-1 flex flex-col items-center" style={{ borderColor: 'var(--border-subtle)' }}>
-                <span className="text-[0.625rem] font-bold uppercase text-ink-muted">Pipeline Verdict</span>
-                <span className="text-sm font-black mono" style={{ color: riskColor }}>{threatCode}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Visual Workflow Pipeline Node Diagram */}
-          <Card
-            title="Digital Pipeline Workflow Diagram"
-            subtitle="Interactive visual sequence of analytical engines processing video bitstreams and latent dynamics"
-          >
-            <div className="mt-3 p-4 rounded-xl border bg-surface-2 overflow-x-auto" style={{ borderColor: 'var(--border-subtle)' }}>
-              <div className="flex items-center gap-2 min-w-[920px] py-3">
-                {(evidence.pipeline_modules?.length ? evidence.pipeline_modules : VIDEO_PIPELINE_STAGES).map((mod, i, arr) => {
-                  const sNum = mod.stage || i + 1
-                  const st = mod.status || 'PASSED'
-                  const isBad = ['SUSPICIOUS', 'AI_FLAGGED', 'ANOMALY_DETECTED', 'FAILED'].includes(st)
-                  const isExpanded = expandedStage === sNum
-                  return (
-                    <React.Fragment key={sNum}>
-                      <button
-                        onClick={() => setExpandedStage(isExpanded ? null : sNum)}
-                        className={`p-2.5 rounded-xl border text-center transition-all flex flex-col items-center justify-between w-28 h-24 shrink-0 shadow-sm ${
-                          isExpanded
-                            ? 'ring-2 ring-accent border-accent bg-accent/10'
-                            : 'hover:border-accent hover:bg-surface-1'
-                        }`}
-                        style={{
-                          borderColor: isBad ? 'rgba(239,68,68,0.4)' : 'var(--border-subtle)',
-                          background: isBad ? 'rgba(239,68,68,0.06)' : 'var(--surface-1)',
-                        }}
-                      >
-                        <div className="flex items-center justify-between w-full">
-                          <span
-                            className="flex h-5 w-5 items-center justify-center rounded-full text-[0.625rem] font-black"
-                            style={{
-                              background: isBad ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
-                              color: isBad ? 'var(--status-critical)' : 'var(--status-good)',
-                            }}
-                          >
-                            {sNum}
-                          </span>
-                          <span
-                            className="text-[0.5625rem] font-black uppercase px-1 py-0.2 rounded"
-                            style={{
-                              background: isBad ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
-                              color: isBad ? 'var(--status-critical)' : 'var(--status-good)',
-                            }}
-                          >
-                            {isBad ? 'FLAG' : 'OK'}
-                          </span>
-                        </div>
-                        <span className="text-[0.6875rem] font-bold text-ink-primary line-clamp-2 leading-tight mt-1">
-                          {mod.name.replace('Forensics', '').replace('Dynamics', '').trim()}
-                        </span>
-                        <span className="text-[0.5625rem] text-ink-muted mono mt-1">
-                          {mod.duration_ms != null ? `${mod.duration_ms}ms` : 'Active'}
-                        </span>
-                      </button>
-                      {i < arr.length - 1 && (
-                        <div className="w-3 shrink-0 flex items-center justify-center text-ink-muted opacity-50 font-bold text-xs">
-                          ➔
-                        </div>
-                      )}
-                    </React.Fragment>
-                  )
-                })}
-              </div>
-            </div>
-          </Card>
-
-          {/* Filter Controls & Stage Details */}
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
-              Pipeline Stage Audit Logs (11 Stages)
-            </span>
-            <div className="flex items-center gap-1.5 p-1 rounded-xl border bg-surface-2" style={{ borderColor: 'var(--border-subtle)' }}>
-              {['all', 'flagged', 'passed'].map(f => (
-                <button
-                  key={f}
-                  onClick={() => setStageFilter(f)}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all ${
-                    stageFilter === f
-                      ? 'bg-accent text-white shadow-xs'
-                      : 'text-ink-secondary hover:text-ink-primary'
-                  }`}
-                >
-                  {f === 'all' ? 'All Stages (11)' : f === 'flagged' ? 'Flagged / Anomalies' : 'Passed Stages'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Detailed Stage Audit Cards */}
-          <div className="space-y-3">
-            {(evidence.pipeline_modules?.length ? evidence.pipeline_modules : VIDEO_PIPELINE_STAGES)
-              .filter(mod => {
-                const st = mod.status || 'PASSED'
-                const isBad = ['SUSPICIOUS', 'AI_FLAGGED', 'ANOMALY_DETECTED', 'FAILED'].includes(st)
-                if (stageFilter === 'flagged') return isBad
-                if (stageFilter === 'passed') return !isBad
-                return true
-              })
-              .map((mod, idx) => {
-                const stageNum = mod.stage || idx + 1
-                const st = mod.status || 'PASSED'
-                const isBad = ['SUSPICIOUS', 'AI_FLAGGED', 'ANOMALY_DETECTED', 'FAILED'].includes(st)
-                const isExpanded = expandedStage === stageNum
-                return (
-                  <motion.div
-                    key={stageNum}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.03 }}
-                    className="rounded-xl border p-4 transition-all hover:bg-surface-2"
-                    style={{
-                      borderColor: isBad ? 'rgba(239,68,68,0.35)' : 'var(--border-subtle)',
-                      background: isBad ? 'rgba(239,68,68,0.03)' : 'var(--surface-2)',
-                    }}
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-black shadow-xs shrink-0"
-                          style={{
-                            background: isBad ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
-                            color: isBad ? 'var(--status-critical)' : 'var(--status-good)',
-                          }}
-                        >
-                          {stageNum}
-                        </span>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-extrabold text-ink-primary">
-                              Stage {stageNum}: {mod.name}
-                            </span>
-                            <span className="text-[0.625rem] font-bold uppercase mono text-accent">
-                              {mod.category || 'Video Forensic Core'}
-                            </span>
-                          </div>
-                          <p className="text-xs text-ink-secondary mt-0.5 leading-relaxed">
-                            {mod.desc || mod.summary}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        {mod.duration_ms != null && (
-                          <span className="mono text-xs text-ink-muted bg-surface-1 px-2.5 py-1 rounded-md border" style={{ borderColor: 'var(--border-subtle)' }}>
-                            {mod.duration_ms} ms
-                          </span>
-                        )}
-                        <span
-                          className="text-[0.625rem] font-black uppercase px-2.5 py-1 rounded-md border mono"
-                          style={{
-                            background: isBad ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
-                            color: isBad ? 'var(--status-critical)' : 'var(--status-good)',
-                            borderColor: isBad ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)',
-                          }}
-                        >
-                          {st.replace('_', ' ')}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })}
-          </div>
-        </div>
+        <VideoPipelineVisualizer
+          result={result}
+          onSwitchSubTab={setActiveSubTab}
+        />
       )}
 
       {/* ── TAB 4: Forensic Timeline ──────────────────────────────────────── */}

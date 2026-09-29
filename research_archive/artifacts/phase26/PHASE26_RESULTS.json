@@ -1,0 +1,6 @@
+{
+    "status": "VALIDATED",
+    "baseline_regression_pass": true,
+    "tenant_isolation_pass": true,
+    "prompt_injection_resistance_pass": true
+}

@@ -15,3 +15,9 @@ if (!URL.createObjectURL) {
   URL.createObjectURL = () => 'blob:mock'
   URL.revokeObjectURL = () => {}
 }
+
+global.ResizeObserver ??= class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}

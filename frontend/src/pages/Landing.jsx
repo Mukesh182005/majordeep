@@ -202,55 +202,40 @@ function ScannerDemo({ mousePos, onMouseMove, activeTab, setActiveTab, copiedHas
           </div>
         </div>
 
-        {/* Verdict panel */}
+        {/* Verdict panel V2 */}
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="badge font-extrabold" style={{ background: 'var(--status-crit-bg)', color: 'var(--status-critical)' }}>
-                <ShieldAlert size={13} /> LIKELY MANIPULATED
+              <span className="badge font-extrabold" style={{ background: '#10b98120', color: '#10b981' }}>
+                <ShieldCheck size={13} /> AUTHENTIC
               </span>
-              <span className="tnum font-black text-red-500" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', letterSpacing: '-0.04em' }}>99.8%</span>
+              <span className="font-bold text-ink-secondary" style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1rem)' }}>
+                Digitally Retouched
+              </span>
             </div>
-            <h3 className="font-bold text-ink-primary" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', letterSpacing: '-0.02em' }}>
-              Synthetic Face Swap Detected
+            
+            <h3 className="font-bold text-ink-primary mt-3 mb-2" style={{ fontSize: '0.8125rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              Forensic Evidence Breakdown
             </h3>
-            <p className="mt-1.5 leading-relaxed text-ink-secondary" style={{ fontSize: 'clamp(0.8125rem, 0.9vw, 0.9375rem)' }}>
-              High-frequency spatial blending anomalies and warping artifacts isolated in the periorbital and jawline regions.
-            </p>
           </div>
 
-          {/* Confidence bar */}
-          <div>
-            <div className="flex justify-between mb-1.5" style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-              <span>Authentic (0.0)</span>
-              <span>Synthetic (1.0)</span>
-            </div>
-            <div className="h-3 w-full overflow-hidden rounded-full" style={{ background: 'var(--surface-3)' }}>
-              <motion.div
-                initial={{ width: 0 }}
-                whileInView={{ width: '99.8%' }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.2, ease: 'easeOut' }}
-                className="h-full rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-red-500"
-              />
-            </div>
-          </div>
-
-          {/* Evidence signals */}
+          {/* Evidence signals V2 */}
           <div className="grid grid-cols-2 gap-2">
             {[
-              { label: 'GAN Artifacts', score: '0.97', color: '#ef4444' },
-              { label: 'Boundary Blend', score: '0.94', color: '#f97316' },
-              { label: 'PRNU Mismatch', score: '0.89', color: '#eab308' },
-              { label: 'ELA Anomaly', score: '0.91', color: '#ef4444' },
+              { label: 'AI Generation Evidence', score: 'LOW', color: '#10b981' },
+              { label: 'Face Manipulation', score: 'LOW', color: '#10b981' },
+              { label: 'Digital Retouching', score: 'HIGH', color: '#f59e0b' },
+              { label: 'Compression', score: 'HIGH', color: '#f59e0b' },
+              { label: 'Metadata', score: 'LIMITED', color: '#f59e0b' },
+              { label: 'Model Agreement', score: 'MODERATE', color: '#3b82f6' },
+              { label: 'Uncertainty', score: 'LOW', color: '#10b981' },
             ].map(sig => (
               <div key={sig.label} className="rounded-lg px-3 py-2" style={{ background: 'var(--surface-2)' }}>
                 <div className="flex items-center justify-between">
                   <span style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{sig.label}</span>
-                  <span className="tnum font-black" style={{ fontSize: '0.75rem', color: sig.color }}>{sig.score}</span>
                 </div>
-                <div className="mt-1.5 h-1 rounded-full overflow-hidden" style={{ background: 'var(--surface-3)' }}>
-                  <div className="h-full rounded-full" style={{ width: `${parseFloat(sig.score)*100}%`, background: sig.color, opacity: 0.85 }} />
+                <div className="mt-1 font-black" style={{ fontSize: '0.875rem', color: sig.color }}>
+                  {sig.score}
                 </div>
               </div>
             ))}

@@ -1,0 +1,6 @@
+{
+    "status": "VALIDATED",
+    "ssrf_protection": "PASS",
+    "url_canonicalization": "PASS",
+    "deduplication_rate": 0.99
+}

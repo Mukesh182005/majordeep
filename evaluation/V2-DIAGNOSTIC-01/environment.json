@@ -1,0 +1,18 @@
+{
+    "identifier": "V2-DIAGNOSTIC-01",
+    "python_version": "3.11.9",
+    "pytorch_version": "2.14.0+cu130",
+    "cuda_available": true,
+    "os": "Windows",
+    "huggingface_version": "5.17.0",
+    "models": [
+        {
+            "model_name": "image_detector.pt",
+            "path": "checkpoints\\image_detector.pt",
+            "sha256": "7c6f5f16edcff8acaaa0d9ae2968e52820a8f09735e53eb78ff944f90afa0c3b",
+            "parameter_count": 17550409,
+            "device": "cuda",
+            "input_size": 224
+        }
+    ]
+}

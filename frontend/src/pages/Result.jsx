@@ -6,11 +6,11 @@ import AuthedImage from '../components/AuthedImage'
 import { CopyButton, Notice } from '../components/ui'
 import { 
   Activity, CheckCircle, Cpu, FileText, Sparkles, Upload, Clock, Info, Loader2, AlertTriangle, Hash,
-  Globe, Search
+  Globe, Search, Zap
 } from '../components/ui/Icons'
 
 import AudioForensicsView from '../components/AudioForensicsView'
-import VideoForensicsView from '../components/VideoForensicsView'
+import VideoForensicsView, { VIDEO_PIPELINE_STAGES } from '../components/VideoForensicsView'
 import ImageForensicsView from '../components/ImageForensicsView'
 import OriginView from '../components/OriginView'
 
@@ -96,9 +96,10 @@ const STAGE_LABELS = {
 }
 
 const TABS = [
-  { id: 'analysis',    label: 'Analysis',       icon: Activity  },
-  { id: 'forensics',   label: 'Forensics',      icon: Cpu       },
-  { id: 'origin',      label: 'Origin',         icon: Globe     },
+  { id: 'analysis',    label: 'Analysis',        icon: Activity  },
+  { id: 'forensics',   label: 'Forensics',       icon: Cpu       },
+  { id: 'pipeline',    label: 'Pipeline Stages',  icon: Zap       },
+  { id: 'origin',      label: 'Origin',          icon: Globe     },
 ]
 
 export default function Result() {
@@ -290,10 +291,10 @@ export default function Result() {
                 <p className="text-[0.6rem] font-black uppercase tracking-widest text-ink-muted">Source Intelligence</p>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { label: 'Lighting', value: mopci.physical_world_consistency?.lighting_shadows?.split(' ')[0] ?? 'Normal' },
-                    { label: 'Earliest', value: mopci.earliest_source?.timestamp ?? 'N/A' },
+                    { label: 'Origin', value: mopci.generation_attribution?.likely_origin?.split('/')[0]?.trim() ?? '—' },
                     { label: 'C2PA', value: mopci.provenance?.c2pa_present ? 'PRESENT' : 'ABSENT' },
-                    { label: 'Generator', value: (mopci.generation_attribution?.generator_family || '—').split('(')[0].trim() },
+                    { label: 'Generator', value: (mopci.generation_attribution?.generator_family || '—').split('(')[0].trim().substring(0, 20) },
+                    { label: 'Confidence', value: mopci.generation_attribution?.confidence != null ? `${Math.round(mopci.generation_attribution.confidence * 100)}%` : '—' },
                   ].map((s, i) => (
                     <div key={i} className="rounded-lg border p-2 text-center" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-1)' }}>
                       <p className="text-[0.55rem] uppercase tracking-wider text-ink-muted">{s.label}</p>
@@ -431,6 +432,86 @@ export default function Result() {
                     </div>
                   ))}
                 </div>
+
+                {/* Modular Forensic Pipeline Execution Summary Card */}
+                <div className="rounded-2xl border p-5 shadow-sm" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-1)' }}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                      <p className="text-[0.625rem] font-black uppercase tracking-widest text-accent">
+                        {isVideo ? '11-Stage Sequential Engine' : isAudio ? 'Acoustic Forensic Pipeline' : '8-Stage Modular Architecture'}
+                      </p>
+                      <h3 className="text-sm font-extrabold text-ink-primary">
+                        Forensic Pipeline Execution ({pipelineModules.length || (isVideo ? 11 : 8)} Stages)
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setActiveTab('pipeline')
+                        if (isVideo) setActiveVideoTab('pipeline')
+                        else if (isAudio) setActiveAudioTab('pipeline')
+                        else setActiveImageTab('pipeline')
+                      }}
+                      className="btn-secondary py-1.5 px-3 text-xs text-accent font-bold flex items-center gap-1.5 self-start sm:self-auto hover:bg-accent/10 cursor-pointer"
+                    >
+                      <span>Interactive Pipeline & Diagram</span>
+                      <span>➔</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    {((pipelineModules.length ? pipelineModules : (isVideo ? VIDEO_PIPELINE_STAGES : []))).map((mod, idx) => {
+                      const stageNum = mod.stage || mod.id || idx + 1
+                      const st = mod.status || 'PASSED'
+                      const isBad = ['SUSPICIOUS', 'AI_FLAGGED', 'ANOMALY_DETECTED', 'FAILED'].includes(st)
+                      const isWarn = ['INCONCLUSIVE', 'INSUFFICIENT_FACE_FRAMES', 'INSUFFICIENT_FACE_SAMPLES', 'SKIPPED'].includes(st)
+                      return (
+                        <div
+                          key={stageNum}
+                          onClick={() => {
+                            setActiveTab('pipeline')
+                            if (isVideo) setActiveVideoTab('pipeline')
+                            else if (isAudio) setActiveAudioTab('pipeline')
+                            else setActiveImageTab('pipeline')
+                          }}
+                          className="cursor-pointer rounded-xl border p-3 flex flex-col justify-between transition hover:border-accent hover:shadow-xs"
+                          style={{
+                            borderColor: isBad ? 'rgba(239,68,68,0.35)' : isWarn ? 'rgba(245,158,11,0.35)' : 'var(--border-subtle)',
+                            background: isBad ? 'rgba(239,68,68,0.04)' : isWarn ? 'rgba(245,158,11,0.04)' : 'var(--surface-2)',
+                          }}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="flex h-5 w-5 items-center justify-center rounded-full text-[0.625rem] font-black"
+                                style={{
+                                  background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(245,158,11,0.15)' : 'var(--status-good-bg)',
+                                  color: isBad ? 'var(--status-critical)' : isWarn ? 'var(--status-warn)' : 'var(--status-good)',
+                                }}
+                              >
+                                {stageNum}
+                              </span>
+                              <span className="text-xs font-bold text-ink-primary truncate max-w-[170px]">
+                                {mod.name}
+                              </span>
+                            </div>
+                            <span
+                              className="text-[0.5625rem] font-bold uppercase px-1.5 py-0.5 rounded mono"
+                              style={{
+                                background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(245,158,11,0.15)' : 'var(--status-good-bg)',
+                                color: isBad ? 'var(--status-critical)' : isWarn ? 'var(--status-warn)' : 'var(--status-good)',
+                              }}
+                            >
+                              {st.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-[0.625rem] text-ink-muted mt-2 pt-1.5 border-t border-subtle">
+                            <span className="truncate max-w-[190px]">{mod.desc || mod.summary}</span>
+                            {mod.duration_ms != null && <span className="mono shrink-0 ml-1">{mod.duration_ms}ms</span>}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -442,6 +523,38 @@ export default function Result() {
                 <VideoForensicsView result={result} activeSubTab={activeVideoTab} setActiveSubTab={setActiveVideoTab} />
               ) : (
                 <ImageForensicsView result={result} activeSubTab={activeImageTab} setActiveSubTab={setActiveImageTab} />
+              )
+            )}
+
+            {/* Pipeline Stages Tab */}
+            {activeTab === 'pipeline' && (
+              isAudio ? (
+                <AudioForensicsView
+                  result={result}
+                  activeSubTab="pipeline"
+                  setActiveSubTab={(sub) => {
+                    if (sub !== 'pipeline') setActiveTab('forensics')
+                    setActiveAudioTab(sub)
+                  }}
+                />
+              ) : isVideo ? (
+                <VideoForensicsView
+                  result={result}
+                  activeSubTab="pipeline"
+                  setActiveSubTab={(sub) => {
+                    if (sub !== 'pipeline') setActiveTab('forensics')
+                    setActiveVideoTab(sub)
+                  }}
+                />
+              ) : (
+                <ImageForensicsView
+                  result={result}
+                  activeSubTab="pipeline"
+                  setActiveSubTab={(sub) => {
+                    if (sub !== 'pipeline') setActiveTab('forensics')
+                    setActiveImageTab(sub)
+                  }}
+                />
               )
             )}
 

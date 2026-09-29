@@ -7,6 +7,7 @@ import {
   Info, Lock, ShieldAlert, ShieldCheck, ShieldQuestion, Sparkles, Waveform, Zap
 } from './ui/Icons'
 import { percent } from '../lib/format'
+import AudioPipelineVisualizer from './AudioPipelineVisualizer'
 
 export default function AudioForensicsView({ result, activeSubTab, setActiveSubTab }) {
   // Helper to deeply map nested dictionaries from the backend
@@ -57,8 +58,11 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
   const [intelCategory, setIntelCategory] = useState('all')
   const [intelSearch, setIntelSearch] = useState('')
 
+  const pipelineModules = evidence.pipeline_modules || forensics.pipeline_modules || result.pipeline_modules || []
+
   const tabs = [
     { id: 'summary', label: 'Scorecard & Timeline', count: 'Overview' },
+    { id: 'pipeline', label: '8-Stage Audio Pipeline', count: pipelineModules.length || 8 },
     { id: 'security', label: 'File DNA & Cybersecurity', count: 'Security' },
     { id: 'signal', label: 'Deep Signal & Phase Lab', count: Object.keys(signalIntel).length || 'Signal' },
     { id: 'voice', label: 'Voice & Prosody Forensics', count: Object.keys(glottal).length || 'Voice' },
@@ -1322,6 +1326,19 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
 
       <div className="p-6 space-y-6 overflow-y-auto min-h-0 flex-1">
         {tab === 'summary' && <ScorecardBlock />}
+        {tab === 'pipeline' && (
+          <Card
+            title="Modular Audio Forensic Pipeline Execution"
+            subtitle="Complete interactive audit trail, workflow architecture graph, latency waterfall, and acoustic risk radar"
+          >
+            <div className="mt-4">
+              <AudioPipelineVisualizer
+                result={result}
+                onSwitchSubTab={setActiveSubTab}
+              />
+            </div>
+          </Card>
+        )}
         {tab === 'security' && <SecurityBlock />}
         {tab === 'signal' && <SignalBlock />}
         {tab === 'voice' && <VoiceBlock />}

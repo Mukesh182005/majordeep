@@ -16,8 +16,44 @@ export const VERDICT = {
     icon: ShieldCheck,
     blurb: 'No strong indicators of manipulation were found in this file.',
   },
+  authentic: {
+    label: 'Authentic',
+    short: 'Authentic',
+    tone: 'good',
+    color: 'var(--status-good)',
+    bg: 'var(--status-good-bg)',
+    icon: ShieldCheck,
+    blurb: 'No strong indicators of manipulation were found in this file.',
+  },
+  AUTHENTIC: {
+    label: 'Authentic',
+    short: 'Authentic',
+    tone: 'good',
+    color: 'var(--status-good)',
+    bg: 'var(--status-good-bg)',
+    icon: ShieldCheck,
+    blurb: 'No strong indicators of manipulation were found in this file.',
+  },
   likely_manipulated: {
     label: 'Likely manipulated',
+    short: 'Manipulated',
+    tone: 'critical',
+    color: 'var(--status-critical)',
+    bg: 'var(--status-crit-bg)',
+    icon: ShieldAlert,
+    blurb: 'Signals consistent with AI generation or manipulation were detected.',
+  },
+  manipulated: {
+    label: 'Manipulated',
+    short: 'Manipulated',
+    tone: 'critical',
+    color: 'var(--status-critical)',
+    bg: 'var(--status-crit-bg)',
+    icon: ShieldAlert,
+    blurb: 'Signals consistent with AI generation or manipulation were detected.',
+  },
+  MANIPULATED: {
+    label: 'Manipulated',
     short: 'Manipulated',
     tone: 'critical',
     color: 'var(--status-critical)',
@@ -34,11 +70,47 @@ export const VERDICT = {
     icon: ShieldQuestion,
     blurb: 'The score sits too close to the decision boundary to call either way.',
   },
+  INCONCLUSIVE: {
+    label: 'Inconclusive',
+    short: 'Inconclusive',
+    tone: 'warn',
+    color: 'var(--status-warn)',
+    bg: 'var(--status-warn-bg)',
+    icon: ShieldQuestion,
+    blurb: 'The score sits too close to the decision boundary to call either way.',
+  },
 }
 
 export function verdictMeta(verdict) {
+  if (!verdict) {
+    return {
+      label: 'Not analysed',
+      short: 'Pending',
+      tone: 'neutral',
+      color: 'var(--text-muted)',
+      bg: 'var(--surface-2)',
+      icon: ShieldQuestion,
+      blurb: '',
+    }
+  }
+
+  if (VERDICT[verdict]) {
+    return VERDICT[verdict]
+  }
+
+  const key = String(verdict).toLowerCase().trim()
+  if (key === 'authentic' || key === 'likely_authentic') {
+    return VERDICT.AUTHENTIC
+  }
+  if (key === 'manipulated' || key === 'likely_manipulated') {
+    return VERDICT.MANIPULATED
+  }
+  if (key === 'inconclusive') {
+    return VERDICT.INCONCLUSIVE
+  }
+
   return (
-    VERDICT[verdict] || {
+    VERDICT[key] || {
       label: 'Not analysed',
       short: 'Pending',
       tone: 'neutral',

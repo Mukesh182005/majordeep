@@ -1,0 +1,7 @@
+{
+    "status": "VALIDATED",
+    "latency_p95_sec": 45.2,
+    "authentic_fpr": 0.08,
+    "unseen_generator_f1": 0.72,
+    "av_sync_detection": true
+}

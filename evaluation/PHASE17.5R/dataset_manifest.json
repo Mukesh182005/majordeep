@@ -1,0 +1,502 @@
+[
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_013166.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_019329.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_052186.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_035987.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_004639.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_031852.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_001587.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_035914.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_015821.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_000056.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_034495.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_030948.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_013430.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_064208.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_019374.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_038165.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_054955.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_053768.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_041684.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\facebook_real\\facebook_real_046643.jpg",
+        "label": "AUTHENTIC",
+        "category": "facebook_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_043421.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_050639.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_009300.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_016881.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_009835.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_009206.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_017110.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_041372.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_056962.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_000883.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_047919.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_013342.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_037801.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_006362.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_034666.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_024765.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_059395.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_008979.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_006137.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\snapchat_real\\snapchat_real_045333.jpg",
+        "label": "RETOUCHED",
+        "category": "snapchat_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_040419.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_019575.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_024524.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_064348.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_058316.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_063907.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_060651.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_066635.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_066996.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_006204.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_050669.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_052139.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_023008.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_059400.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_039727.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_039440.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_077742.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_041394.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_047411.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_real\\instagram_real_059128.jpg",
+        "label": "RETOUCHED",
+        "category": "instagram_real"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_063719.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_018645.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_045168.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_034361.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_006007.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_035311.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_039228.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_008918.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_004671.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_062193.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_047166.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_034782.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_060508.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_025813.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_049525.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_068436.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_061251.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_059451.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_016729.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\instagram_fake\\instagram_fake_043603.jpg",
+        "label": "AI",
+        "category": "instagram_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_007094.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_003810.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_003449.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_001158.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_003220.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_013334.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_002946.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_010594.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_005095.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_004506.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_018810.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_013832.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_014961.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_001541.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_001625.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_005677.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_008564.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_003649.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_013227.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    },
+    {
+        "path": "C:\\Users\\STUDENT\\Desktop\\deepfake\\deepfake\\data\\raw\\massive_social\\diffusion_fake\\diffusion_fake_009890.jpg",
+        "label": "AI",
+        "category": "diffusion_fake"
+    }
+]

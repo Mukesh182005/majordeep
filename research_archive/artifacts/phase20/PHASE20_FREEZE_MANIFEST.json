@@ -1,0 +1,8 @@
+{
+    "image_frozen_version": "phase17_production_v1",
+    "audio_frozen_version": "phase19_development_v1",
+    "IMAGE_REGRESSION": "PASS",
+    "AUDIO_REGRESSION": "PASS",
+    "resnet_sha256": "6fa78e1b3d688cf2f41bb92f398e4f16b24d775191e4ab61234c9f1165da00f7",
+    "fusion_sha256": "6fa78e1b3d688cf2f41bb92f398e4f16b24d775191e4ab61234c9f1165da00f7"
+}

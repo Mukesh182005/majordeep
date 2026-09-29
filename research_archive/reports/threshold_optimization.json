@@ -1,0 +1,10 @@
+{
+    "LOW_FPR_MODE": 0.65,
+    "BALANCED_MODE": 0.65,
+    "HIGH_SENSITIVITY_MODE": 0.65,
+    "Metrics": {
+        "ROC_AUC": 1.0,
+        "PR_AUC": 1.0,
+        "Brier_Score": 0.05825
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "filename": "snapchat_real_002847.jpg",
+    "V2_result": {
+        "verdict": "INCONCLUSIVE",
+        "confidence": {
+            "calibrated": 0.559
+        },
+        "probabilities": {
+            "raw_ai": 0.5731465220451355,
+            "calibrated_ai": 0.558668619868784
+        },
+        "forensics": {
+            "metadata": {
+                "status": "INTACT",
+                "evidence": [
+                    "EXIF Present"
+                ]
+            },
+            "compression": {
+                "level": "HIGH",
+                "evidence": [
+                    "Heavy JPEG quantization detected"
+                ]
+            },
+            "retouching": {
+                "level": "LOW",
+                "evidence": []
+            },
+            "noise_signature": {
+                "status": "DETECTED",
+                "evidence": [
+                    "CFA intact"
+                ]
+            }
+        },
+        "uncertainty": {
+            "ood": true
+        },
+        "latency": 0.05347037315368652,
+        "explanation": [
+            "Why this image was classified as Inconclusive:",
+            "\u2022 Strong JPEG recompression or social media compression indicators were detected."
+        ]
+    }
+}

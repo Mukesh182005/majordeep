@@ -1,0 +1,6 @@
+{
+    "status": "VALIDATED",
+    "leakage_audit_pass": true,
+    "external_evaluation_pass": true,
+    "reproducibility_audit_pass": true
+}

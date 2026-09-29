@@ -1,0 +1,56 @@
+{
+  "release_version": "1.0.0",
+  "commit_hash": "02dd9dbd5f4a33b48c4edf86fcc16b898996100c",
+  "date": "2026-09-29T13:48:00+05:30",
+  "frontend_version": "1.0.0",
+  "backend_version": "1.0.0",
+  "api_version": "1.0.0",
+  "database_schema_version": "1.0",
+  "models": [
+    {
+      "name": "image_detector",
+      "version": "1.0.0",
+      "architecture": "EfficientNet-B4 / CNN Fine-Tuned",
+      "file_path": "checkpoints/image_detector.pt",
+      "size_bytes": 70975155,
+      "sha256": "87fb1fd56a55b6383a7094561464a2a9e984eed036270688ee40326506ccf430"
+    },
+    {
+      "name": "image_detector_b0",
+      "version": "1.0.0",
+      "architecture": "EfficientNet-B0 Lightweight",
+      "file_path": "checkpoints/image_detector_b0.pt",
+      "size_bytes": 16342833,
+      "sha256": "661ef40b00c4aa55d3040f270a9173dc111e08608fe9c95de0040ec87e5a7aba"
+    },
+    {
+      "name": "audio_detector",
+      "version": "1.0.0",
+      "architecture": "Light CNN (LCNN)",
+      "file_path": "checkpoints/audio_detector.pt",
+      "size_bytes": 598513,
+      "sha256": "43a96a0a1b422685576b80db11ce6d5a885052dd5ea53d7b9e983de060774b03"
+    }
+  ],
+  "critical_dependencies": {
+    "python": "3.11.9",
+    "torch": "2.6.0+cu124",
+    "torchvision": "0.21.0+cu124",
+    "torchaudio": "2.6.0+cu124",
+    "fastapi": "0.115.0",
+    "uvicorn": "0.30.6",
+    "pydantic": "2.9.2",
+    "sqlalchemy": "2.0.35",
+    "celery": "5.4.0",
+    "opencv-python": "4.10.0.84",
+    "librosa": "0.10.2",
+    "reportlab": "4.2.5",
+    "node": "18+",
+    "react": "18.3.1",
+    "vite": "5.4.21",
+    "tailwindcss": "3.4.10",
+    "recharts": "2.12.7"
+  },
+  "verification_status": "VALIDATED",
+  "status_code": "PHASE31_RELEASE_READY"
+}

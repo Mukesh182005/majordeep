@@ -63,7 +63,7 @@ class TestJobLifecycle:
 
     def test_result_contains_verdict_and_evidence(self, client, completed_job):
         result = client.get(f"/api/jobs/{completed_job['id']}/result").json()
-        assert result["verdict"] in {"likely_authentic", "likely_manipulated", "inconclusive"}
+        assert result["verdict"] in {"AUTHENTIC", "MANIPULATED", "INCONCLUSIVE", "likely_authentic", "likely_manipulated", "inconclusive"}
         assert 0.0 <= result["fake_probability"] <= 1.0
         assert 0.0 <= result["confidence"] <= 1.0
         assert result["model_name"] and result["model_version"]
@@ -192,18 +192,23 @@ class TestHistory:
     def test_delete_removes_the_scan_and_its_files(self, client, auth_headers, png_bytes):
         from pathlib import Path
 
-        job = client.post(
+        upload_response = client.post(
             "/api/upload",
             files={"file": ("delete-me.png", png_bytes, "image/png")},
             headers=auth_headers,
-        ).json()
+        )
+        assert upload_response.status_code == 202, f"Upload failed: {upload_response.text}"
+        job = upload_response.json()
+        
         client.post(f"/api/jobs/{job['id']}/report", headers=auth_headers)
 
         from app.database import SessionLocal
         from app.models import Job
 
         with SessionLocal() as session:
-            stored_path = Path(session.get(Job, job["id"]).stored_path)
+            db_job = session.get(Job, job["id"])
+            assert db_job is not None, f"Job {job['id']} not found in database!"
+            stored_path = Path(db_job.stored_path)
         assert stored_path.exists()
 
         assert client.delete(f"/api/history/{job['id']}", headers=auth_headers).status_code == 204

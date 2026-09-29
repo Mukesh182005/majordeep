@@ -14,3 +14,5 @@ facenet-pytorch>=2.5.3  # MTCNN face detection/cropping
 opencv-python-headless>=4.10.0.84
 
 pillow-heif>=0.16.0
+imageio-ffmpeg>=0.5.1
+transformers>=4.30.0

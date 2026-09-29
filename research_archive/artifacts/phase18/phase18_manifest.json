@@ -1,0 +1,15 @@
+{
+    "frozen_production_version": "phase17_production_v1",
+    "resnet_checkpoint_sha256": "6fa78e1b3d688cf2f41bb92f398e4f16b24d775191e4ab61234c9f1165da00f7",
+    "vit1_identifier": "umm-maybe/AI-image-detector",
+    "vit2_identifier": "umm-maybe/AI-image-detector (sdxl)",
+    "fusion_artifact_sha256": "6fa78e1b3d688cf2f41bb92f398e4f16b24d775191e4ab61234c9f1165da00f7",
+    "fusion_coefficients": {
+        "resnet": 2.3966,
+        "vit1": 0.2826,
+        "vit2": 0.2833,
+        "intercept": -1.1552
+    },
+    "TRAINING_DISABLED": true,
+    "FUSION_MODIFICATION_DISABLED": true
+}

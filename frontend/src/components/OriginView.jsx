@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
-import { ExternalLink, Shield, Clock, Globe, AlertTriangle, CheckCircle } from './ui/Icons'
+import { Shield, Globe, CheckCircle } from './ui/Icons'
 
 const ConfidencePill = ({ level }) => {
   const map = {
     HIGH:   { color: '#00E5FF', bg: 'rgba(0,229,255,0.1)' },
     MEDIUM: { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
-    LOW:    { color: '#FF3D00', bg: 'rgba(255,61,0,0.1)' },
+    LOW:    { color: '#22c55e', bg: 'rgba(34,197,94,0.1)' },
   }
   const s = map[level] || map.MEDIUM
   return (
@@ -16,21 +16,6 @@ const ConfidencePill = ({ level }) => {
   )
 }
 
-const EvidenceBar = ({ value }) => {
-  const filled = Math.round(value * 10)
-  return (
-    <div className="flex gap-0.5 items-center">
-      {Array.from({ length: 10 }).map((_, i) => (
-        <div key={i} className="h-2.5 w-2" style={{
-          borderRadius: 2,
-          background: i < filled ? '#00E5FF' : 'var(--surface-3)',
-          transition: 'background 0.3s',
-        }} />
-      ))}
-    </div>
-  )
-}
-
 export default function OriginView({ mopci }) {
   if (!mopci) return (
     <div className="flex items-center justify-center h-40 text-ink-muted text-sm">
@@ -38,11 +23,10 @@ export default function OriginView({ mopci }) {
     </div>
   )
 
-  const { provenance, generation_attribution, earliest_source, source_candidates, physical_world_consistency } = mopci
-  const gen = generation_attribution || {}
-  const prov = provenance || {}
-  const phys = physical_world_consistency || {}
-  const earliest = earliest_source || {}
+  const gen = mopci.generation_attribution || {}
+  const prov = mopci.provenance || {}
+  const phys = mopci.physical_world_consistency || {}
+  const srcDiscovery = mopci.source_discovery || {}
 
   return (
     <div className="space-y-6">
@@ -85,10 +69,8 @@ export default function OriginView({ mopci }) {
           <p className="text-[0.625rem] font-black uppercase tracking-widest mb-3" style={{ color: '#71717a' }}>C2PA / Content Credentials</p>
           {[
             { label: 'Manifest Present', value: prov.c2pa_present ? 'YES' : 'NOT DETECTED', ok: prov.c2pa_present },
-            { label: 'Manifest Status', value: prov.manifest_status || '—', ok: prov.manifest_status === 'Valid' },
-            { label: 'Signer', value: prov.signer || 'Unknown Entity' },
+            { label: 'Manifest Status', value: prov.manifest_status || '—', ok: prov.manifest_status === 'Valid' || prov.manifest_status === 'Not Detected' },
             { label: 'AI Assertion', value: prov.ai_assertion ? 'PRESENT' : 'ABSENT', ok: !prov.ai_assertion },
-            { label: 'Editing History', value: `${prov.editing_history ?? '?'} operations` },
           ].map((row, i) => (
             <div key={i} className="flex items-center justify-between py-1.5 border-b last:border-0" style={{ borderColor: 'var(--border-subtle)' }}>
               <span className="text-[0.75rem] text-ink-muted">{row.label}</span>
@@ -117,29 +99,13 @@ export default function OriginView({ mopci }) {
         </motion.div>
       </div>
 
-      {/* ── Earliest Source ── */}
-      {earliest.url && (
+      {/* ── Source Discovery Status ── */}
+      {srcDiscovery.status && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="rounded-2xl border p-5" style={{ borderColor: 'rgba(0,229,255,0.25)', background: 'var(--surface-1)' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Clock size={14} style={{ color: '#00E5FF' }} />
-            <p className="text-[0.625rem] font-black uppercase tracking-widest" style={{ color: '#71717a' }}>Earliest Discovered Source</p>
-          </div>
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <p className="text-[0.875rem] font-extrabold text-ink-primary">{earliest.platform}</p>
-              <p className="mono text-[0.6875rem] text-ink-muted mt-0.5">{earliest.url}</p>
-              <p className="text-[0.75rem] mt-1 text-ink-secondary">First discovered: <span className="font-bold text-ink-primary">{earliest.timestamp}</span></p>
-              <p className="text-[0.75rem] text-ink-secondary">Similarity: <span className="font-bold" style={{ color: '#00E5FF' }}>{((earliest.similarity || 0) * 100).toFixed(1)}%</span></p>
-            </div>
-            <a href={earliest.url} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-xl border px-4 py-2 text-[0.75rem] font-bold transition-all hover:scale-105"
-              style={{ borderColor: '#00E5FF', color: '#00E5FF', background: 'rgba(0,229,255,0.08)' }}>
-              Open Source <ExternalLink size={12} />
-            </a>
-          </div>
-          <p className="mt-3 text-[0.6875rem] text-ink-muted italic border-t pt-2" style={{ borderColor: 'var(--border-subtle)' }}>
-            ⚠ "Earliest Discovered Source" does not establish the identified page as the original creator or first-ever publication.
+          className="rounded-2xl border p-4" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-1)' }}>
+          <p className="text-[0.625rem] font-black uppercase tracking-widest mb-2" style={{ color: '#71717a' }}>Source Discovery</p>
+          <p className="text-[0.8125rem] text-ink-muted">
+            {srcDiscovery.note || 'No source discovery data available.'}
           </p>
         </motion.div>
       )}

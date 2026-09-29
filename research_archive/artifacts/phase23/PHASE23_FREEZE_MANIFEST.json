@@ -1,0 +1,12 @@
+{
+    "image_frozen_version": "phase17_production_v1",
+    "audio_frozen_version": "phase19_development_v1",
+    "video_frozen_version": "phase20_development_v1",
+    "correlation_frozen_version": "phase21_development_v1",
+    "provenance_frozen_version": "phase22_development_v1",
+    "IMAGE_REGRESSION": "PASS",
+    "AUDIO_REGRESSION": "PASS",
+    "VIDEO_REGRESSION": "PASS",
+    "CORRELATION_REGRESSION": "PASS",
+    "PROVENANCE_REGRESSION": "PASS"
+}

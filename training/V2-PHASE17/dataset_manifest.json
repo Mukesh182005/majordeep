@@ -1,0 +1,6 @@
+{
+    "authentic_clean": 20,
+    "authentic_hard_neg": 20,
+    "ai_positive": 40,
+    "total": 80
+}

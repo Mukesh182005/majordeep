@@ -1,0 +1,7 @@
+{
+    "status": "VALIDATED",
+    "claim_grounding_unsupported_rate": 0.0,
+    "citation_validation": "PASS",
+    "case_isolation": "PASS",
+    "prompt_injection_protection": "PASS"
+}

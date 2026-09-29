@@ -21,6 +21,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 
+from sqlalchemy.types import TypeDecorator
+
+
 def _utcnow() -> datetime:
     return datetime.now(UTC)
 
@@ -43,9 +46,45 @@ class JobStatus(enum.StrEnum):
 
 
 class Verdict(enum.StrEnum):
-    AUTHENTIC = "likely_authentic"
-    MANIPULATED = "likely_manipulated"
-    INCONCLUSIVE = "inconclusive"
+    AUTHENTIC = "AUTHENTIC"
+    MANIPULATED = "MANIPULATED"
+    INCONCLUSIVE = "INCONCLUSIVE"
+
+
+class SafeEnum(TypeDecorator):
+    """Case-insensitive, legacy-compatible Enum serializer for SQLAlchemy."""
+
+    impl = String
+    cache_ok = True
+
+    def __init__(self, enum_cls, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.enum_cls = enum_cls
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        if isinstance(value, enum.Enum):
+            return value.value
+        return str(value)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        try:
+            return self.enum_cls(value)
+        except ValueError:
+            pass
+        val_str = str(value).lower()
+        for member in self.enum_cls:
+            if member.name.lower() == val_str or str(member.value).lower() == val_str:
+                return member
+            # Legacy mapping for likely_authentic -> AUTHENTIC, likely_manipulated -> MANIPULATED
+            if val_str in ("likely_authentic", "authentic") and member.name == "AUTHENTIC":
+                return member
+            if val_str in ("likely_manipulated", "manipulated") and member.name == "MANIPULATED":
+                return member
+        return list(self.enum_cls)[0]
 
 
 class User(Base):
@@ -73,20 +112,21 @@ class Job(Base):
     # --- Submitted file details (Phase 8, report section 2) ---
     original_filename: Mapped[str] = mapped_column(String(512), nullable=False)
     stored_path: Mapped[str] = mapped_column(String(1024), nullable=False)
-    media_type: Mapped[MediaType] = mapped_column(Enum(MediaType), nullable=False)
+    media_type: Mapped[MediaType] = mapped_column(SafeEnum(MediaType), nullable=False)
     content_type: Mapped[str] = mapped_column(String(128), nullable=False)
     file_size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
     sha256: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
     uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
     # --- Job lifecycle ---
-    status: Mapped[JobStatus] = mapped_column(Enum(JobStatus), default=JobStatus.QUEUED, index=True)
+    status: Mapped[JobStatus] = mapped_column(SafeEnum(JobStatus), default=JobStatus.QUEUED, index=True)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     error_message: Mapped[str | None] = mapped_column(Text)
 
     # --- Results ---
-    verdict: Mapped[Verdict | None] = mapped_column(Enum(Verdict))
+    verdict: Mapped[Verdict | None] = mapped_column(SafeEnum(Verdict))
+
     fake_probability: Mapped[float | None] = mapped_column(Float)
     confidence: Mapped[float | None] = mapped_column(Float)
     model_name: Mapped[str | None] = mapped_column(String(128))

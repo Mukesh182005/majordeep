@@ -1,0 +1,15 @@
+{
+    "clean_real_ai_fpr": 0.4,
+    "all_genuine_ai_fpr": 0.4,
+    "ai_precision": 0.5471698113207547,
+    "ai_recall": 0.48333333333333334,
+    "ai_f1": 0.5132743362831859,
+    "retouch_precision": 0.0,
+    "retouch_recall": 0.0,
+    "retouch_f1": 0.0,
+    "brier_score": 0.29639171105825385,
+    "latency_p50": 0.06621170043945312,
+    "latency_p95": 0.08335280418395996,
+    "latency_p99": 0.08983629226684571,
+    "total_images": 120
+}

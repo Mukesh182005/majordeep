@@ -71,6 +71,11 @@ class Settings(BaseSettings):
     audio_sample_rate: int = 16000
     audio_window_seconds: float = 4.0
     device: str = "cpu"
+    # The face-crop checkpoint was trained on StyleGAN faces only. On real vs
+    # modern-AI photos with faces it flagged 21% of real faces and 15% of AI
+    # faces, so its score is reported but kept out of verdicts until a
+    # retrained model is validated.
+    face_model_in_verdict: bool = False
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5

@@ -3,6 +3,7 @@ import { clearSession } from '../lib/api'
 import { useAuth } from '../lib/useAuth'
 import { useTheme } from '../lib/theme'
 import { Moon, ShieldCheck, Sun } from './ui/Icons'
+import MouseTracer from './MouseTracer'
 
 function NavItem({ to, children }) {
   return (
@@ -58,6 +59,9 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Interactive Mouse Tracer with Red-to-Green fading trail */}
+      <MouseTracer />
+
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header
         className="sticky top-0 z-30 border-b backdrop-blur-xl blueprint-bg"

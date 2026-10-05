@@ -19,13 +19,15 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_current_user_optional(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> User | None:
     """Resolve the bearer token to a user, or ``None`` for guests."""
-    if credentials is None:
+    token = credentials.credentials if credentials else request.query_params.get("token")
+    if not token:
         return None
-    payload = decode_access_token(credentials.credentials)
+    payload = decode_access_token(token)
     if not payload or not payload.get("sub"):
         return None
     user = db.get(User, payload["sub"])

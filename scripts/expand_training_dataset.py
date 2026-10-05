@@ -1,135 +1,163 @@
 #!/usr/bin/env python3
-"""Build an expanded master manifest incorporating 500,000 images.
+"""Build the image-detector training manifest without train/validation leakage.
 
-Indexes:
-1. Core faces-140k (140,000 images)
-2. Social & modern diffusion dataset (360,000 images across Instagram, LinkedIn, Pinterest, Facebook, Snapchat, Inpaint, Diffusion)
-3. Live real-world user uploads and adversarial samples
+Sources:
+1. faces-140k (real FFHQ faces vs StyleGAN faces). Its own train / valid / test
+   folders are kept as train / val / test; the test folder stays held out.
+2. Derived sets (``massive_social``, ``expansion_300k``): re-encoded, filtered
+   copies of faces-140k *training* images. A copy carries its source's
+   content, so a copy in validation whose source is in training measures
+   memorisation, not detection (the previous split put 144,000 such copies in
+   validation and reported 99.98% accuracy after one epoch). Derived images
+   are therefore training-only.
+3. ``--extra`` CSV files (``path,label[,group]``) for independently labelled
+   data — e.g. real photos and images from current generators. They are split
+   70/15/15 by ``group`` so related images never straddle splits.
 
-Compiles the final balanced dataset into data/processed/faces/manifest.csv.
+Unlabelled uploads are never added. The previous version appended every file
+in ``backend/storage/uploads`` (and a local IDE folder) with label 1 = fake,
+teaching the model that users' own real photos were AI.
+
+Note: the derived "diffusion" and "inpaint" classes are not diffusion output —
+they are PIL blur / patch filters applied to StyleGAN faces (see
+``generate_massive_social_dataset.py``). Detecting current generators needs
+real generated images, supplied through ``--extra``.
+
+Usage (from the repo root):
+    python scripts/expand_training_dataset.py
+    python scripts/expand_training_dataset.py --extra data/labelled/modern_ai.csv
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
-import random
-import sys
+import hashlib
+from collections import Counter
 from pathlib import Path
 
-REPO_ROOT = Path(r"C:\Users\STUDENT\Desktop\deepfake\deepfake")
-RAW_ROOT = REPO_ROOT / "data" / "raw" / "faces-140k" / "real_vs_fake" / "real-vs-fake"
-SOCIAL_ROOT = REPO_ROOT / "data" / "raw" / "massive_social"
-OUT_DIR  = REPO_ROOT / "data" / "processed" / "faces"
-MANIFEST = OUT_DIR / "manifest.csv"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+RAW_ROOT = REPO_ROOT / "data" / "raw"
+FACES_140K = RAW_ROOT / "faces-140k" / "real_vs_fake" / "real-vs-fake"
+DERIVED_ROOTS = (RAW_ROOT / "massive_social", RAW_ROOT / "expansion_300k")
+DEFAULT_MANIFEST = REPO_ROOT / "data" / "processed" / "faces" / "manifest.csv"
 
 IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
+FACES_SPLITS = {"train": "train", "valid": "val", "test": "test"}
+LABELS = {"real": 0, "fake": 1}
+
+
+def group_split(group: str, val: float = 0.15, test: float = 0.15) -> str:
+    """Deterministic split from a group key, so a group always lands in one split."""
+    bucket = int(hashlib.sha1(group.encode("utf-8")).hexdigest()[:8], 16) / 0xFFFFFFFF
+    if bucket < val:
+        return "val"
+    if bucket < val + test:
+        return "test"
+    return "train"
+
+
+def _images(folder: Path) -> list[Path]:
+    return sorted(p for p in folder.iterdir() if p.suffix.lower() in IMAGE_EXT)
+
+
+def _derived_label(folder_name: str) -> int | None:
+    name = folder_name.lower()
+    if name.endswith("_fake"):
+        return 1
+    if name.endswith("_real"):
+        return 0
+    return None
+
+
+def faces_140k_rows() -> list[dict]:
+    rows = []
+    for folder_split, split in FACES_SPLITS.items():
+        for class_name, label in LABELS.items():
+            folder = FACES_140K / folder_split / class_name
+            if not folder.exists():
+                continue
+            files = _images(folder)
+            print(f"  faces-140k {folder_split}/{class_name}: {len(files):,} -> {split}")
+            rows += [{"path": str(p), "label": label, "group": f"faces140k_{p.stem}", "split": split} for p in files]
+    return rows
+
+
+def derived_rows() -> list[dict]:
+    rows = []
+    for root in DERIVED_ROOTS:
+        if not root.exists():
+            continue
+        for folder in sorted(d for d in root.iterdir() if d.is_dir()):
+            label = _derived_label(folder.name)
+            if label is None:
+                print(f"  skipping {root.name}/{folder.name}: name does not end in _real/_fake")
+                continue
+            files = _images(folder)
+            print(f"  {root.name}/{folder.name}: {len(files):,} -> train only (derived from faces-140k train)")
+            rows += [
+                {"path": str(p), "label": label, "group": f"{root.name}_{folder.name}_{p.stem}", "split": "train"}
+                for p in files
+            ]
+    return rows
+
+
+def extra_rows(csv_path: Path) -> list[dict]:
+    rows = []
+    with csv_path.open(newline="", encoding="utf-8") as fh:
+        for line_no, record in enumerate(csv.DictReader(fh), start=2):
+            path = Path(record["path"])
+            if not path.is_absolute():
+                path = (csv_path.parent / path).resolve()
+            label = int(record["label"])
+            if label not in (0, 1):
+                raise SystemExit(f"{csv_path}:{line_no}: label must be 0 (real) or 1 (fake), got {label}")
+            group = record.get("group") or path.stem
+            rows.append({"path": str(path), "label": label, "group": f"extra_{group}", "split": group_split(group)})
+    print(f"  {csv_path.name}: {len(rows):,} labelled images (split by group)")
+    return rows
 
 
 def main() -> None:
-    random.seed(42)
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    rows: list[dict] = []
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--output", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument("--extra", type=Path, action="append", default=[], help="CSV with path,label[,group]")
+    parser.add_argument("--no-derived", action="store_true", help="exclude massive_social / expansion_300k")
+    args = parser.parse_args()
 
-    # 1. Process faces-140k
-    split_target_map = {
-        "train": "train",
-        "test":  "train",  # Merge test split into training set
-        "valid": "val",    # Keep valid split for evaluation
-    }
+    print("Indexing sources...")
+    rows = faces_140k_rows()
+    if not args.no_derived:
+        rows += derived_rows()
+    for csv_path in args.extra:
+        rows += extra_rows(csv_path)
+    if not rows:
+        raise SystemExit(f"No images found under {RAW_ROOT}.")
 
-    print("Enumerating faces-140k core dataset...")
-    for folder_split, target_split in split_target_map.items():
-        for class_name, label in [("real", 0), ("fake", 1)]:
-            class_dir = RAW_ROOT / folder_split / class_name
-            if not class_dir.exists():
-                continue
-            files = [p for p in class_dir.iterdir() if p.suffix.lower() in IMAGE_EXT]
-            print(f"  faces-140k {folder_split}/{class_name}: {len(files):,} images -> {target_split}")
-            for p in files:
-                rows.append({
-                    "path": str(p),
-                    "label": label,
-                    "group": p.stem,
-                    "split": target_split,
-                })
+    # Guard: no group may appear in more than one split.
+    splits_by_group: dict[str, set[str]] = {}
+    for row in rows:
+        splits_by_group.setdefault(row["group"], set()).add(row["split"])
+    leaking = [g for g, s in splits_by_group.items() if len(s) > 1]
+    if leaking:
+        raise SystemExit(f"{len(leaking)} groups span several splits, e.g. {leaking[:3]}")
 
-    # 2. Process massive_social (Instagram, LinkedIn, Pinterest, Facebook, Snapchat, Inpaint, Diffusion)
-    if SOCIAL_ROOT.exists():
-        print("\nEnumerating massive_social multi-platform datasets...")
-        for cat_dir in sorted(SOCIAL_ROOT.iterdir()):
-            if not cat_dir.is_dir():
-                continue
-            dir_name = cat_dir.name.lower()
-            label = 1 if "fake" in dir_name else 0
-            cat_files = [p for p in cat_dir.iterdir() if p.suffix.lower() in IMAGE_EXT]
-            if not cat_files:
-                continue
-
-            # 85% train, 15% validation
-            random.shuffle(cat_files)
-            n_val = max(1, int(len(cat_files) * 0.15))
-            val_items = set(cat_files[:n_val])
-
-            train_count = len(cat_files) - n_val
-            print(f"  {cat_dir.name}: {len(cat_files):,} images (Train: {train_count:,}, Val: {n_val:,}) | Label: {'Fake' if label==1 else 'Real'}")
-
-            for p in cat_files:
-                split = "val" if p in val_items else "train"
-                rows.append({
-                    "path": str(p),
-                    "label": label,
-                    "group": f"{dir_name}_{p.stem}",
-                    "split": split,
-                })
-
-    # 3. Add real-world user uploads if present
-    extra_added = 0
-    uploads_dir = REPO_ROOT / "backend" / "storage" / "uploads"
-    if uploads_dir.exists():
-        for p in uploads_dir.iterdir():
-            if p.suffix.lower() in IMAGE_EXT and p.stat().st_size > 1000:
-                rows.append({
-                    "path": str(p),
-                    "label": 1,
-                    "group": f"upload_{p.stem}",
-                    "split": "train",
-                })
-                extra_added += 1
-
-    user_uploaded_dir = Path(r"C:\Users\STUDENT\.gemini\antigravity-ide\brain\06763a06-af1d-4512-8bad-bc88ec434d5f\.user_uploaded")
-    if user_uploaded_dir.exists():
-        for p in user_uploaded_dir.iterdir():
-            if p.suffix.lower() in IMAGE_EXT:
-                rows.append({
-                    "path": str(p),
-                    "label": 1,
-                    "group": f"user_{p.stem}",
-                    "split": "train",
-                })
-                extra_added += 1
-
-    print(f"\nAdded {extra_added} real-world user uploads into training set.")
-
-    # Write manifest.csv
-    print(f"Writing master manifest to {MANIFEST}...")
-    with open(MANIFEST, "w", newline="", encoding="utf-8") as fh:
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    with args.output.open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=["path", "label", "group", "split"])
         writer.writeheader()
         writer.writerows(rows)
 
-    total = len(rows)
-    train_n = sum(1 for r in rows if r["split"] == "train")
-    val_n   = sum(1 for r in rows if r["split"] == "val")
-    real_n  = sum(1 for r in rows if r["label"] == 0)
-    fake_n  = sum(1 for r in rows if r["label"] == 1)
-
-    print(f"\n================ MASTER MANIFEST SUMMARY ================")
-    print(f"  Total Images Index   : {total:,}")
-    print(f"  Real Images          : {real_n:,} ({real_n/total*100:.1f}%)")
-    print(f"  Fake Images          : {fake_n:,} ({fake_n/total*100:.1f}%)")
-    print(f"  Training Split (85%) : {train_n:,}")
-    print(f"  Validation Split(15%): {val_n:,}")
-    print(f"=========================================================\n")
+    counts = Counter((r["split"], r["label"]) for r in rows)
+    print(f"\nWrote {len(rows):,} rows to {args.output}")
+    for split in ("train", "val", "test"):
+        print(f"  {split:5s}: real {counts[(split, 0)]:,} | fake {counts[(split, 1)]:,}")
+    if not args.extra:
+        print(
+            "\nWARNING: every 'fake' here is a StyleGAN face or a filtered copy of one. A model "
+            "trained on this manifest detects StyleGAN faces, not current generators; pass "
+            "--extra with real photos and genuine diffusion / GPT / Gemini images for that."
+        )
 
 
 if __name__ == "__main__":

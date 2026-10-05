@@ -283,4 +283,29 @@ export const Clock = (p) => (
 )
 
 
+export const ChevronDown = (p) => (
+  <Svg {...p}>
+    <polyline points="6 9 12 15 18 9" />
+  </Svg>
+)
+
+export const ChevronUp = (p) => (
+  <Svg {...p}>
+    <polyline points="18 15 12 9 6 15" />
+  </Svg>
+)
+
+export const ChevronRight = (p) => (
+  <Svg {...p}>
+    <polyline points="9 18 15 12 9 6" />
+  </Svg>
+)
+
+export const X = (p) => (
+  <Svg {...p}>
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </Svg>
+)
+
 export const MEDIA_ICON = { image: Image, audio: Waveform, video: Video }

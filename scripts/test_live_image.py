@@ -25,11 +25,11 @@ from app.ml.image_pipeline import analyze_image
 PRESET_SAMPLES = {
     "1": ("Real Flickr-HQ Face", _REPO_ROOT / "data/raw/faces-140k/real_vs_fake/real-vs-fake/valid/real/00005.jpg"),
     "2": ("StyleGAN Fake Face", _REPO_ROOT / "data/raw/faces-140k/real_vs_fake/real-vs-fake/valid/fake/00483R5CC4.jpg"),
-    "3": ("Modern Diffusion AI (Midjourney/SDXL)", next(_REPO_ROOT.glob("data/raw/massive_social/diffusion_fake/*.jpg"))),
-    "4": ("Instagram Compressed Photo", next(_REPO_ROOT.glob("data/raw/massive_social/instagram_real/*.jpg"))),
-    "5": ("LinkedIn Headshot Photo", next(_REPO_ROOT.glob("data/raw/massive_social/linkedin_real/*.jpg"))),
-    "6": ("Snapchat Mobile Photo", next(_REPO_ROOT.glob("data/raw/massive_social/snapchat_real/*.jpg"))),
-    "7": ("Synthetic Inpainted Face", next(_REPO_ROOT.glob("data/raw/massive_social/inpaint_fake/*.jpg"))),
+    "3": ("Blurred StyleGAN Face ('diffusion_fake' emulation, not real diffusion)", next(_REPO_ROOT.glob("data/raw/massive_social/diffusion_fake/*.jpg"))),
+    "4": ("Re-encoded FFHQ Face ('instagram_real')", next(_REPO_ROOT.glob("data/raw/massive_social/instagram_real/*.jpg"))),
+    "5": ("Re-encoded FFHQ Face ('linkedin_real')", next(_REPO_ROOT.glob("data/raw/massive_social/linkedin_real/*.jpg"))),
+    "6": ("Re-encoded FFHQ Face ('snapchat_real')", next(_REPO_ROOT.glob("data/raw/massive_social/snapchat_real/*.jpg"))),
+    "7": ("Patch-blurred StyleGAN Face ('inpaint_fake' emulation)", next(_REPO_ROOT.glob("data/raw/massive_social/inpaint_fake/*.jpg"))),
 }
 
 def test_file(file_path: Path):

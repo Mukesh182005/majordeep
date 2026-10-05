@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -22,9 +23,15 @@ class AnalysisResult:
     model_version: str
     weights_status: str  # "trained" | "untrained-backbone"
     evidence: dict[str, Any] = field(default_factory=dict)
+    # Set when the evidence cannot support the verdict the probability alone
+    # would give: a screenshot the detectors did not flag is not thereby
+    # "authentic", it is unverifiable.
+    verdict_override: Verdict | None = None
 
     @property
     def verdict(self) -> Verdict:
+        if self.verdict_override is not None:
+            return self.verdict_override
         return classify(self.fake_probability)
 
     @property
@@ -33,9 +40,30 @@ class AnalysisResult:
 
         A probability of 0.5 carries no information (confidence 0.0); 0.0 or 1.0
         is maximally confident. This is what the UI shows, so a borderline score
-        never renders as a confident verdict.
+        never renders as a confident verdict — and an INCONCLUSIVE override never
+        shows more confidence than a probability inside the uncertain band could.
         """
-        return round(abs(self.fake_probability - 0.5) * 2, 4)
+        confidence = abs(self.fake_probability - 0.5) * 2
+        if self.verdict_override is Verdict.INCONCLUSIVE:
+            confidence = min(confidence, settings.uncertain_band * 2)
+        return round(confidence, 4)
+
+
+def json_safe(value: Any) -> Any:
+    """Copy of ``value`` that strict JSON accepts: NaN/inf become ``None``, numpy scalars become Python.
+
+    Evidence is persisted as JSON and parsed by browsers, which reject the
+    ``NaN`` literal Python's encoder emits by default.
+    """
+    if isinstance(value, dict):
+        return {key: json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [json_safe(item) for item in value]
+    if hasattr(value, "item") and callable(value.item) and getattr(value, "ndim", None) == 0:
+        value = value.item()  # numpy scalar
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    return value
 
 
 def classify(fake_probability: float) -> Verdict:

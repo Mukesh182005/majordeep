@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 
 from app.config import settings
 from app.database import SessionLocal
-from app.ml.base import DetectorUnavailableError
+from app.ml.base import DetectorUnavailableError, json_safe
 from app.models import Job, JobStatus
 from app.worker.celery_app import celery_app
 
@@ -52,7 +52,7 @@ def analyze_job(self, job_id: str) -> dict:
         job.model_name = result.model_name
         job.model_version = result.model_version
         job.weights_status = result.weights_status
-        job.evidence = result.evidence
+        job.evidence = json_safe(result.evidence)
         job.processing_ms = int((time.perf_counter() - started) * 1000)
         job.finished_at = datetime.now(UTC)
         job.error_message = None

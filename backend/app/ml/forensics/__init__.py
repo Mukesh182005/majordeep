@@ -118,14 +118,14 @@ def run_comprehensive_forensics(
     if ela["compression_anomaly_detected"]:
         st4_findings.append(f"Compression divergence detected (peak ELA delta: {ela['peak_error']}).")
     if not camera_stats["cfa_artifacts_detected"]:
-        st4_findings.append("Missing physical Bayer CFA demosaicing periodicity (typical of synthetic rendering).")
+        # Absent in every real JPEG photo measured: resizing and recompression erase it.
+        st4_findings.append("No camera CFA demosaicing trace found (normal after resizing or JPEG recompression; not evidence of AI generation on its own).")
 
     if camera_stats.get("fourier_spectral_slope"):
         st4_findings.append(f"Fourier spectral slope: alpha={camera_stats['fourier_spectral_slope']} (Wavelet HH peak ratio: {camera_stats.get('wavelet_grid_peak_ratio')}).")
 
-    synthetic_cfa = not camera_stats["cfa_artifacts_detected"]
-    st4_status = "AI_FLAGGED" if synthetic_cfa else ("SUSPICIOUS" if ela["compression_anomaly_detected"] else "PASSED")
-    cfa_label = "Physical Hardware Grid (Real Camera)" if camera_stats["cfa_artifacts_detected"] else "Missing (Synthetic AI Generation)"
+    st4_status = "SUSPICIOUS" if ela["compression_anomaly_detected"] else "PASSED"
+    cfa_label = "Physical Hardware Grid (Real Camera)" if camera_stats["cfa_artifacts_detected"] else "Not detected"
     pipeline_modules.append({
         "stage": 4,
         "name": "Frequency & Signal Forensics (FFT / DCT / ELA)",
@@ -147,7 +147,7 @@ def run_comprehensive_forensics(
     fswap_info = tampering.get("face_swap", {})
     if fswap_info.get("face_swap_detected"):
         for anom in fswap_info.get("anomalies", []):
-            st5_findings.append(f"Deepfake facial boundary seam: {anom}.")
+            st5_findings.append(f"Face-region inconsistency (heuristic; common in real portraits, not proof of a face swap): {anom}.")
     if tampering.get("synthetic_matte_detected"):
         st5_findings.append(f"Synthetic background matte: {round(tampering.get('clamped_black_ratio', 0) * 100, 1)}% of frame is zero-noise digital void (matte/cutout).")
     if tampering["copy_move_detected"]:
@@ -158,7 +158,7 @@ def run_comprehensive_forensics(
         st5_findings.append(f"Watermark detected: {watermark['subtype']} in {watermark['location']}.")
 
     has_tamper = (tampering["copy_move_detected"] or tampering["splicing_detected"] or watermark["watermark_detected"] or fswap_info.get("face_swap_detected"))
-    st5_status = "AI_FLAGGED" if (fswap_info.get("face_swap_detected") or tampering.get("synthetic_matte_detected")) else ("SUSPICIOUS" if has_tamper else "PASSED")
+    st5_status = "SUSPICIOUS" if (has_tamper or tampering.get("synthetic_matte_detected")) else "PASSED"
     splicing_summary = "Synthetic Matte" if tampering.get("synthetic_matte_detected") else ("Detected" if tampering["splicing_detected"] else "None")
     pipeline_modules.append({
         "stage": 5,
@@ -184,47 +184,27 @@ def run_comprehensive_forensics(
         pass
     ai_forensic_result = compute_ai_forensic_score(image, file_format=file_fmt)
     forensic_ai_prob = float(ai_forensic_result.get("ai_forensic_prob", 0.40))
-    
-    # Fuse Module 28 forensic AI score with neural ensemble
-    # Only boost if forensic analysis agrees AI is likely (>= 0.50)
-    current_scene_prob = float(ai_scores.get("scene_ai_prob", 0.0))
-    current_ensemble = float(ai_scores.get("ensemble_fake_prob", 0.0))
-    
-    if forensic_ai_prob >= 0.55 and current_scene_prob < 0.50:
-        # Forensics strongly says AI but neural net missed it — use calibrated blend
-        blended_scene = current_scene_prob * 0.40 + forensic_ai_prob * 0.60
-        ai_scores = dict(ai_scores)  # Don't mutate original
-        ai_scores["scene_ai_prob"] = round(blended_scene, 4)
-        ai_scores["ensemble_fake_prob"] = round(max(current_ensemble, blended_scene), 4)
-        ai_scores["forensic_ai_prob"] = round(forensic_ai_prob, 4)
-        logger.info(
-            "Module 28 override: forensic_prob=%.3f -> blended scene_prob=%.3f",
-            forensic_ai_prob, blended_scene
-        )
-    elif forensic_ai_prob >= 0.45 and current_scene_prob >= 0.35:
-        # Both agree it's suspicious — slight boost
-        blended_scene = max(current_scene_prob, (current_scene_prob + forensic_ai_prob) / 2)
-        ai_scores = dict(ai_scores)
-        ai_scores["scene_ai_prob"] = round(blended_scene, 4)
-        ai_scores["ensemble_fake_prob"] = round(max(current_ensemble, blended_scene), 4)
-        ai_scores["forensic_ai_prob"] = round(forensic_ai_prob, 4)
-    else:
-        ai_scores = dict(ai_scores)
-        ai_scores["forensic_ai_prob"] = round(forensic_ai_prob, 4)
-    
+
+    # Module 28 is reported but not fused into the AI score. Measured on 560
+    # labelled images (200 real photos, 360 from current generators) its
+    # score had AUC 0.26-0.31: it rates real photos as *more* synthetic than
+    # AI images, so blending it in can only move verdicts the wrong way.
+    ai_scores = dict(ai_scores)
+    ai_scores["forensic_ai_prob"] = round(forensic_ai_prob, 4)
+
     t1 = time.perf_counter()
 
-    ai_flag = float(ai_scores.get("ensemble_fake_prob", 0.0)) >= 0.50 or float(ai_scores.get("scene_ai_prob", 0.0)) >= 0.22
+    ai_flag = float(ai_scores.get("ensemble_fake_prob", 0.0)) >= 0.50 or float(ai_scores.get("scene_ai_prob", 0.0)) >= 0.50
     forensic_verdict = ai_forensic_result.get("forensic_verdict", "BORDERLINE")
-    st6_status = "AI_FLAGGED" if ai_flag else ("SUSPICIOUS" if forensic_ai_prob >= 0.45 else "PASSED")
+    st6_status = "AI_FLAGGED" if ai_flag else ("SUSPICIOUS" if float(ai_scores.get("scene_ai_prob", 0.0)) >= 0.35 else "PASSED")
     pipeline_modules.append({
         "stage": 6,
         "name": "AI & Deepfake Detection Engine (Neural + M28 Forensic)",
         "category": "AI Forensics",
         "status": st6_status,
         "duration_ms": max(1, int((t1 - t0) * 1000)),
-        "summary": f"Ensemble Score: {round(ai_scores.get('ensemble_fake_prob', 0.0) * 100, 1)}% | GenAI ViT: {round(ai_scores.get('scene_ai_prob', 0.0) * 100, 1)}% | M28 Forensic: {round(forensic_ai_prob * 100, 1)}% ({forensic_verdict})",
-        "findings": [f"Dominant Indicator: {'Synthetic AI Generation' if ai_scores.get('scene_ai_prob', 0) >= ai_scores.get('face_fake_prob', 0) else 'Deepfake Facial Manipulation'}", f"M28 Signal Count: {ai_forensic_result.get('strong_ai_signal_count', 0)} strong synthetic markers"] if ai_flag else [f"M28 Forensic: {forensic_verdict} (score: {round(forensic_ai_prob*100,1)}%). Neural classifiers indicate authentic photographic characteristics."],
+        "summary": f"Ensemble Score: {round(ai_scores.get('ensemble_fake_prob', 0.0) * 100, 1)}% | Scene AI detectors: {round(ai_scores.get('scene_ai_prob', 0.0) * 100, 1)}% | M28 heuristic (informational): {round(forensic_ai_prob * 100, 1)}%",
+        "findings": [f"Dominant Indicator: {'Synthetic AI Generation' if ai_scores.get('scene_ai_prob', 0) >= ai_scores.get('face_fake_prob', 0) else 'Deepfake Facial Manipulation'}"] if ai_flag else [f"No AI-generation detector crossed its threshold. M28 heuristic: {forensic_verdict} ({round(forensic_ai_prob*100,1)}%; unvalidated, not used in the verdict)."],
     })
 
     # ------------------------------------------------------------- STAGE 7: Steganography & Provenance

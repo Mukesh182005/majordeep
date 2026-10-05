@@ -27,7 +27,7 @@ from app.ml.base import AnalysisResult
 from app.ml.faces import extract_faces
 from app.ml.forensics import run_comprehensive_forensics
 from app.ml.gradcam import compute_gradcam, overlay_heatmap
-from app.ml.image_pipeline import get_scene_detector
+from app.ml.image_pipeline import score_scene
 from app.ml.preprocessing import normalize_waveform, preprocess_image, sample_video_frames
 from app.ml.registry import UNTRAINED, get_image_model
 from app.ml.video.audio_crossmodal import analyze_crossmodal_lipsync
@@ -123,29 +123,36 @@ def analyze_video(
         })
         frame_tensors.append((timestamp_s, tensor, crop.image))
 
-    worst_idx = int(np.argmax([s["fake_probability"] for s in frame_scores]))
-    worst_prob = float(frame_scores[worst_idx]["fake_probability"])
+    # The face model is trained on face crops; on a frame without a face it
+    # scores scenery, which is noise. Only frames with a detected face count.
+    face_frames = [i for i, s in enumerate(frame_scores) if s["face_detected"]]
+    if face_frames:
+        worst_idx = max(face_frames, key=lambda i: frame_scores[i]["fake_probability"])
+        worst_prob = float(frame_scores[worst_idx]["fake_probability"])
+    else:
+        worst_idx = len(frame_scores) // 2  # representative keyframe for scene analysis
+        worst_prob = 0.0
     worst_pil = frames_pil[worst_idx][1]
-    faces_in_any = sum(1 for s in frame_scores if s["face_detected"])
+    faces_in_any = len(face_frames)
+    # The face model's score is shown per frame, but it only feeds the verdict
+    # when a validated face model is configured (see settings.face_model_in_verdict).
+    face_display_prob = worst_prob
+    if not settings.face_model_in_verdict:
+        worst_prob = 0.0
 
-    # Full-scene generative AI ViT classifier on worst frame
+    # Full-scene generative-AI detectors on the worst frame — the same fused
+    # ensemble the image pipeline uses. (This block used to call each
+    # ensemble entry directly; entries are records, not callables, so every
+    # call raised, the bare ``except`` swallowed it, and the score was 0.0.)
     vit_genai_prob = 0.0
     try:
-        scene_detectors = get_scene_detector()
-        if scene_detectors:
-            ai_scores = []
-            for det in scene_detectors:
-                try:
-                    predictions = det(worst_pil)
-                    for p in predictions:
-                        if str(p.get("label", "")).lower() in ("artificial", "fake", "synthetic", "ai", "sdxl", "generated"):
-                            ai_scores.append(float(p.get("score", 0.0)))
-                except Exception:
-                    pass
-            if ai_scores:
-                vit_genai_prob = float(np.mean(ai_scores))
+        scene = score_scene(worst_pil)
+        if scene["scene_ai_prob"] is not None:
+            vit_genai_prob = float(scene["scene_ai_prob"])
+        else:
+            logger.warning("No scene detector available for video job %s; scene AI score omitted.", job_id)
     except Exception as exc:
-        logger.debug("ViT scene detector in video pipeline skipped: %s", exc)
+        logger.warning("Scene AI detection on video keyframe failed: %s", exc)
 
     st3_ms = int((time.perf_counter() - st3_start) * 1000)
     pipeline_modules.append({
@@ -153,7 +160,7 @@ def analyze_video(
         "name": "Spatial Neural & Generative AI Backbone",
         "duration_ms": st3_ms,
         "status": "AI_FLAGGED" if max(worst_prob, vit_genai_prob) >= 0.65 else "PASSED",
-        "desc": f"Face score: {round(worst_prob * 100, 1)}% | Full-scene ViT GenAI: {round(vit_genai_prob * 100, 1)}%",
+        "desc": f"Face score: {round(face_display_prob * 100, 1)}%{'' if settings.face_model_in_verdict else ' (informational)'} | Full-scene ViT GenAI: {round(vit_genai_prob * 100, 1)}%",
     })
 
     # ── Stage 4: Comprehensive 28-Module Image Forensics on Keyframe ─────────────

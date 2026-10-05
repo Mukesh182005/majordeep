@@ -27,7 +27,6 @@ def compute_risk_and_fusion(
     ai_gen_prob = float(ai_scores.get("ensemble_fake_prob", 0.0))
     scene_ai_prob = float(ai_scores.get("scene_ai_prob", 0.0))
     face_fake_prob = float(ai_scores.get("face_fake_prob", 0.0))
-    faces_count = int(ai_scores.get("faces_count", 0))
 
     # Evaluate AI generation component from full-scene ViT, facial models, and ensemble
     ai_component = round(max(ai_gen_prob, scene_ai_prob, face_fake_prob) * 100.0, 1)
@@ -44,13 +43,12 @@ def compute_risk_and_fusion(
     # Combine AI generation scores from ViT scene detector, facial models, and ensemble
     ai_component = round(max(ai_gen_prob, scene_ai_prob, face_fake_prob) * 100.0, 1)
 
-    # Positive Authentic Evidence Counter
+    # Positive authenticity evidence: traces a camera leaves that generators do
+    # not. A low face-model score is not one — that model only knows StyleGAN
+    # faces and scores modern AI faces as real — nor is a "natural" spectral
+    # slope, which textured AI renders also produce.
     authentic_signals = 0
-    if faces_count > 0 and face_fake_prob < 0.15:
-        authentic_signals += 1
-    if camera_stats.get("fourier_spectral_slope", 0) >= 1.35:
-        authentic_signals += 1
-    if camera_stats.get("cfa_periodicity_ratio", 0) >= 1.75 or camera_stats.get("cfa_artifacts_detected", False):
+    if camera_stats.get("cfa_artifacts_detected", False):
         authentic_signals += 1
     if metadata.get("exif_present", False) and not camera_unknown:
         authentic_signals += 1
@@ -75,7 +73,8 @@ def compute_risk_and_fusion(
     # Tampering component
     tampering_component = 0.0
     if fswap.get("face_swap_detected"):
-        tampering_component = max(tampering_component, 85.0)
+        # Unvalidated heuristic (fires on ~30% of real portraits): moderate weight only.
+        tampering_component = max(tampering_component, 40.0)
     if tampering.get("copy_move_detected"):
         tampering_component = max(tampering_component, 75.0 if tampering.get("cloned_feature_pairs", 0) >= 8 else 50.0)
     if tampering.get("synthetic_matte_detected"):
@@ -142,9 +141,11 @@ def compute_risk_and_fusion(
         ai_component = max(ai_component, 98.0)
         raw_risk = max(raw_risk, 95.0)
 
-    if synthetic_sensor and (scene_ai_prob >= 0.45 or ai_gen_prob >= 0.45):
+    # High risk tracks a detection, not the CFA/noise heuristics (true for
+    # most real web photos) or a matte on its own.
+    if scene_ai_prob >= 0.65 or ai_gen_prob >= 0.65:
         raw_risk = max(raw_risk, 82.0)
-    if tampering.get("synthetic_matte_detected") and (scene_ai_prob >= 0.35 or synthetic_sensor):
+    if tampering.get("synthetic_matte_detected") and scene_ai_prob >= 0.65:
         raw_risk = max(raw_risk, 86.0)
 
     if provenance.get("threat_intel", {}).get("threat_level") in ("HIGH", "ELEVATED"):
@@ -162,28 +163,24 @@ def compute_risk_and_fusion(
         risk_tier = "LOW_RISK"
 
     # 3. Evidence Correlation & Fusion Engine (Module 22)
+    # Only signals that separate real from AI images are counted. Measured on
+    # 196 real photos / 341 AI images, several former "signals" fired at
+    # chance and are kept as context instead: no CFA trace (100% of real JPEG
+    # photos), missing camera EXIF (most web images), the Fourier/wavelet
+    # artifact (50% of real vs 47% of AI), the face-seam heuristic (30% of real
+    # faces vs 27% of AI faces) and a black/chroma matte (2.0% vs 1.8%).
+    # Counting them made one detector score look like "3 independent signals".
     corroborating_signals = []
+    context_signals = []
     if provenance.get("ai_generation_disclosed"):
         gen_name = provenance.get("disclosed_generator") or "C2PA Disclosed Generative AI"
         corroborating_signals.append(f"Content Credentials / Provenance ({gen_name})")
 
-    if fswap.get("face_swap_detected"):
-        corroborating_signals.append(f"Deepfake Face-Swap Blending ({', '.join(fswap.get('anomalies', []))})")
-
     if ai_gen_prob >= 0.60 or scene_ai_prob >= 0.55:
-        corroborating_signals.append(f"AI Generative Pattern (ViT / Diffusion Probe: {round(max(ai_gen_prob, scene_ai_prob)*100, 1)}%)")
+        corroborating_signals.append(f"AI Generative Pattern (scene detectors: {round(max(ai_gen_prob, scene_ai_prob)*100, 1)}%)")
 
-    if synthetic_sensor and (scene_ai_prob >= 0.60 or ai_gen_prob >= 0.60 or (watermark.get("watermark_detected") and watermark.get("watermark_type") == "AI_GENERATOR_STAMP") or tampering.get("synthetic_matte_detected")):
-        corroborating_signals.append("Missing Physical Bayer CFA Grid (Synthetic Sensor Footprint)")
-
-    if camera_unknown and synthetic_sensor and (scene_ai_prob >= 0.65 or ai_gen_prob >= 0.65 or tampering.get("synthetic_matte_detected")):
-        corroborating_signals.append("Missing Camera Hardware EXIF (Typical of AI Generation)")
-
-    if tampering.get("synthetic_matte_detected"):
-        corroborating_signals.append("Synthetic Background Alpha / Blackout Matte (Digital Composition)")
-
-    if camera_stats.get("wavelet_grid_peak_ratio", 1.0) > 6.5 or (camera_stats.get("fourier_spectral_slope", 2.0) < 1.15 and synthetic_sensor):
-        corroborating_signals.append(f"Wavelet / Fourier Frequency Artifact (Slope: {camera_stats.get('fourier_spectral_slope', 2.0)})")
+    if metadata.get("ai_metadata_detected"):
+        corroborating_signals.append(f"AI Generator Metadata ({metadata.get('ai_generator_name') or 'generator parameters'})")
 
     if watermark.get("watermark_detected"):
         w_type = watermark.get("watermark_type")
@@ -197,13 +194,9 @@ def compute_risk_and_fusion(
 
     if tampering.get("copy_move_detected") and tampering.get("cloned_feature_pairs", 0) >= 12:
         corroborating_signals.append(f"Pixel Cloning / Copy-Move Duplication ({tampering.get('cloned_feature_pairs', 0)} keypoints)")
-    elif tampering.get("splicing_detected") and not fswap.get("face_swap_detected") and not tampering.get("synthetic_matte_detected"):
-        corroborating_signals.append("Pixel Splicing Boundary Discontinuity")
 
     if ela.get("compression_anomaly_detected"):
         corroborating_signals.append("Compression ELA Divergence")
-    if metadata.get("ai_metadata_detected") or metadata.get("editing_software_detected"):
-        corroborating_signals.append("Metadata Inconsistency")
     if stego.get("payload_likelihood") in ("HIGH", "MEDIUM"):
         corroborating_signals.append("Statistical Stego / LSB Anomaly")
     if file_security.get("embedded_objects"):
@@ -211,6 +204,17 @@ def compute_risk_and_fusion(
     elif file_security.get("trailing_data_detected") and file_security.get("trailing_bytes_count", 0) > 100:
         # Small trailing data (<= 100 bytes) is common from WhatsApp/social media recompression
         corroborating_signals.append("Container Structural Payload (Significant Trailing Data)")
+
+    if not camera_stats.get("cfa_artifacts_detected", False):
+        context_signals.append("No camera CFA demosaicing trace (normal after resizing/recompression)")
+    if camera_unknown:
+        context_signals.append("No camera make/model in metadata")
+    if metadata.get("editing_software_detected"):
+        context_signals.append(f"Edited with {metadata.get('software', 'editing software')}")
+    if tampering.get("synthetic_matte_detected"):
+        context_signals.append("Flat black/chroma background region (matte)")
+    if fswap.get("face_swap_detected"):
+        context_signals.append("Face-region inconsistency heuristic fired (unvalidated)")
 
     signal_count = len(corroborating_signals)
     if signal_count >= 3:
@@ -220,33 +224,30 @@ def compute_risk_and_fusion(
         fusion_verdict = "CORROBORATED_MANIPULATION"
         fusion_confidence = "HIGH"
     elif signal_count == 1:
-        if (
-            fswap.get("face_swap_detected")
-            or (tampering.get("copy_move_detected") and tampering.get("cloned_feature_pairs", 0) >= 8)
-            or tampering.get("synthetic_matte_detected")
-            or provenance.get("ai_generation_disclosed")
-        ):
+        if provenance.get("ai_generation_disclosed"):
             fusion_verdict = "CORROBORATED_MANIPULATION"
             fusion_confidence = "HIGH"
         else:
             fusion_verdict = "ISOLATED_ANOMALY"
             fusion_confidence = "MODERATE"
-    else:
+    elif authentic_signals:
         fusion_verdict = "CONSISTENT_AUTHENTIC_SIGNALS"
         fusion_confidence = "HIGH"
+    else:
+        # Nothing flagged, but nothing camera-specific confirmed either:
+        # absence of detected manipulation is not evidence of authenticity.
+        fusion_verdict = "NO_MANIPULATION_SIGNALS_DETECTED"
+        fusion_confidence = "LOW"
 
     # 4. Granular Threat Taxonomy Assignment
-    if fswap.get("face_swap_detected"):
-        dominant_threat = "Deepfake Face-Swap / Morph"
-        threat_code = "DEEPFAKE_FACE_SWAP"
-    elif tampering.get("synthetic_matte_detected"):
+    if tampering.get("synthetic_matte_detected") and scene_ai_prob >= 0.45:
         dominant_threat = "Synthetic Background / Inpainting Matte"
         threat_code = "SYNTHETIC_BACKGROUND_REPLACEMENT"
     elif ai_gen_prob >= 0.50 or scene_ai_prob >= 0.45 or (synthetic_sensor and scene_ai_prob >= 0.35) or provenance.get("ai_generation_disclosed"):
         gen_label = provenance.get("disclosed_generator") or metadata.get("ai_generator_name") or "Diffusion / Neural Generator"
         dominant_threat = f"Synthetic AI Generation ({gen_label})"
         threat_code = "SYNTHETIC_AI_GENERATION"
-    elif tampering.get("copy_move_detected") or tampering.get("splicing_detected"):
+    elif tampering.get("copy_move_detected"):
         dominant_threat = "Cloning / Photographic Splicing"
         threat_code = "SPLICING_TAMPERING"
     else:
@@ -272,6 +273,7 @@ def compute_risk_and_fusion(
             "dominant_threat": dominant_threat,
             "threat_code": threat_code,
             "corroborating_signals": corroborating_signals,
+            "context_signals": context_signals,
             "orthogonal_signals_count": signal_count,
         },
     }

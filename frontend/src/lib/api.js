@@ -86,8 +86,10 @@ export const api = {
   upload: (file, onProgress) => uploadWithProgress(file, onProgress),
   jobStatus: (id) => request(`/jobs/${id}/status`),
   jobResult: (id) => request(`/jobs/${id}/result`),
-  createReport: (id) => request(`/jobs/${id}/report`, { method: 'POST' }),
-  reportUrl: (id) => `${API}/jobs/${id}/report`,
+  reportUrl: (id) => {
+    const token = getToken()
+    return `${API}/jobs/${id}/report${token ? `?token=${encodeURIComponent(token)}` : ''}`
+  },
   evidenceUrl: (path) => {
     if (!path) return ''
     if (path.startsWith('http://') || path.startsWith('https://')) return path

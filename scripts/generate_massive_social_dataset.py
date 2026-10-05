@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
-"""Multi-threaded high-throughput synthesizer for social media & diffusion datasets.
+"""Multi-threaded high-throughput synthesizer for social-media-style re-encodings.
 
 Generates 360,000 multi-platform images (Instagram, LinkedIn, Pinterest, Facebook,
 Snapchat, Inpainting, and Diffusion) across 24 CPU worker processes to form
 a master 500,000-image balanced dataset.
+
+Every output is a filtered copy of a faces-140k *training* image, so:
+  * copies must stay in the training split (``expand_training_dataset.py``
+    enforces this) — a copy in validation leaks its source;
+  * the "diffusion" and "inpaint" folders are NOT diffusion output: they are
+    PIL smoothing / patch-blur filters over StyleGAN faces. A model trained on
+    them learns "blurred StyleGAN face", not Stable Diffusion, Flux, DALL-E,
+    Midjourney, GPT-image or Gemini output.
 """
 
 from __future__ import annotations

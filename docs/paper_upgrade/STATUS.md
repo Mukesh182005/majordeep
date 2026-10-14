@@ -43,6 +43,11 @@ Last updated: 2026-10-14.
 - Smoke test with the real detectors on 4 images (scratch output, not a paper number): GPU, float32, detector A revision `4ae1822603cb1ec980c217cfde1ef1b8e0477a16`, detector B revision `b37fede8562cb72b89ec201c0987f96ba21b518a`; about 50 ms per image for the scene scores and 250 ms end to end after warm-up.
 - Tests: `test_paper_stats.py`, `test_image_eval_harness.py`.
 
+### Phase 3 preparation (legacy audio signals; nothing changed in the backend)
+- `ml/evaluation/audio_heuristics_dev.py`: balanced dev subsample (1,000 bona fide, 1,000 spoofed spread over A01–A06, seed 0) and, per utterance, every legacy signal (glottal, coarticulation, ENF/mains hum, splice timeline, model-stage branches, R_synth, R_tamper, final probability and verdict) from the full `run_comprehensive_audio_forensics`; resumable; torch seeded for the untrained SincRawNet. Test: `test_audio_heuristics_subsample.py`.
+- Timing on 20 dev files (scratch output): 1.34 s per utterance, so about **45 minutes** for all 2,000. Per `GOAL.md`, the full run waits for your go-ahead.
+- Early observation from those 20 files only (all bona fide; not a measurement): the splice-timeline detector fired on every file, R_tamper was 0.5 and the legacy verdict was INCONCLUSIVE for all of them. The full run will show whether this holds.
+
 ### Phase 5 preparation (nothing frozen, nothing scored)
 - `ml/evaluation/baselines/`: `umm_maybe` (old detector C), `univfd`, `cnndetection`, and `verify_official.py`.
 - `paper/config/freeze_image_config.py`: writes `frozen_image_config.json` (detector revisions and file hashes, weights, threshold, band, rules, border-crop constants, implementation file hashes). Not run: when to freeze is your decision (see Blocked).
@@ -87,6 +92,8 @@ Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 sk
 8. **Licences:** detector B (cc-by-nc-3.0), CNNDetection and Synthbuster (CC BY-NC-SA 4.0) and RAISE (non-commercial research and education) are non-commercial; detector B also runs in the deployed platform. In-the-Wild's licence is stated differently on its page (Apache 2.0) and its Hugging Face card (CC BY-SA 4.0).
 9. **Detector A's training data is not stated** on its model card (threat to validity).
 10. **torch is a nightly build**; Phase 9 should pin it.
+11. **The audio "conformal prediction" is not implemented.** `backend/app/ml/audio/evidence_fusion.py` labels its decision step "Conformal Prediction Set (alpha = 0.01)" with the comment "Bounded false positive rate: P(Authentic flagged as fake) <= 1%" and returns `conformal_alpha_guarantee: 0.01`, but the thresholds are fixed constants (0.35 and 0.70), nothing is calibrated on held-out data, and `alpha` is never used. No such guarantee can be claimed.
+12. **The audio "likelihood ratios" are constants** (25,000, 450 or 0.0001 by verdict), not computed from data.
 
 ## Blocked (needs you)
 
@@ -109,5 +116,6 @@ Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 sk
    git commit -m "Select ASVspoof front end on dev; freeze checkpoints before eval"
    ```
    Each run writes `checkpoints\audio_lcnn_asvspoof_<features>_seed<k>.pt` (not committed) and `paper_results\audio_asvspoof2019la\dev_runs\<run>\` (`train_log.csv`, `dev_scores.csv`, `dev_metrics.json`, `run_config.json`). An interrupted run continues with the same command plus `--resume`.
-2. Then I score eval once per seed (`eval_asvspoof.py --confirm-final-eval`), run `paper/analysis/audio_asvspoof_report.py`, and start Phase 3.
-3. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloading; RAISE-1k needs your form; team photographs).
+2. Then I score eval once per seed (`eval_asvspoof.py --confirm-final-eval`), run `paper/analysis/audio_asvspoof_report.py`, and continue Phase 3.
+3. **Phase 3 heuristics run (about 45 minutes), when you approve:** `python ml\evaluationudio_heuristics_dev.py` writes `paper_resultsudio_heuristics_dev\` (`subsample.csv`, `scores.csv`, `config.json`). It does not need the LCNN; its column is added after Phase 2.
+4. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloading; RAISE-1k needs your form; team photographs).

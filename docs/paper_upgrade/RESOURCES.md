@@ -24,16 +24,15 @@ official `demo.py` output on every image.
 
 ## 2. Downloadable with one command (not yet downloaded)
 
-Run from PowerShell; each command resumes if interrupted.
+Run from PowerShell; each command resumes if interrupted. For large files, `scriptsetch_dataset.py` (parallel byte ranges, reconnects stalled connections, verifies the MD5) is faster: single connections to DataShare and Zenodo slowed to under 0.5 MB/s during the ASVspoof download.
 
 | Resource | Size | Licence | Command |
 |---|---|---|---|
-| Synthbuster (T2 generated images, nine generators) | 12,372,557,226 B, MD5 `0695bd328e16ea21c5c9cc2ae1d994ff` | CC BY-NC-SA 4.0 | `curl.exe -L -C - -o C:\deepsentinel_data\downloads\synthbuster.zip "https://zenodo.org/api/records/10066460/files/synthbuster.zip/content"` |
+| Synthbuster (T2 generated images, nine generators) | 12,372,557,226 B, MD5 `0695bd328e16ea21c5c9cc2ae1d994ff` | CC BY-NC-SA 4.0 | **Download started 2026-10-14** into `downloads\synthbuster_parts`; to finish or resume it: `python scriptsetch_dataset.py --url "https://zenodo.org/api/records/10066460/files/synthbuster.zip/content" --out C:\deepsentinel_data\downloads\synthbuster.zip --size 12372557226 --md5 0695bd328e16ea21c5c9cc2ae1d994ff --parts-dir C:\deepsentinel_data\downloads\synthbuster_parts` |
 | COCO val2017 (T2 real-photo candidates) | 815,585,330 B | Annotations and image terms to be checked on cocodataset.org | `curl.exe -L -C - -o C:\deepsentinel_data\downloads\coco_val2017.zip "http://images.cocodataset.org/zips/val2017.zip"` |
 | In-the-Wild audio (optional cross-dataset test) | 8,161,489,023 B | **Conflict:** project page says Apache 2.0, Hugging Face card says CC BY-SA 4.0; resolve before use | `python -c "from huggingface_hub import hf_hub_download; hf_hub_download('mueller91/In-The-Wild', 'release_in_the_wild.zip', repo_type='dataset', local_dir=r'C:\deepsentinel_data\downloads')"` |
 
-Disk: C: had 79 GB free after the downloads in section 1. The ASVspoof feature
-cache needs about 14 GB more; Synthbuster needs about 25 GB if it is extracted.
+Disk (2026-10-14): after extracting ASVspoof and building its 15 GB feature cache, C: had 53 GB free. Synthbuster needs 12.4 GB for the zip and about the same again if extracted.
 
 ## 3. Only you can obtain these
 

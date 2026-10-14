@@ -65,3 +65,8 @@ celerybeat.pid
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Paper-upgrade artefacts: weights and resume state are never committed
+checkpoints/audio_lcnn_asvspoof_*.pt
+paper_results/**/last.pt
+paper_results/**/*.pt

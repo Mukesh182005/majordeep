@@ -12,3 +12,26 @@ Everything needed to build the IEEE paper from measured results.
 | `latex/` | The paper's LaTeX source; added in Phase 10. |
 
 Rules: `CLAUDE.md` in the repository root. Plan: `docs/paper_upgrade/PLAN.md`.
+
+## Image manifest format
+
+Every image test set (H560, T2 and its transformed copies) is described by a
+CSV manifest in `manifests/`, with one row per image file:
+
+| Column | Meaning |
+|---|---|
+| `image_id` | Unique id of this file (a transformed copy has its own id, e.g. `t2_0412_jpeg75`). |
+| `relative_path` | Path relative to the image root passed with `--image-root`; never an absolute path. |
+| `label` | `1` = AI-generated, `0` = real camera photograph. |
+| `generator` | Generator and version for AI images (e.g. `sdxl_1.0`, `flux1_dev`); exactly `real` for real photos. |
+| `source` | Where the file came from (e.g. `synthbuster`, `raise1k`, `coco_val2017`, `team_phone`). |
+| `condition` | `original`, or the transformation applied: `jpeg95`, `jpeg75`, `jpeg50`, `resize50`, `resize25`, `screenshot`, `whatsapp`. |
+| `group` | `image_id` of the original this file was derived from; an original is its own group (an empty value means the same). Copies of one original always stay together in every split and de-duplication step. |
+
+`ml/evaluation/eval_image_detectors.py` validates these rules before scoring
+(unique ids, labels 0/1, `real` only for real photos, relative paths only).
+Licence, date and prompt of each image are recorded in a separate
+`<manifest>_sources.csv` keyed by `image_id`, so the scoring manifest stays small.
+
+Per-image scores are written as JSON Lines to `paper_results/<experiment>/scores.jsonl`
+and turned into metrics, tables and figures by `analysis/image_metrics.py`.

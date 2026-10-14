@@ -1,0 +1,13 @@
+{
+  "note": "Published values quoted for comparison; not our measurements. See baselines.md.",
+  "source": "Todisco et al., ASVspoof 2019: Future Horizons in Spoofed and Fake Audio Detection, Proc. Interspeech 2019, pp. 1008-1012, doi:10.21437/Interspeech.2019-2249, Table 1 (LA)",
+  "eval": {
+    "B01_CQCC_GMM": {"min_tdcf": 0.2366, "eer_percent": 9.57},
+    "B02_LFCC_GMM": {"min_tdcf": 0.2116, "eer_percent": 8.09}
+  },
+  "dev_source": "ASVspoof 2019 evaluation plan, Table 3 (LA, development set)",
+  "dev": {
+    "LFCC_GMM": {"min_tdcf": 0.0663, "eer_percent": 2.71},
+    "CQCC_GMM": {"min_tdcf": 0.0123, "eer_percent": 0.43}
+  }
+}

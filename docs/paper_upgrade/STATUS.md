@@ -32,6 +32,9 @@ Last updated: 2026-10-14.
 - `paper/analysis/audio_asvspoof_report.py`: mean and SD over seeds, LaTeX tables, DET figure, `INDEX.md` rows, from saved files only.
 - `paper_results/audio_asvspoof2019la/baselines.md` and `.json`: official baselines B01 and B02, read from Table 1 of the challenge paper itself.
 - Tests: `test_asvspoof_metrics.py` (EER and t-DCF known answers, official-code agreement) and `test_asvspoof_training_loop.py` (one epoch, dev scoring, overwrite and eval guards on a fake corpus).
+- Full feature cache built for train, dev and eval, both front ends (15 GB, about 710 utterances/s with 24 workers).
+- Smoke test on the real data, both front ends: 2,000 random training utterances, 1 epoch, full dev scoring with min t-DCF from the organisers' dev ASV scores, about 10 s per epoch and 25 s per run. Outputs went to a scratch folder; they are **not** results (one epoch on 8 % of the training data) and are not in `paper_results/`.
+- Estimate for a full run (30 epochs maximum, early stop after 10 epochs without a dev gain): about 15–20 minutes on the RTX 5070, extrapolated from the smoke epoch.
 
 ### Phase 4: image evaluation harness (code done; H560 blocked)
 - Manifest format in `paper/README.md`; `ml/evaluation/eval_image_detectors.py` (per-image scores, uncropped scores when borders were cropped, extra scorers, `--end-to-end` verdicts and rules, resumable, errors logged, float32 enforced, detector revisions recorded).
@@ -94,6 +97,17 @@ Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 sk
 
 ## Next
 
-1. Finish the ASVspoof download, extract, build the full manifest, check the official totals, and smoke-test features (Phase 1), then the 2,000-utterance training smoke test (Phase 2).
-2. You run the seed-0 trainings for both front ends; then front-end selection on dev, seeds 1 and 2, freeze, eval once.
-3. Decide H560; then freeze the image configuration and build T2 (Synthbuster, RAISE-1k or COCO, team photographs).
+1. **You run the Phase 2 trainings** (PowerShell, repository root):
+   ```powershell
+   $env:DEEPSENTINEL_DATA = "C:\deepsentinel_data"
+   python ml\training\train_asvspoof.py --features logmel --seed 0
+   python ml\training\train_asvspoof.py --features lfcc --seed 0
+   python ml\evaluation\select_asvspoof_frontend.py
+   # it prints the selected front end and the two commands for seeds 1 and 2; run them, then:
+   python ml\evaluation\select_asvspoof_frontend.py --write
+   git add paper\config\audio_model_selection.json paper_results\audio_asvspoof2019la\dev_runs
+   git commit -m "Select ASVspoof front end on dev; freeze checkpoints before eval"
+   ```
+   Each run writes `checkpoints\audio_lcnn_asvspoof_<features>_seed<k>.pt` (not committed) and `paper_results\audio_asvspoof2019la\dev_runs\<run>\` (`train_log.csv`, `dev_scores.csv`, `dev_metrics.json`, `run_config.json`). An interrupted run continues with the same command plus `--resume`.
+2. Then I score eval once per seed (`eval_asvspoof.py --confirm-final-eval`), run `paper/analysis/audio_asvspoof_report.py`, and start Phase 3.
+3. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloading; RAISE-1k needs your form; team photographs).

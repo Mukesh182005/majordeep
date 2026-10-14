@@ -15,6 +15,7 @@ Checked 2026-10-14. Data lives under `C:\deepsentinel_data` (set
 | UnivFD official code + linear head `fc_weights.pth` | `baselines\UniversalFakeDetect` (commit `030495a`) | – | – | https://github.com/WisconsinAIVision/UniversalFakeDetect, MIT | Phase 5 baseline |
 | CLIP ViT-L/14 weights for UnivFD | `baselines\clip_weights\ViT-L-14.pt` | 932,768,134 B | SHA-256 `b8cca3fd…a03836` = OpenAI's published hash | OpenAI CLIP release | Phase 5 baseline |
 | CNNDetection official code + `blur_jpg_prob0.5.pth` | `baselines\CNNDetection` (commit `ea0b562`) | 282,442,597 B | SHA-256 `3533f3e58a3b82215f21197f2faf4e99b911ec42a4a6e2d7823e04d5f3fd245a` | https://github.com/PeterWang512/CNNDetection, CC BY-NC-SA 4.0 | Phase 5 baseline |
+| Synthbuster (T2 generated images) | `downloads\synthbuster.zip` (not yet extracted; 13.58 GB unpacked) | 12,372,557,226 B | MD5 `0695bd328e16ea21c5c9cc2ae1d994ff`, as published on Zenodo | https://doi.org/10.5281/zenodo.10066460, CC BY-NC-SA 4.0 | Phase 5 (T2): 9,000 PNGs, 1,000 each from DALL-E 2, DALL-E 3, Adobe Firefly, GLIDE, Midjourney v5, Stable Diffusion 1.3, 1.4, 2 and XL, plus `prompts.csv` |
 
 The wrappers `ml/evaluation/baselines/univfd.py` and `cnndetection.py` were
 checked against the official code paths with
@@ -28,11 +29,10 @@ Run from PowerShell; each command resumes if interrupted. For large files, `scri
 
 | Resource | Size | Licence | Command |
 |---|---|---|---|
-| Synthbuster (T2 generated images, nine generators) | 12,372,557,226 B, MD5 `0695bd328e16ea21c5c9cc2ae1d994ff` | CC BY-NC-SA 4.0 | **Download started 2026-10-14** into `downloads\synthbuster_parts`; to finish or resume it: `python scriptsetch_dataset.py --url "https://zenodo.org/api/records/10066460/files/synthbuster.zip/content" --out C:\deepsentinel_data\downloads\synthbuster.zip --size 12372557226 --md5 0695bd328e16ea21c5c9cc2ae1d994ff --parts-dir C:\deepsentinel_data\downloads\synthbuster_parts` |
 | COCO val2017 (T2 real-photo candidates) | 815,585,330 B | Annotations and image terms to be checked on cocodataset.org | `curl.exe -L -C - -o C:\deepsentinel_data\downloads\coco_val2017.zip "http://images.cocodataset.org/zips/val2017.zip"` |
 | In-the-Wild audio (optional cross-dataset test) | 8,161,489,023 B | **Conflict:** project page says Apache 2.0, Hugging Face card says CC BY-SA 4.0; resolve before use | `python -c "from huggingface_hub import hf_hub_download; hf_hub_download('mueller91/In-The-Wild', 'release_in_the_wild.zip', repo_type='dataset', local_dir=r'C:\deepsentinel_data\downloads')"` |
 
-Disk (2026-10-14): after extracting ASVspoof and building its 15 GB feature cache, C: had 53 GB free. Synthbuster needs 12.4 GB for the zip and about the same again if extracted.
+Disk (2026-10-14): after extracting ASVspoof, building its 15 GB feature cache and downloading Synthbuster, C: had about 51 GB free; extracting Synthbuster needs 13.6 GB more.
 
 ## 3. Only you can obtain these
 

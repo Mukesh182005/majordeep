@@ -14,7 +14,8 @@ Last updated: 2026-10-14.
 - ASVspoof 2019 LA downloaded from Edinburgh DataShare to `C:\deepsentinel_data` (it was not on this machine), with the README, licence, evaluation plan and challenge paper.
 - Official ASVspoof EER / t-DCF code kept outside the repository (no licence in its repository) and used to cross-check ours.
 - UnivFD and CNNDetection official code and weights in `C:\deepsentinel_data\baselines`; wrappers verified against the official code paths.
-- Synthbuster, COCO val2017 and In-the-Wild located with sizes, checksums and licences; download commands in `RESOURCES.md`.
+- Synthbuster downloaded and verified (MD5 matches Zenodo): 9,000 PNGs, 1,000 from each of nine generators; not yet extracted.
+- COCO val2017 and In-the-Wild located with sizes, checksums and licences; download commands in `RESOURCES.md`.
 - References for every dataset, baseline and statistical method checked on Crossref (DOIs in `RESOURCES.md`).
 - H560 searched for on C:, D: and Google Drive: not found. A paper draft exists as a Google Doc (link in `RESOURCES.md`); no LaTeX source found.
 
@@ -118,4 +119,4 @@ Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 sk
    Each run writes `checkpoints\audio_lcnn_asvspoof_<features>_seed<k>.pt` (not committed) and `paper_results\audio_asvspoof2019la\dev_runs\<run>\` (`train_log.csv`, `dev_scores.csv`, `dev_metrics.json`, `run_config.json`). An interrupted run continues with the same command plus `--resume`.
 2. Then I score eval once per seed (`eval_asvspoof.py --confirm-final-eval`), run `paper/analysis/audio_asvspoof_report.py`, and continue Phase 3.
 3. **Phase 3 heuristics run (about 45 minutes), when you approve:** `python ml\evaluationudio_heuristics_dev.py` writes `paper_resultsudio_heuristics_dev\` (`subsample.csv`, `scores.csv`, `config.json`). It does not need the LCNN; its column is added after Phase 2.
-4. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloading; RAISE-1k needs your form; team photographs).
+4. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloaded; RAISE-1k needs your form; team photographs).

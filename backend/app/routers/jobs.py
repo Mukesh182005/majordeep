@@ -158,7 +158,14 @@ def job_result(
             evidence[f"{kind}_url"] = f"{settings.api_v1_prefix}/jobs/{job.id}/evidence/{kind}"
 
     payload = JobResultOut.model_validate(job, from_attributes=True)
-    return payload.model_copy(update={"evidence": evidence, "disclaimer": RESULT_DISCLAIMER})
+    return payload.model_copy(
+        update={
+            "evidence": evidence,
+            "experimental": bool(evidence.get("experimental")),
+            "experimental_reason": evidence.get("experimental_reason"),
+            "disclaimer": RESULT_DISCLAIMER,
+        }
+    )
 
 
 @router.get("/{job_id}/evidence/{kind}")

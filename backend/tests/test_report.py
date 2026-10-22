@@ -126,12 +126,57 @@ class TestUntrainedWarning:
         job = make_job(weights_status="untrained-backbone")
         artifacts = generate_report(job, output_dir=tmp_path, evidence_dir=tmp_path)
         text = pdf_text(artifacts.path)
-        assert "MODEL NOT TRAINED" in text
-        assert "no evidentiary value" in text
+        assert "NO TRAINED MODEL" in text
+        assert "no evidential value" in text
 
     def test_trained_model_shows_no_warning(self, tmp_path):
         artifacts = generate_report(make_job(), output_dir=tmp_path, evidence_dir=tmp_path)
-        assert "MODEL NOT TRAINED" not in pdf_text(artifacts.path)
+        assert "NO TRAINED MODEL" not in pdf_text(artifacts.path)
+
+    def test_experimental_audio_states_its_reason(self, tmp_path):
+        from app.ml.audio_pipeline import EXPERIMENTAL_REASON
+
+        job = make_job(
+            media_type=MediaType.AUDIO,
+            original_filename="call.wav",
+            weights_status="untrained-backbone",
+            evidence={"media": "audio", "experimental": True, "experimental_reason": EXPERIMENTAL_REASON, "notes": []},
+        )
+        text = " ".join(pdf_text(generate_report(job, output_dir=tmp_path, evidence_dir=tmp_path).path).split())
+        assert "No trained audio model is in use" in text
+        assert "No trained audio model was used for this analysis" in text  # methodology
+
+
+class TestNoStandardsClaims:
+    """No legal or standards-compliance claims in the PDF, for any media type."""
+
+    BANNED = ("SWGDE", "27037", "27042", "Daubert", "Judicial", "Legal Compliance", "Conformal", "Likelihood Ratio")
+
+    def test_plain_disclaimer_on_the_first_page(self, tmp_path):
+        from pypdf import PdfReader
+
+        path = generate_report(make_job(), output_dir=tmp_path, evidence_dir=tmp_path).path
+        first_page = " ".join(PdfReader(str(path)).pages[0].extract_text().split())
+        assert "Automated assessment only. Not forensic or legal evidence." in first_page
+
+    @pytest.mark.parametrize("media", [MediaType.AUDIO, MediaType.VIDEO])
+    def test_forensics_sections_make_no_standards_claims(self, tmp_path, media):
+        forensics = {
+            "fusion_decision": {"final_verdict": "INCONCLUSIVE", "decision_rule": "rule"},
+            "models_output": {"fused_ai_probability": 0.4, "model_stage_label": "heuristic (unvalidated)"},
+            "vault_record": {"evidence_id": "EVID-1", "hashes": {"sha256": "a" * 64, "sha512": "b" * 128}},
+            "file_dna": {"container_format": "RIFF/WAV"},
+        }
+        evidence = {"media": media.value, "notes": [], "forensics": forensics}
+        if media is MediaType.VIDEO:
+            evidence.update({"container_forensics": {"file_info": {"extension": ".mp4"}},
+                             "generator_attribution": {"predicted_platform": "X", "attribution_confidence": 0.5}})
+        job = make_job(media_type=media, original_filename=f"clip.{'wav' if media is MediaType.AUDIO else 'mp4'}",
+                       evidence=evidence)
+        text = " ".join(pdf_text(generate_report(job, output_dir=tmp_path, evidence_dir=tmp_path).path).split())
+        assert "4.6 File Identification" in text  # the forensics section rendered
+        for banned in self.BANNED:
+            assert banned not in text, banned
 
 
 class TestMediaVariants:
@@ -158,8 +203,9 @@ class TestMediaVariants:
                 "notes": [],
             },
         )
-        text = pdf_text(generate_report(job, output_dir=tmp_path, evidence_dir=tmp_path).path)
-        assert "spectrogram" in text.lower()
+        text = " ".join(pdf_text(generate_report(job, output_dir=tmp_path, evidence_dir=tmp_path).path).split())
+        assert "ASVspoof 2019" in text and "LFCC" in text
+        assert "has not been evaluated on real-world recordings" in text
         assert "LIKELY AUTHENTIC" in text
 
     def test_image_report_renders_without_a_timeline(self, tmp_path):

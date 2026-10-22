@@ -1,14 +1,17 @@
-"""Audio Forensics Package: Complete 10-Engine Audio Intelligence & Forensics Suite.
+"""Audio analysis suite: eight stages run in order.
 
-Executes an 8-stage progressive forensic pipeline:
-  Stage 1: Secure Ingestion Vault & Cryptographic Chain-of-Custody
-  Stage 2: Audio File DNA & Container Cybersecurity
-  Stage 3: Deterministic Signal Intelligence & 120+ Descriptors
-  Stage 4: Physiological Glottal Flow (IAIF) & Physical Acoustics (VoiceRadar)
-  Stage 5: Speech Semantics & Phonemic Coarticulation
-  Stage 6: Multi-Model Detection & Intermediate SSL Probing (WavLM L18 / Whisper L4)
-  Stage 7: Environmental & Grid Forensics (ENF Phase & Room RT60)
-  Stage 8: Cybersecurity, Splicing Localization & Conformal Evidence Fusion
+  Stage 1: File hashes
+  Stage 2: Container parsing (format, codec, trailing bytes)
+  Stage 3: Signal descriptors (time, frequency, cepstral, loudness)
+  Stage 4: Glottal-flow and propagation heuristics
+  Stage 5: Speech rate and coarticulation heuristics
+  Stage 6: Model stage: the ASVspoof 2019 LA LCNN (``audio_model_source="lcnn_asvspoof"``)
+           or, in ``legacy`` mode, hand-set rules only (heuristic, unvalidated)
+  Stage 7: Mains-hum (ENF) and room-acoustics heuristics
+  Stage 8: Splice timeline, provenance checks, and the risk/verdict rule
+
+Only the LCNN is a trained model. Every other stage is a heuristic whose
+discrimination has not been shown (paper_results/audio_heuristics_dev/).
 """
 
 from __future__ import annotations
@@ -26,7 +29,7 @@ from app.ml.audio.signal_intelligence import extract_signal_intelligence
 from app.ml.audio.glottal_physiological import analyze_glottal_and_physics
 from app.ml.audio.speech_semantics import analyze_speech_and_semantics
 from app.ml.audio.signal_lab import generate_signal_lab_plates
-from app.ml.audio.models_arch import AudioMultiModelEnsemble
+from app.ml.audio.models_arch import score_audio_heuristics
 from app.ml.audio.splicing_timeline import analyze_splicing_and_timeline
 from app.ml.audio.enf_environment import analyze_environmental_and_enf
 from app.ml.audio.security_provenance import analyze_security_and_provenance
@@ -34,16 +37,6 @@ from app.ml.audio.evidence_fusion import compute_evidence_fusion_and_risk
 from app.ml.audio.xai_interpretability import generate_audio_xai_explanations
 
 logger = logging.getLogger(__name__)
-
-# Global singleton ensemble instance
-_AUDIO_ENSEMBLE = None
-
-
-def get_audio_ensemble() -> AudioMultiModelEnsemble:
-    global _AUDIO_ENSEMBLE
-    if _AUDIO_ENSEMBLE is None:
-        _AUDIO_ENSEMBLE = AudioMultiModelEnsemble()
-    return _AUDIO_ENSEMBLE
 
 
 def run_comprehensive_audio_forensics(
@@ -55,7 +48,7 @@ def run_comprehensive_audio_forensics(
     case_reference: str | None = None,
     model_waveform: np.ndarray | None = None,
 ) -> dict[str, Any]:
-    """Execute all 10 audio forensic engines and compile exhaustive evidentiary dossier.
+    """Run the eight audio stages and collect their outputs.
 
     ``model_waveform`` is the waveform before peak normalisation, used by the
     ASVspoof LCNN when ``settings.audio_model_source == "lcnn_asvspoof"``.
@@ -70,18 +63,18 @@ def run_comprehensive_audio_forensics(
 
     pipeline_modules: list[dict[str, Any]] = []
 
-    # ------------------------------------------------------------- STAGE 1: Secure Ingestion Vault
+    # ------------------------------------------------------------- STAGE 1: File hashes
     t0 = time.perf_counter()
     vault_record = create_evidence_record(file_path, case_reference=case_reference)
     t1 = time.perf_counter()
     pipeline_modules.append({
         "stage": 1,
-        "name": "Secure Ingestion Vault",
-        "category": "Evidence Integrity",
+        "name": "File Hashes",
+        "category": "File Integrity",
         "status": "PASSED",
         "duration_ms": max(1, int((t1 - t0) * 1000)),
         "summary": f"Evidence ID: {vault_record['evidence_id']} | SHA-256: {vault_record['hashes']['sha256'][:16]}...",
-        "findings": ["SWGDE & ISO 27042 compliant cryptographic bind established.", "Write-blocker access emulated."],
+        "findings": ["SHA-256, SHA-512, MD5 and SHA-1 of the uploaded file recorded."],
     })
 
     # ------------------------------------------------------------- STAGE 2: Audio File DNA & Container
@@ -153,11 +146,13 @@ def run_comprehensive_audio_forensics(
         ],
     })
 
-    # ------------------------------------------------------------- STAGE 6: Multi-Model AI Detection & SSL Probing
+    # ------------------------------------------------------------- STAGE 6: Model stage
     t0 = time.perf_counter()
-    ensemble = get_audio_ensemble()
-    models_output: dict[str, Any] = ensemble.classify_audio(waveform, sample_rate, signal_intel, glottal_physics, file_dna)
-    lcnn_finding: list[str] = []
+    models_output: dict[str, Any] = score_audio_heuristics(signal_intel, glottal_physics, file_dna)
+    model_findings = [
+        "No trained model in this mode: hand-set rules over glottal, voice-quality and cepstral "
+        "descriptors (heuristic, unvalidated)."
+    ]
     if settings.audio_model_source == "lcnn_asvspoof":
         from app.ml.audio.lcnn_asvspoof import score_lcnn_asvspoof
 
@@ -171,25 +166,26 @@ def run_comprehensive_audio_forensics(
             "legacy_fused_ai_probability": models_output.get("fused_ai_probability"),
             "fused_ai_probability": lcnn["probability"],
             "model_stage_source": "lcnn_asvspoof",
+            "model_stage_label": "trained model (ASVspoof 2019 LA)",
             "lcnn_asvspoof": lcnn,
         }
-        lcnn_finding = [
-            f"Model stage: ASVspoof 2019 LA LCNN ({lcnn['model_version']}), {lcnn['n_windows']} window(s), "
-            f"calibrated spoof probability {lcnn['probability'] * 100:.1f}%; legacy branches shown as context only."
+        model_findings = [
+            f"ASVspoof 2019 LA LCNN ({lcnn['model_version']}), {lcnn['n_windows']} window(s), "
+            f"calibrated spoof probability {lcnn['probability'] * 100:.1f}%.",
+            f"Hand-set rule score {models_output['legacy_fused_ai_probability'] * 100:.1f}% shown as context only "
+            "(heuristic, unvalidated).",
         ]
     t1 = time.perf_counter()
     ai_prob = models_output.get("fused_ai_probability", 0.1)
     pipeline_modules.append({
         "stage": 6,
-        "name": "Multi-Model ML & Intermediate SSL Probing",
-        "category": "Machine Learning",
+        "name": "Model Stage",
+        "category": "Machine Learning" if models_output.get("model_stage_source") == "lcnn_asvspoof" else "Heuristic (unvalidated)",
         "status": "ANOMALY_DETECTED" if ai_prob > 0.65 else "PASSED",
         "duration_ms": max(1, int((t1 - t0) * 1000)),
-        "summary": f"Domain: {models_output.get('audio_domain')} | Sinc-RawNet: {models_output.get('model_branch_scores', {}).get('rawnet_waveform_prob')*100:.1f}% | WavLM L18: {models_output.get('model_branch_scores', {}).get('wavlm_l18_acoustic_prob')*100:.1f}%",
-        "findings": lcnn_finding + [
-            f"Evaluated intermediate WavLM Layer 18 and Whisper Layer 4 representations.",
-            f"Top Typology: Fully Synthetic TTS ({models_output.get('typology_breakdown', {}).get('tts_fully_synthetic_pct')}%) vs Bona Fide ({models_output.get('typology_breakdown', {}).get('bona_fide_authentic_pct')}%).",
-        ],
+        "summary": f"Spoof probability: {ai_prob * 100:.1f}% ({models_output.get('model_stage_label')}) | "
+        f"Domain (heuristic): {models_output.get('audio_domain')}",
+        "findings": model_findings,
     })
 
     # ------------------------------------------------------------- STAGE 7: Environmental & Grid Forensics (ENF)
@@ -222,12 +218,12 @@ def run_comprehensive_audio_forensics(
     t1 = time.perf_counter()
     pipeline_modules.append({
         "stage": 8,
-        "name": "Evidence Fusion & Conformal Risk Engine",
-        "category": "Decision Engine",
+        "name": "Risk and Verdict",
+        "category": "Decision Rule",
         "status": "ANOMALY_DETECTED" if fusion_decision.get("final_verdict") in ("AI_GENERATED", "MANIPULATED") else "PASSED",
         "duration_ms": max(1, int((t1 - t0) * 1000)),
         "summary": f"Verdict: {fusion_decision.get('final_verdict')} | AI Risk: {(fusion_decision.get('generative_ai_risk_score') or 0.0)*100:.1f}% | Tamper Risk: {(fusion_decision.get('structural_tampering_risk_score') or 0.0)*100:.1f}%",
-        "findings": fusion_decision.get("orthogonal_signals_details") or ["Zero manipulation signals detected across all 10 engines."],
+        "findings": fusion_decision.get("flagged_signals") or ["No signal reached its flag threshold."],
     })
 
     # ------------------------------------------------------------- Visual Scalograms & XAI Plates

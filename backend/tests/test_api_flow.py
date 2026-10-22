@@ -67,7 +67,7 @@ class TestJobLifecycle:
         assert 0.0 <= result["fake_probability"] <= 1.0
         assert 0.0 <= result["confidence"] <= 1.0
         assert result["model_name"] and result["model_version"]
-        assert "disclaimer" in result and "not a certified forensic opinion" in result["disclaimer"]
+        assert "disclaimer" in result and "Not forensic or legal evidence" in result["disclaimer"]
 
     def test_untrained_deployment_is_flagged_in_the_result(self, client, completed_job):
         """A demo build must never look like an evidential one."""

@@ -1,18 +1,29 @@
-"""Engine 10 (Decision Layer): Evidence Fusion, Conformal Prediction & Risk Engine.
+"""Stage 8 of the audio suite: synthesis and tampering risk, and the verdict.
 
-Synthesizes:
-1. Conformal Risk Control with distribution-free bounded False Positive Rates (FPR <= 0.01).
-2. Dual-Risk Separation: Generative AI Probability (R_synth) vs Structural Tampering Probability (R_tamper).
-3. Out-of-Distribution (OOD) Safeguard yielding INCONCLUSIVE verdicts on unseen zero-day architectures.
-4. Directional Correlated Evidence Graph mapping forensic causality from raw evidence to final verdict.
-5. Calibrated Forensic Likelihood Ratios (LR) adhering to international expert testimony scales.
+    R_synth  = 0.50 x model stage + 0.35 x glottal anomaly + 0.15 x coarticulation anomaly
+    R_tamper = 0.25 x (3 ENF splice + 2 splice-timeline flag + 2 trailing bytes + 1 steganography),
+               clipped to [0.02, 0.98]
+
+AUTHENTIC when both risks are below 0.35, flagged when either reaches 0.70,
+INCONCLUSIVE in between. The weights and both thresholds were set by hand; they
+were not fitted or calibrated on data, so no false-positive bound comes with
+them. (Earlier versions called the decision a conformal prediction set with
+alpha = 0.01 and reported likelihood ratios of 25,000 / 450 / 0.0001; none of
+those numbers was computed from data, and they were removed.)
 """
 
 from __future__ import annotations
 
-import math
 from typing import Any
-import numpy as np
+
+TAU_AUTHENTIC = 0.35
+TAU_FLAGGED = 0.70
+
+DECISION_RULE = (
+    "Hand-set rule, not calibrated on data: authentic if synthesis and tampering risk "
+    f"are both below {TAU_AUTHENTIC}, flagged if either reaches {TAU_FLAGGED}, "
+    "inconclusive otherwise."
+)
 
 
 def compute_evidence_fusion_and_risk(
@@ -26,23 +37,21 @@ def compute_evidence_fusion_and_risk(
     security_provenance: dict[str, Any],
     speech_semantics: dict[str, Any],
 ) -> dict[str, Any]:
-    """Fuse all 10 engine telemetry streams into a calibrated dual-risk verdict and evidence graph."""
-    
-    # ------------------------------------------------------------- 1. Generative AI Risk (R_synth)
-    # Combines Sinc-RawNet, WavLM Layer 18, glottal IAIF aerodynamics, and physical VoiceRadar metrics
+    """Combine the stage outputs into synthesis risk, tampering risk and a verdict."""
+
+    # ------------------------------------------------------------- 1. Synthesis risk (R_synth)
     ai_ml_prob = models_output.get("fused_ai_probability", 0.10)
     glottal_err = glottal_physics.get("composite_physiological_anomaly_score", 0.20)
     coarticulation_err = speech_semantics.get("phonemic_coarticulation_anomaly_score", 0.10)
-    
+
     r_synth = float(0.50 * ai_ml_prob + 0.35 * glottal_err + 0.15 * coarticulation_err)
 
-    # ------------------------------------------------------------- 2. Structural Tampering Risk (R_tamper)
-    # Combines ENF phase slips, F1 displacement spikes, trailing bytes, and steganography
+    # ------------------------------------------------------------- 2. Tampering risk (R_tamper)
     enf_splice = enf_environment.get("environmental_splicing_confirmed", False)
     timeline_splice = splicing_timeline.get("splicing_detected", False)
     trailing_bytes = file_dna.get("trailing_data_detected", False)
     stego_detected = security_provenance.get("steganography_forensics", {}).get("steganography_detected", False)
-    
+
     tamper_signals = 0
     if enf_splice:
         tamper_signals += 3
@@ -55,107 +64,91 @@ def compute_evidence_fusion_and_risk(
 
     r_tamper = float(min(0.98, max(0.02, tamper_signals * 0.25)))
 
-    # ------------------------------------------------------------- 3. Conformal Prediction Set (alpha = 0.01)
-    # Bounded false positive rate: P(Authentic flagged as fake) <= 1%
-    alpha = 0.01
-    tau_authentic = 0.35
-    tau_synthetic = 0.70
-
-    prediction_set = []
-    if r_synth < tau_authentic and r_tamper < tau_authentic:
-        prediction_set.append("AUTHENTIC")
-    elif r_synth >= tau_synthetic or r_tamper >= tau_synthetic:
-        if r_synth >= tau_synthetic:
-            prediction_set.append("AI_GENERATED")
-        if r_tamper >= tau_synthetic:
-            prediction_set.append("SPLICED_TAMPERED")
+    # ------------------------------------------------------------- 3. Decision (fixed thresholds)
+    decision_set = []
+    if r_synth < TAU_AUTHENTIC and r_tamper < TAU_AUTHENTIC:
+        decision_set.append("AUTHENTIC")
+    elif r_synth >= TAU_FLAGGED or r_tamper >= TAU_FLAGGED:
+        if r_synth >= TAU_FLAGGED:
+            decision_set.append("AI_GENERATED")
+        if r_tamper >= TAU_FLAGGED:
+            decision_set.append("SPLICED_TAMPERED")
     else:
-        prediction_set = ["AUTHENTIC", "AI_GENERATED"]  # INCONCLUSIVE REGION
+        decision_set = ["AUTHENTIC", "AI_GENERATED"]  # between the thresholds
 
-    is_inconclusive = len(prediction_set) > 1
+    is_inconclusive = len(decision_set) > 1
 
-    # ------------------------------------------------------------- 4. Final Verdict & Likelihood Ratio (LR)
     overall_fake_prob = max(r_synth, r_tamper)
     if is_inconclusive:
         verdict = "INCONCLUSIVE"
-        verbal_scale = "Inconclusive / Equivocal Evidence"
-        lr_value = 1.0
-    elif overall_fake_prob >= 0.70:
+    elif overall_fake_prob >= TAU_FLAGGED:
         verdict = "AI_GENERATED" if r_synth >= r_tamper else "MANIPULATED"
-        lr_value = 25000.0 if overall_fake_prob > 0.90 else 450.0
-        verbal_scale = "Extremely Strong Support for Synthesis / Tampering" if lr_value > 10000 else "Strong Support for Manipulation"
     else:
         verdict = "AUTHENTIC"
-        lr_value = 0.0001
-        verbal_scale = "Extremely Strong Support for Bona Fide Human Speech"
 
-    # ------------------------------------------------------------- 5. Correlated Evidence Graph
+    # ------------------------------------------------------------- 4. Evidence graph
     graph = _build_evidence_graph(
-        vault_record, file_dna, signal_intel, glottal_physics,
-        models_output, splicing_timeline, enf_environment, security_provenance,
-        r_synth, r_tamper, verdict
+        vault_record, file_dna, glottal_physics, models_output, splicing_timeline, enf_environment, verdict
     )
 
-    # ------------------------------------------------------------- 6. Orthogonal Consensus Assessment
-    positive_signals = []
+    # ------------------------------------------------------------- 5. Signals that fired
+    flagged_signals = []
     if r_synth >= 0.65:
-        positive_signals.append("Acoustic & SSL Foundation Model Synthesis Consensus")
+        flagged_signals.append("Synthesis risk at or above 0.65")
     if glottal_err >= 0.60:
-        positive_signals.append("Physiological Glottal Flow Aerodynamic Inconsistency (IAIF)")
+        flagged_signals.append("Glottal anomaly score at or above 0.60 (heuristic, unvalidated)")
     if enf_splice:
-        positive_signals.append("Electric Network Frequency (ENF) Phase Discontinuity")
+        flagged_signals.append("Mains-hum (ENF) phase discontinuity (heuristic, unvalidated)")
     if timeline_splice:
-        positive_signals.append("First-Order SSL Dynamics (F1) Splice Boundary Spikes")
+        flagged_signals.append("Splice-timeline boundary spikes (heuristic, unvalidated)")
     if trailing_bytes:
-        positive_signals.append(f"Container Security: {file_dna.get('trailing_bytes_count')} Trailing Appended Bytes")
+        flagged_signals.append(f"Container: {file_dna.get('trailing_bytes_count')} bytes appended after the audio data")
     if stego_detected:
-        positive_signals.append("Audio Steganography / Covert Channel Payload")
+        flagged_signals.append("Possible steganographic payload (heuristic, unvalidated)")
 
     return {
         "final_verdict": verdict,
         "calibrated_fake_probability": round(overall_fake_prob, 4),
         "generative_ai_risk_score": round(r_synth, 4),
         "structural_tampering_risk_score": round(r_tamper, 4),
-        "conformal_prediction_set": prediction_set,
+        "decision_set": decision_set,
+        "decision_rule": DECISION_RULE,
         "is_inconclusive": is_inconclusive,
-        "conformal_alpha_guarantee": alpha,
-        "forensic_likelihood_ratio": lr_value,
-        "verbal_scale_interpretation": verbal_scale,
-        "orthogonal_signals_count": len(positive_signals),
-        "orthogonal_signals_details": positive_signals,
+        "flagged_signals_count": len(flagged_signals),
+        "flagged_signals": flagged_signals,
         "evidence_graph": graph,
     }
 
 
 def _build_evidence_graph(
-    vault: dict, dna: dict, intel: dict, phys: dict,
-    models: dict, splice: dict, enf: dict, sec: dict,
-    r_synth: float, r_tamper: float, verdict: str
+    vault: dict, dna: dict, phys: dict, models: dict, splice: dict, enf: dict, verdict: str
 ) -> dict[str, Any]:
-    """Build directed node-edge forensic dependency graph."""
+    """Which stage outputs feed the verdict. Edges carry no weights: see the module docstring."""
+    model_label = models.get("model_stage_label") or "trained model"
+    glottal = phys.get("composite_physiological_anomaly_score", 0)
     nodes = [
-        {"id": "file_root", "label": "Audio Evidence", "type": "root", "status": "NEUTRAL"},
-        {"id": "vault_node", "label": f"Vault: {vault.get('evidence_id', 'EVID')}", "type": "custody", "status": "VERIFIED"},
-        {"id": "dna_node", "label": f"DNA: {dna.get('container_format')} / {dna.get('codec')}", "type": "container", "status": "TAMPERED" if dna.get("trailing_data_detected") else "NORMAL"},
-        {"id": "iaif_node", "label": f"IAIF Glottal Flow (Err: {phys.get('composite_physiological_anomaly_score', 0):.2f})", "type": "physics", "status": "ALERT" if phys.get('composite_physiological_anomaly_score', 0) > 0.6 else "NORMAL"},
-        {"id": "enf_node", "label": f"ENF Grid (Slip: {enf.get('enf_forensics', {}).get('max_phase_slip_degrees', 0):.1f}°)", "type": "environment", "status": "ALERT" if enf.get('environmental_splicing_confirmed') else "NORMAL"},
-        {"id": "ssl_node", "label": f"SSL WavLM L18: {models.get('model_branch_scores', {}).get('wavlm_l18_acoustic_prob', 0)*100:.1f}%", "type": "neural", "status": "ALERT" if r_synth > 0.65 else "NORMAL"},
-        {"id": "splice_node", "label": f"Splicing F1: {splice.get('first_order_f1_spikes_count', 0)} Spikes", "type": "temporal", "status": "ALERT" if splice.get('splicing_detected') else "NORMAL"},
-        {"id": "verdict_node", "label": f"Verdict: {verdict}", "type": "verdict", "status": "CRITICAL" if verdict in ('AI_GENERATED', 'MANIPULATED') else ("INCONCLUSIVE" if verdict == "INCONCLUSIVE" else "SECURE")},
+        {"id": "file_root", "label": "Audio file", "type": "root", "status": "NEUTRAL"},
+        {"id": "vault_node", "label": f"File hashes: {vault.get('evidence_id', 'EVID')}", "type": "integrity", "status": "RECORDED"},
+        {"id": "dna_node", "label": f"Container: {dna.get('container_format')} / {dna.get('codec')}", "type": "container", "status": "ALERT" if dna.get("trailing_data_detected") else "NORMAL"},
+        {"id": "glottal_node", "label": f"Glottal anomaly {glottal:.2f} (heuristic, unvalidated)", "type": "physics", "status": "ALERT" if glottal > 0.6 else "NORMAL"},
+        {"id": "enf_node", "label": f"Mains hum (max slip {enf.get('enf_forensics', {}).get('max_phase_slip_degrees', 0):.1f} deg; heuristic, unvalidated)", "type": "environment", "status": "ALERT" if enf.get("environmental_splicing_confirmed") else "NORMAL"},
+        {"id": "model_node", "label": f"Model stage {models.get('fused_ai_probability', 0) * 100:.1f}% ({model_label})", "type": "model", "status": "ALERT" if models.get("fused_ai_probability", 0) > 0.65 else "NORMAL"},
+        {"id": "splice_node", "label": f"Splice timeline: {splice.get('first_order_f1_spikes_count', 0)} spikes (heuristic, unvalidated)", "type": "temporal", "status": "ALERT" if splice.get("splicing_detected") else "NORMAL"},
+        {"id": "verdict_node", "label": f"Verdict: {verdict}", "type": "verdict", "status": "CRITICAL" if verdict in ("AI_GENERATED", "MANIPULATED") else ("INCONCLUSIVE" if verdict == "INCONCLUSIVE" else "SECURE")},
     ]
 
     edges = [
-        {"source": "file_root", "target": "vault_node", "label": "cryptographic bind"},
-        {"source": "file_root", "target": "dna_node", "label": "container inspection"},
-        {"source": "file_root", "target": "iaif_node", "label": "inverse filter"},
-        {"source": "file_root", "target": "enf_node", "label": "grid analysis"},
-        {"source": "file_root", "target": "ssl_node", "label": "intermediate probing"},
-        {"source": "file_root", "target": "splice_node", "label": "F1 dynamics"},
-        {"source": "dna_node", "target": "verdict_node", "weight": 0.25},
-        {"source": "iaif_node", "target": "verdict_node", "weight": 0.35},
-        {"source": "enf_node", "target": "verdict_node", "weight": 0.35},
-        {"source": "ssl_node", "target": "verdict_node", "weight": 0.45},
-        {"source": "splice_node", "target": "verdict_node", "weight": 0.40},
+        {"source": "file_root", "target": "vault_node", "label": "hashing"},
+        {"source": "file_root", "target": "dna_node", "label": "container parsing"},
+        {"source": "file_root", "target": "glottal_node", "label": "inverse filtering"},
+        {"source": "file_root", "target": "enf_node", "label": "mains-hum tracking"},
+        {"source": "file_root", "target": "model_node", "label": "model stage"},
+        {"source": "file_root", "target": "splice_node", "label": "segment comparison"},
+        {"source": "model_node", "target": "verdict_node", "label": "synthesis risk"},
+        {"source": "glottal_node", "target": "verdict_node", "label": "synthesis risk"},
+        {"source": "dna_node", "target": "verdict_node", "label": "tampering risk"},
+        {"source": "enf_node", "target": "verdict_node", "label": "tampering risk"},
+        {"source": "splice_node", "target": "verdict_node", "label": "tampering risk"},
     ]
 
     return {"nodes": nodes, "edges": edges}

@@ -16,6 +16,12 @@ that feeds the audio verdict separates bona fide from spoofed speech.
   this run is repeatable, and the seed is recorded. The application itself
   uses a different random draw in every process.
 
+**Runs only on the pre-P1 code.** P1 (branch fix/p1-honest-outputs) deleted
+the untrained SincRawNet and spectral-smoothness branches this script records.
+The committed results in paper_results/audio_heuristics_dev/ were produced at
+commit 4daed3f (recorded in their config.json); to reproduce them, check out
+that commit. On later code the script stops instead of writing other columns.
+
 Writes ``scores.csv`` (one row per utterance, resumable) and ``config.json``.
 The LCNN probability column is added once the Phase 2 model is chosen.
 
@@ -135,7 +141,13 @@ def main() -> int:
         writer.writerows([r["utt_id"], r["label"], r["attack_id"]] for r in subsample)
 
     torch.manual_seed(args.torch_seed)
-    from app.ml.audio import get_audio_ensemble
+    try:
+        from app.ml.audio import get_audio_ensemble
+    except ImportError:
+        raise SystemExit(
+            "The legacy model-stage branches this script measures were removed in P1. "
+            "Run it from commit 4daed3f, where paper_results/audio_heuristics_dev/ was produced."
+        ) from None
 
     get_audio_ensemble()  # build the seeded ensemble before any scoring
 

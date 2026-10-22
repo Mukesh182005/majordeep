@@ -1,12 +1,9 @@
 {
-  "fused_ai_probability": 0.4447,
-  "model_branch_scores": {
-    "rawnet_waveform_prob": 0.5177,
-    "wavlm_l18_acoustic_prob": 0.4714,
-    "whisper_l4_semantic_prob": 0.4737,
-    "tabular_physics_prob": 0.3071
+  "fused_ai_probability": 0.3071,
+  "heuristic_scores": {
+    "tabular_rules_prob": 0.3071
   },
-  "generative_ai_risk_score": 0.3972,
+  "generative_ai_risk_score": 0.3284,
   "structural_tampering_risk_score": 0.5,
   "calibrated_fake_probability": 0.5,
   "final_verdict": "INCONCLUSIVE"

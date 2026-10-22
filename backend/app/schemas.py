@@ -9,8 +9,8 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from app.models import JobStatus, MediaType, Verdict
 
 RESULT_DISCLAIMER = (
-    "This is an automated technical assessment, not a certified forensic opinion. "
-    "For legal proceedings, verification by a certified forensic expert is recommended."
+    "Automated assessment only. Not forensic or legal evidence. Automated detectors make "
+    "mistakes in both directions; treat the result as a lead, not as proof."
 )
 
 
@@ -102,6 +102,10 @@ class JobResultOut(BaseModel):
     weights_status: str | None = None
     processing_ms: int | None = None
     evidence: dict | None = None
+    # True when the verdict does not come from a trained, evaluated model
+    # (today: audio with AUDIO_MODEL_SOURCE=legacy); the reason says why.
+    experimental: bool = False
+    experimental_reason: str | None = None
     disclaimer: str = RESULT_DISCLAIMER
 
 

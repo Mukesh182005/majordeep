@@ -76,8 +76,8 @@ class Settings(BaseSettings):
     # faces, so its score is reported but kept out of verdicts until a
     # retrained model is validated.
     face_model_in_verdict: bool = False
-    # Audio model stage. "legacy": the untrained SincRawNet, spectral-smoothness
-    # and rule branches. "lcnn_asvspoof": the ASVspoof 2019 LA-trained LCNN chosen
+    # Audio model stage. "legacy": hand-set rules only, no trained model (results
+    # are marked experimental). "lcnn_asvspoof": the ASVspoof 2019 LA-trained LCNN chosen
     # on dev, with the dev-fitted calibration and checkpoint hash recorded in
     # audio_lcnn_calibration_file.
     audio_model_source: str = "legacy"

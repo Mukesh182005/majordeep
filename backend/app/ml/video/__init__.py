@@ -2,10 +2,11 @@
 
 Unified multi-modal architecture executing:
   1. Spatial Image Forensics (28-module image suite + ViT full-scene generative AI)
-  2. Acoustic Audio Forensics (10-engine speech physics, voice cloning & ENF phase)
-  3. Temporal Video Forensics (Dense optical flow, landmark acceleration, EAR blinks)
-  4. AI Generator Attribution Engine (Intrinsic no-watermark detection: Sora, Gemini/Veo, Kling, Runway, Luma)
-  5. Conformal Multi-Modal Risk Fusion & Threat Attribution
+  2. Audio track: the audio suite (app/ml/audio)
+  3. Temporal checks (optical flow, landmark acceleration, blinks)
+  4. Generator profile match (unvalidated heuristic: hand-set profiles named after
+     Sora, Veo, Kling, Runway, Luma; never tested on labelled video)
+  5. Hand-set multi-signal risk fusion and threat taxonomy
 
 Generates comprehensive evidence: Grad-CAM heatmap, Farneback optical flow plate, ELA plate, and timeline.
 """
@@ -310,15 +311,17 @@ def analyze_video(
     st11_ms = int((time.perf_counter() - st11_start) * 1000)
     pipeline_modules.append({
         "stage": 11,
-        "name": "AI Generator Attribution Engine",
+        "name": "Generator Profile Match (unvalidated)",
         "duration_ms": st11_ms,
         "status": "AI_FLAGGED" if attribution_info.get("is_ai_generated") else "PASSED",
-        "desc": f"Predicted origin: {attribution_info.get('predicted_platform')} ({round(attribution_info.get('attribution_confidence', 0) * 100, 1)}% confidence) | Detection without watermarks: ACTIVE",
+        "desc": f"Closest hand-set profile: {attribution_info.get('predicted_platform')} "
+        f"(match {round(attribution_info.get('attribution_confidence', 0) * 100, 1)}%) | "
+        "unvalidated heuristic, not tested on labelled video",
     })
 
     duration_s = float(video_meta.get("duration_seconds", 10.0))
 
-    # ── Multi-Modal Conformal Fusion ─────────────────────────────────────────────
+    # ── Multi-signal fusion (hand-set weights) ─────────────────────────────────────────────
     fusion = fuse_video_forensics(
         spatial_prob=worst_prob,
         frame_scores=frame_scores,

@@ -1,4 +1,4 @@
-"""Automated unit and integration test suite for the AudioSentinel 10-Engine Platform."""
+"""Unit and integration tests for the audio suite (app/ml/audio)."""
 
 import math
 from pathlib import Path
@@ -11,7 +11,7 @@ from app.ml.audio.file_dna import analyze_audio_dna
 from app.ml.audio.signal_intelligence import extract_signal_intelligence
 from app.ml.audio.glottal_physiological import analyze_glottal_and_physics
 from app.ml.audio.speech_semantics import analyze_speech_and_semantics
-from app.ml.audio.models_arch import AudioMultiModelEnsemble
+from app.ml.audio.models_arch import HEURISTIC_LABEL, score_audio_heuristics
 from app.ml.audio.splicing_timeline import analyze_splicing_and_timeline
 from app.ml.audio.enf_environment import analyze_environmental_and_enf
 from app.ml.audio.security_provenance import analyze_security_and_provenance
@@ -47,8 +47,10 @@ def test_vault_cryptographic_hashes(sample_wav):
 
     record = create_evidence_record(file_path)
     assert record["evidence_id"].startswith("EVID-")
-    assert record["chain_of_custody_status"] == "PRESERVED_IMMUTABLE"
-    assert record["write_blocker_emulated"] is True
+    assert record["hashes"] == hashes
+    # No acquisition-standard or write-blocker claims: only what was computed.
+    for claim in ("compliance", "write_blocker_emulated", "chain_of_custody_status", "integrity_verified"):
+        assert claim not in record
 
 
 def test_file_dna_and_trailing_data(sample_wav):
@@ -125,27 +127,30 @@ def test_speech_semantics_and_wpm(sample_wav):
     assert 0 <= semantics["speech_ratio_percent"] <= 100
 
 
-def test_multi_model_ensemble(sample_wav):
+def test_heuristic_model_stage_is_labelled_and_deterministic(sample_wav):
     file_path, audio, sr = sample_wav
     dna = analyze_audio_dna(file_path, raw_audio_data=audio, sample_rate=sr)
     intel = extract_signal_intelligence(audio, sr)
     phys = analyze_glottal_and_physics(audio, sr)
 
-    ensemble = AudioMultiModelEnsemble()
-    out = ensemble.classify_audio(audio, sr, intel, phys, dna)
+    out = score_audio_heuristics(intel, phys, dna)
     assert 0.0 <= out["fused_ai_probability"] <= 1.0
-    assert "typology_breakdown" in out
+    assert out["model_stage_label"] == HEURISTIC_LABEL
+    assert out["model_stage_source"] == "legacy"
     assert "audio_domain" in out
+    # The removed outputs were built on an untrained network and a formula.
+    for removed in ("model_branch_scores", "typology_breakdown", "generator_family_attribution"):
+        assert removed not in out
+    assert score_audio_heuristics(intel, phys, dna) == out
 
 
-def test_evidence_fusion_and_conformal_risk(sample_wav):
+def test_evidence_fusion_and_risk(sample_wav):
     file_path, audio, sr = sample_wav
     vault = create_evidence_record(file_path)
     dna = analyze_audio_dna(file_path, raw_audio_data=audio, sample_rate=sr)
     intel = extract_signal_intelligence(audio, sr)
     phys = analyze_glottal_and_physics(audio, sr)
-    ensemble = AudioMultiModelEnsemble()
-    models = ensemble.classify_audio(audio, sr, intel, phys, dna)
+    models = score_audio_heuristics(intel, phys, dna)
     splice = analyze_splicing_and_timeline(audio, sr)
     enf = analyze_environmental_and_enf(audio, sr)
     sec = analyze_security_and_provenance(file_path, audio, sr)
@@ -157,7 +162,11 @@ def test_evidence_fusion_and_conformal_risk(sample_wav):
     assert fusion["final_verdict"] in ("AUTHENTIC", "AI_GENERATED", "MANIPULATED", "INCONCLUSIVE")
     assert 0.0 <= fusion["generative_ai_risk_score"] <= 1.0
     assert 0.0 <= fusion["structural_tampering_risk_score"] <= 1.0
-    assert len(fusion["conformal_prediction_set"]) >= 1
+    assert len(fusion["decision_set"]) >= 1
+    assert "not calibrated" in fusion["decision_rule"]
+    for removed in ("conformal_prediction_set", "conformal_alpha_guarantee", "forensic_likelihood_ratio"):
+        assert removed not in fusion
+    assert all("weight" not in edge for edge in fusion["evidence_graph"]["edges"])
     assert "evidence_graph" in fusion
     assert len(fusion["evidence_graph"]["nodes"]) >= 5
 
@@ -167,7 +176,10 @@ def test_analyze_audio_pipeline_end_to_end(sample_wav, tmp_path):
     ev_dir = tmp_path / "evidence"
     res = analyze_audio(file_path, ev_dir, "job_test_full")
     assert 0.0 <= res.fake_probability <= 1.0
-    assert "AudioSentinel" in res.model_name
+    assert res.model_name == "Hand-set audio rules (heuristic, unvalidated)"
+    assert res.weights_status == "untrained-backbone"
+    assert res.evidence["experimental"] is True
+    assert "No trained audio model" in res.evidence["experimental_reason"]
     assert res.evidence["media"] == "audio"
     assert len(res.evidence["pipeline_modules"]) == 8
     assert res.evidence["risk_tier"] in ("LOW_RISK", "MODERATE_RISK", "HIGH_RISK", "CRITICAL_RISK")

@@ -131,10 +131,11 @@ def analyze_video_container(path: str | Path) -> dict[str, Any]:
     is_reencoded = False
     inconsistencies: list[str] = []
 
-    # Check for software traces in metadata, brand info, and filename
+    # Software traces in the container metadata and brand only. The file name is
+    # not evidence: whoever uploads a file chooses its name.
     text_corpus = " ".join(
         list(metadata_tags.values())
-        + [str(brand_info.get("major_brand", "")), file_path.name]
+        + [str(brand_info.get("major_brand", ""))]
     ).lower()
 
     for sig, (name, category) in _KNOWN_SOFTWARE_SPECS.items():

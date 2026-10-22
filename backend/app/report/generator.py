@@ -64,6 +64,8 @@ VERDICT_STYLING: dict[Verdict, tuple[str, colors.Color]] = {
     Verdict.INCONCLUSIVE: ("INCONCLUSIVE", colors.HexColor("#f9a825")),
 }
 
+PLAIN_DISCLAIMER = "Automated assessment only. Not forensic or legal evidence."
+
 DISCLAIMER = (
     "This report is an automated technical assessment produced by a machine-learning "
     "system. It is <b>not</b> a certified forensic or legal determination, and it has not "
@@ -96,16 +98,25 @@ METHODOLOGY: dict[str, str] = {
         "of frames."
     ),
     "audio": (
-        "The submitted audio was converted to a standard 16 kHz mono signal, silence was "
-        "trimmed, and the clip was divided into short consecutive windows. Each window was "
-        "transformed into a log-Mel spectrogram — a visual representation of how the sound's "
-        "frequency content changes over time — and scored by a neural network trained on "
-        "the ASVspoof anti-spoofing benchmark to distinguish genuine human speech from "
-        "text-to-speech and voice-cloned speech. Synthetic speech typically leaves "
-        "artefacts in the higher frequency bands that are hard to hear but measurable. "
-        "The spectrogram in this report marks the flagged windows in red."
+        "The submitted audio was converted to a 16 kHz mono signal and divided into "
+        "consecutive 4-second windows (a shorter clip is repeated to 4 seconds). Each window "
+        "was described by linear-frequency cepstral coefficients (LFCC) and scored by a "
+        "light convolutional network (LCNN) trained on the ASVspoof 2019 logical-access "
+        "training set to separate genuine speech from text-to-speech and voice-conversion "
+        "speech. The window scores were averaged and mapped to a probability with a "
+        "calibration fitted on the ASVspoof 2019 development set. That benchmark contains "
+        "studio-quality English read speech; the model has not been evaluated on real-world "
+        "recordings. The glottal, mains-hum, splice and container checks listed in section 4 "
+        "are heuristics whose discrimination has not been shown."
     ),
 }
+
+METHODOLOGY_AUDIO_RULES = (
+    "No trained audio model was used for this analysis. The score comes from hand-set rules "
+    "over signal descriptors (glottal-flow, voice-quality and cepstral measures, container "
+    "checks) whose ability to separate genuine from synthetic speech has not been shown. "
+    "The result is experimental and should not be relied on."
+)
 
 
 @dataclass
@@ -312,6 +323,7 @@ def _section_header(job, report_reference, generated_at, requester, styles) -> l
             f"<b>{job.case_reference}</b>",
             styles["subtitle"],
         ),
+        Paragraph(f"<b>{PLAIN_DISCLAIMER}</b>", styles["subtitle"]),
         Spacer(1, 4),
         HRFlowable(width="100%", thickness=1.1, color=ACCENT, spaceAfter=8),
         _kv_table(
@@ -442,10 +454,11 @@ def _section_analysis_summary(job, charts, styles) -> list[Any]:
         story += [
             Spacer(1, 6),
             _callout(
-                "MODEL NOT TRAINED — RESULT IS NOT EVIDENCE",
-                "This analysis ran on a network with no trained checkpoint loaded. The score "
-                "above is the output of an untrained model and carries no evidentiary value "
-                "whatsoever. Do not submit this report in support of a complaint.",
+                "EXPERIMENTAL — NO TRAINED MODEL",
+                evidence.get("experimental_reason")
+                or "This analysis ran without a trained checkpoint. The score above is not the "
+                "output of a trained, evaluated model and carries no evidential value. Do not "
+                "submit this report in support of a complaint.",
                 colors.HexColor("#c62828"),
                 styles,
             ),
@@ -663,7 +676,12 @@ def _section_methodology(job, styles, has_forensics: bool = True) -> list[Any]:
     num = 5 if has_forensics else 4
     return [
         Paragraph(f"{num}. Methodology", styles["h2"]),
-        Paragraph(METHODOLOGY.get(job.media_type.value, ""), styles["body"]),
+        Paragraph(
+            METHODOLOGY_AUDIO_RULES
+            if job.media_type.value == "audio" and (job.evidence or {}).get("experimental")
+            else METHODOLOGY.get(job.media_type.value, ""),
+            styles["body"],
+        ),
         Spacer(1, 5),
         Paragraph(
             "The probability reported in section 2 is the model's own confidence, not a "
@@ -680,7 +698,7 @@ def _section_disclaimer(styles, has_forensics: bool = True) -> list[Any]:
     return [
         Paragraph(f"{num}. Limitations and Disclaimer", styles["h2"]),
         _callout(
-            "AUTOMATED ASSESSMENT — NOT A CERTIFIED FORENSIC OPINION",
+            PLAIN_DISCLAIMER.upper(),
             DISCLAIMER,
             colors.HexColor("#455a64"),
             styles,
@@ -925,7 +943,7 @@ def _section_forensics(job, charts, styles) -> list[Any]:
             ("Capillary Pulse (rPPG)", f"{'PHYSIOLOGICAL PULSE CONFIRMED' if pulse_detected else 'ABSENT / UNVERIFIED'} ({rppg_status})"),
             ("Estimated Cardiac Rate (HR)", f"{hr_bpm:.1f} BPM (Cardiac SNR: {snr_db:.1f} dB)"),
             ("Biological Plausibility Index", f"{bio_plaus * 100:.1f}%"),
-            ("Generator Architecture Attribution", f"<b>{attrib_plat}</b> ({attrib_conf * 100:.1f}% confidence)"),
+            ("Generator Attribution (unvalidated)", f"{attrib_plat} (hand-set profile match {attrib_conf * 100:.1f}%; not validated on labelled video)"),
             ("ViT Generative Probe Probability", f"<b>{vit_prob * 100:.1f}%</b>"),
             ("Composite Forensic Risk Score", f"<b>{risk_score_val} / 100</b> ({evidence.get('risk_tier', 'LOW_RISK')})"),
         ]
@@ -957,16 +975,15 @@ def _section_forensics(job, charts, styles) -> list[Any]:
                     Spacer(1, 4),
                 ]
 
-        # 4.6 SWGDE & ISO/IEC 27037 Chain of Custody
+        # 4.6 File identification
         custody_rows = [
             ("Evidence ID", f"EVID-{job.case_reference}"),
             ("Primary Subject Asset", job.original_filename),
             ("Cryptographic SHA-256 Digest", job.sha256),
-            ("Analysis Platform Version", f"{settings.app_name} Video Forensics Suite v2.6"),
-            ("Judicial Standard Compliance", "ISO/IEC 27037:2012 & SWGDE Digital Video Guidelines"),
+            ("Analysis Platform Version", f"{settings.app_name} v{app_version}"),
         ]
         story += [
-            Paragraph("<b>4.6 SWGDE Chain of Custody Register</b>", styles["body"]),
+            Paragraph("<b>4.6 File Identification</b>", styles["body"]),
             Spacer(1, 3),
             _kv_table(custody_rows, styles, mono_keys={"Evidence ID", "Cryptographic SHA-256 Digest"}),
             Spacer(1, 7),
@@ -980,11 +997,12 @@ def _section_forensics(job, charts, styles) -> list[Any]:
 
         story: list[Any] = [
             PageBreak(),
-            Paragraph("4. Audio Intelligence, Authenticity & Cyber Forensics Matrix", styles["h2"]),
+            Paragraph("4. Audio Stage Outputs", styles["h2"]),
             Paragraph(
-                "Exhaustive forensic evaluation across 10 analytical engines, incorporating "
-                "cryptographic chain of custody, Audio File DNA, 120+ deterministic signal descriptors, "
-                "IAIF glottal flow aerodynamics, VoiceRadar physical propagation, and ENF power grid continuity.",
+                "Outputs of the eight audio stages. Only the model stage is a trained model, and "
+                "only when it is the ASVspoof 2019 LA LCNN; the glottal, mains-hum (ENF), splice, "
+                "watermark and container checks are heuristics whose discrimination has not been "
+                "shown, and are marked unvalidated.",
                 styles["body"],
             ),
             Spacer(1, 6),
@@ -994,19 +1012,18 @@ def _section_forensics(job, charts, styles) -> list[Any]:
         verdict = str(fusion.get("final_verdict") or "N/A")
         r_synth = float(fusion.get("generative_ai_risk_score") or 0.0)
         r_tamper = float(fusion.get("structural_tampering_risk_score") or 0.0)
-        conf_set = ", ".join(fusion.get("conformal_prediction_set") or []) or "N/A"
-        lr = float(fusion.get("forensic_likelihood_ratio") if fusion.get("forensic_likelihood_ratio") is not None else 1.0)
-        verbal = str(fusion.get("verbal_scale_interpretation") or "Inconclusive")
+        models = forensics.get("models_output") or {}
+        model_prob = float(models.get("fused_ai_probability") or 0.0)
 
         fusion_rows = [
-            ("Forensic Verdict", f"<b>{verdict}</b>"),
-            ("Generative AI Risk (R_synth)", f"<b>{r_synth * 100:.1f}%</b> (TTS / Neural Vocoder / Cloning)"),
-            ("Structural Tampering Risk (R_tamper)", f"<b>{r_tamper * 100:.1f}%</b> (Splicing / Container Edits)"),
-            ("Conformal Prediction Set (alpha <= 0.01)", f"<b>{conf_set}</b>"),
-            ("Forensic Likelihood Ratio (LR)", f"<b>{lr:,.1f}</b> ({verbal})"),
+            ("Stage-8 Verdict", f"<b>{verdict}</b>"),
+            ("Model Stage", f"<b>{model_prob * 100:.1f}%</b> ({models.get('model_stage_label') or 'N/A'})"),
+            ("Synthesis Risk (R_synth)", f"<b>{r_synth * 100:.1f}%</b>"),
+            ("Tampering Risk (R_tamper)", f"<b>{r_tamper * 100:.1f}%</b> (heuristic, unvalidated)"),
+            ("Decision Rule", str(fusion.get("decision_rule") or "N/A")),
         ]
         story += [
-            Paragraph("<b>4.1 Evidence Fusion & Conformal Dual-Risk Engine</b>", styles["body"]),
+            Paragraph("<b>4.1 Risk and Verdict Rule</b>", styles["body"]),
             Spacer(1, 3),
             _kv_table(fusion_rows, styles),
             Spacer(1, 7),
@@ -1058,7 +1075,7 @@ def _section_forensics(job, charts, styles) -> list[Any]:
             ("VoiceRadar Doppler Micro-Dispersion", f"{vr.get('doppler_micro_dispersion_hz', 'N/A')} Hz (Acoustic 3D Adherence: {vr.get('acoustic_propagation_adherence', 'N/A')})"),
         ]
         story += [
-            Paragraph("<b>4.3 Deterministic Signal Intelligence & Physiological Physics</b>", styles["body"]),
+            Paragraph("<b>4.3 Signal Descriptors and Glottal Heuristics (unvalidated)</b>", styles["body"]),
             Spacer(1, 3),
             _kv_table(sig_rows, styles),
             Spacer(1, 7),
@@ -1075,14 +1092,14 @@ def _section_forensics(job, charts, styles) -> list[Any]:
 
         env_rows = [
             ("ENF Power Grid Carrier", f"{enf_data.get('nominal_grid_frequency_hz', 'N/A')} Hz (Mean: {enf_data.get('estimated_mean_frequency_hz', 'N/A')} Hz)"),
-            ("ENF Phase Continuity Splicing Check", f"Max Phase Slip: {enf_data.get('max_phase_slip_degrees', 0.0)}° — {'SPLICING CONFIRMED' if enf.get('environmental_splicing_confirmed') else 'CONTINUOUS COHERENT PHASE'}"),
+            ("ENF Phase Continuity Check", f"Max Phase Slip: {enf_data.get('max_phase_slip_degrees', 0.0)}° — {'possible splice' if enf.get('environmental_splicing_confirmed') else 'no discontinuity found'}"),
             ("Room Acoustic Reverb (RT60)", f"{room.get('mean_reverberation_time_rt60_s', 'N/A')}s ({room.get('acoustic_space_type', 'N/A')})"),
             ("C2PA Cryptographic Provenance", f"{c2pa.get('cryptographic_signature_status', 'NOT_PRESENT')} (AI Disclosed: {'YES' if c2pa.get('ai_generation_disclosed') else 'NO'})"),
             ("Imperceptible Latent Watermark", f"{wm.get('watermark_scheme', 'NONE')} (Overwriting Attack: {'SUSPECTED' if wm.get('overwriting_attack_suspected') else 'NO'})"),
             ("Steganography / Covert Channel", f"{stego.get('covert_channel_status', 'CLEAN')} (LSB Entropy: {stego.get('lsb_bitplane_entropy', 'N/A')})"),
         ]
         story += [
-            Paragraph("<b>4.4 Environmental ENF, Provenance & Cybersecurity</b>", styles["body"]),
+            Paragraph("<b>4.4 Mains Hum (ENF), Provenance and Container Checks (unvalidated)</b>", styles["body"]),
             Spacer(1, 3),
             _kv_table(env_rows, styles),
             Spacer(1, 7),
@@ -1117,10 +1134,9 @@ def _section_forensics(job, charts, styles) -> list[Any]:
             ("Acquisition Timestamp", str(vault.get("acquisition_timestamp") or "N/A")),
             ("SHA-256 Digest", str(vault_hashes.get("sha256") or job.sha256)),
             ("SHA-512 Digest", str(vault_hashes.get("sha512") or "N/A")[:32] + "..."),
-            ("Legal Compliance Standards", ", ".join(vault.get("compliance", ["SWGDE 08-A-001", "ISO/IEC 27042"]))),
         ]
         story += [
-            Paragraph("<b>4.6 SWGDE Chain of Custody Register</b>", styles["body"]),
+            Paragraph("<b>4.6 File Identification</b>", styles["body"]),
             Spacer(1, 3),
             _kv_table(custody_rows, styles, mono_keys={"Evidence ID", "SHA-256 Digest", "SHA-512 Digest"}),
             Spacer(1, 7),

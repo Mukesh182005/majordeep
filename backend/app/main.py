@@ -38,10 +38,10 @@ DESCRIPTION = """
 Forensic analysis platform for detecting manipulated images, audio and video.
 
 Upload media, receive a probability score with visual evidence, and download a
-timestamped PDF report suitable for attaching to a cybercrime complaint.
+timestamped PDF report of the analysis.
 
-**This platform produces a technical assessment only.** It does not file
-complaints with any authority and is not a certified forensic opinion.
+**Automated assessment only. Not forensic or legal evidence.** The platform
+does not file complaints with any authority.
 """
 
 

@@ -1,17 +1,9 @@
-"""Audio deepfake, intelligence, authenticity and comprehensive forensic analysis pipeline.
+"""Audio analysis: runs the audio suite (app/ml/audio) and packages its evidence.
 
-Combines:
-  1. Secure Ingestion Vault (SHA-256/512, SWGDE & ISO 27042 chain of custody)
-  2. Audio File DNA & Container Cybersecurity (RIFF/MP4 chunks, polyglots, transcoding history)
-  3. Deterministic Signal Intelligence (120+ time/frequency/LFCC/CQCC/LUFS descriptors)
-  4. Physiological Glottal Flow (IAIF) & VoiceRadar Physical Propagation
-  5. Content & Semantic Forensics (Whisper ASR, tempo WPM, phonemic coarticulation)
-  6. Multi-Resolution Signal Lab (Waveform, Mel-Spectrogram, LFCC, CQT, Phase)
-  7. Multi-Model ML & Intermediate SSL Probing (Sinc-RawNet, WavLM Layer 18, Whisper Layer 4)
-  8. Temporal Splicing & First-Order SSL Dynamics (F1 displacement magnitude)
-  9. Environmental & Grid Forensics (50/60 Hz AR ENF Phase Continuity & Room RT60)
-  10. Cybersecurity & Provenance (C2PA manifests, SynthID/Seal watermarks, steganography)
-  11. Evidence Fusion & Conformal Risk Engine (FPR <= 0.01, Dual-Risk, Evidence Graph, XAI Grad-CAM/APEX)
+The probability comes from the suite's risk rule (app/ml/audio/evidence_fusion.py).
+Its model stage is the ASVspoof 2019 LA LCNN when ``audio_model_source`` is
+"lcnn_asvspoof"; in "legacy" mode no trained model runs at all and the result
+is marked experimental.
 """
 
 from __future__ import annotations
@@ -24,26 +16,33 @@ import numpy as np
 from app.config import settings
 from app.ml.base import AnalysisResult
 from app.ml.preprocessing import load_audio, normalize_waveform
-from app.ml.registry import TRAINED, UNTRAINED, get_audio_model
+from app.ml.registry import TRAINED, UNTRAINED
 from app.ml.audio import run_comprehensive_audio_forensics
 
 logger = logging.getLogger(__name__)
 
+EXPERIMENTAL_REASON = (
+    "No trained audio model is in use (AUDIO_MODEL_SOURCE=legacy): the score comes from hand-set "
+    "rules over signal descriptors that have not been validated on labelled speech."
+)
+LCNN_SCOPE_NOTE = (
+    "Model stage: LCNN trained and evaluated on ASVspoof 2019 LA (studio-quality English read speech). "
+    "It has not been evaluated on real-world recordings, phone calls or other languages."
+)
+
 
 def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> AnalysisResult:
-    """Execute complete 10-engine Audio Forensics suite and compile calibrated evidence."""
+    """Run the audio suite on one file and return its probability and evidence."""
     path = Path(path)
     evidence_dir = Path(evidence_dir)
     evidence_dir.mkdir(parents=True, exist_ok=True)
-
-    loaded = get_audio_model()
 
     # ------------------------------------------------------------------ 1. Load Audio
     waveform, sample_rate = load_audio(path, settings.audio_sample_rate)
     normalized = normalize_waveform(waveform)
     duration_s = len(normalized) / sample_rate
 
-    # ------------------------------------------------------------------ 2. Execute Comprehensive 10-Engine Forensics
+    # ------------------------------------------------------------------ 2. Run the audio suite
     forensic_results = run_comprehensive_audio_forensics(
         model_waveform=waveform,
         file_path=path,
@@ -64,12 +63,9 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     provenance = forensic_results["security_provenance"]
 
     # ------------------------------------------------------------------ 3. Investigative Notes
-    notes: list[str] = []
-    if loaded.weights_status == UNTRAINED:
-        notes.append(
-            "Model running with heuristic and physical acoustic foundation. "
-            "Neural weights running on calibrated baseline."
-        )
+    lcnn = forensic_results["models_output"].get("lcnn_asvspoof")
+    experimental = lcnn is None
+    notes: list[str] = [EXPERIMENTAL_REASON if experimental else LCNN_SCOPE_NOTE]
 
     if file_dna.get("trailing_data_detected"):
         notes.append(
@@ -78,22 +74,24 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
 
     if enf.get("environmental_splicing_confirmed"):
         notes.append(
-            f"Physical grid anomaly: ENF phase discontinuity ({enf.get('enf_forensics', {}).get('max_phase_slip_degrees')}°) confirms temporal splicing."
+            f"Mains-hum (ENF) phase discontinuity of {enf.get('enf_forensics', {}).get('max_phase_slip_degrees')}° "
+            "(heuristic, unvalidated): possible splice."
         )
 
     if glottal.get("composite_physiological_anomaly_score", 0.0) > 0.65:
         notes.append(
-            "Physiological anomaly: IAIF glottal flow velocity violates natural human vocal fold aerodynamic limits."
+            "Glottal-flow anomaly score above 0.65 (heuristic, unvalidated)."
         )
 
     if splicing.get("splicing_detected"):
         notes.append(
-            f"Temporal localization: {len(splicing.get('suspicious_intervals', []))} suspicious spliced interval(s) isolated."
+            f"Splice timeline: {len(splicing.get('suspicious_intervals', []))} suspicious interval(s) "
+            "(heuristic, unvalidated)."
         )
 
     if provenance.get("watermark_analysis", {}).get("overwriting_attack_suspected"):
         notes.append(
-            "Security alert: Synthetic watermark detected on authentic vocal tract acoustics — potential Mark-to-Frame framing attack."
+            "Watermark check reported a possible overwriting attack (heuristic, unvalidated)."
         )
 
     if duration_s < settings.audio_window_seconds:
@@ -115,6 +113,8 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "duration_seconds": round(duration_s, 3),
         "sample_rate": sample_rate,
         "notes": notes,
+        "experimental": experimental,
+        "experimental_reason": EXPERIMENTAL_REASON if experimental else None,
 
         # Visual evidence files
         "spectrogram_file": visuals.get("spectrogram_file"),
@@ -129,10 +129,10 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "segment_scores": splicing.get("segments", []),
         "suspicious_intervals": splicing.get("suspicious_intervals", []),
 
-        # 8-Stage Sequential Audit Pipeline
+        # Per-stage audit trail
         "pipeline_modules": forensic_results.get("pipeline_modules", []),
 
-        # Complete 10-Engine Forensics Dossier
+        # Full stage outputs
         "forensics": forensic_results,
         "file_dna": file_dna,
         "signal_intel": signal_intel,
@@ -144,30 +144,28 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "security_provenance": provenance,
         "fusion_decision": fusion,
 
-        # Dual Risk & Conformal Bounding
+        # Synthesis and tampering risk, and the rule that turned them into a verdict
         "risk_score": overall_risk,
         "risk_tier": risk_tier,
         "generative_ai_risk": fusion.get("generative_ai_risk_score"),
         "structural_tampering_risk": fusion.get("structural_tampering_risk_score"),
-        "conformal_prediction_set": fusion.get("conformal_prediction_set"),
+        "decision_set": fusion.get("decision_set"),
+        "decision_rule": fusion.get("decision_rule"),
         "is_inconclusive": fusion.get("is_inconclusive"),
-        "forensic_likelihood_ratio": fusion.get("forensic_likelihood_ratio"),
-        "verbal_scale_interpretation": fusion.get("verbal_scale_interpretation"),
     }
 
-    lcnn = forensic_results["models_output"].get("lcnn_asvspoof")
     if lcnn:
         return AnalysisResult(
             fake_probability=round(final_fake_prob, 4),
-            model_name="AudioSentinel suite + ASVspoof 2019 LA LCNN (LFCC)",
+            model_name="LCNN (LFCC), ASVspoof 2019 LA, with hand-set signal rules",
             model_version=lcnn["model_version"],
             weights_status=TRAINED,
             evidence=evidence_payload,
         )
     return AnalysisResult(
         fake_probability=round(final_fake_prob, 4),
-        model_name="AudioSentinel 10-Engine Ensemble (Sinc-RawNet + WavLM L18 + IAIF + ENF)",
-        model_version="3.0-enterprise",
-        weights_status=loaded.weights_status,
+        model_name="Hand-set audio rules (heuristic, unvalidated)",
+        model_version="rules-no-trained-model",
+        weights_status=UNTRAINED,
         evidence=evidence_payload,
     )

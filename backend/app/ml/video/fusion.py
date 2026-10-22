@@ -1,9 +1,11 @@
-"""Conformal risk fusion and threat taxonomy for video forensics (Module 42, 46, 47, 48, 72).
+"""Video risk fusion and threat taxonomy.
 
-Combines spatial neural detections, ViT generative scene probabilities, 28-module image forensics,
-10-engine acoustic voice forensics, temporal jitter, dense optical flow boundaries,
-compression DNA, facial ocular dynamics, cross-modal lip-sync, and AI generator attribution
-into a unified multi-modal verdict and segment-by-segment forensic timeline.
+Combines the per-frame image scores, the scene detectors, the image-forensics
+checks, the audio suite's score, temporal jitter, optical flow, compression
+features, facial dynamics, lip-sync and the generator profile match into one
+probability and a segment timeline. The weights and thresholds are hand-set;
+they were not fitted or calibrated on labelled video, and the profile match is
+an unvalidated heuristic.
 """
 
 from __future__ import annotations
@@ -179,7 +181,9 @@ def fuse_video_forensics(
     # Corroborating signals identification
     signals: list[str] = []
     if attribution_info and attribution_info.get("is_ai_generated"):
-        signals.append(f"AI Generator Attribution: Video exhibits intrinsic diffusion markers of {predicted_platform} ({round(attrib_score * 100, 1)}% confidence)")
+        signals.append(
+            f"Generator profile match (unvalidated heuristic): {predicted_platform} ({round(attrib_score * 100, 1)}%)"
+        )
         for sig in attribution_info.get("detected_signatures", []):
             signals.append(f"Intrinsic Trace: {sig}")
 
@@ -242,7 +246,7 @@ def fuse_video_forensics(
     is_synthetic_ai = (attribution_info and attribution_info.get("is_ai_generated")) or bool(ai_tool) or vit_genai_prob >= 0.75
 
     if is_synthetic_ai:
-        dominant_threat = f"AI-Generated Video Media ({predicted_platform})"
+        dominant_threat = f"AI-Generated Video Media (unvalidated profile match: {predicted_platform})"
         threat_code = "AI_GENERATED_VIDEO"
         category_name = "AI Generated Video"
         final_prob = max(final_prob, 0.88)
@@ -335,7 +339,7 @@ def fuse_video_forensics(
             "ai_percentage": f"{round(w_prob * 100, 1)}%",
             "manipulation_type": threat_code if w_prob >= 0.50 else "AUTHENTIC_CONTENT",
             "indicators": ", ".join(seg_indicators),
-            "source_match": predicted_platform if w_prob >= 0.50 else "Authentic Master Broadcast",
+            "source_match": f"{predicted_platform} (unvalidated)" if w_prob >= 0.50 else "No profile match",
         })
         t_curr = t_next
 
@@ -359,6 +363,8 @@ def fuse_video_forensics(
         "segment_timeline": segment_timeline,
         "notes": notes,
         "attribution": {
+            "validated": False,
+            "label": "unvalidated heuristic: hand-set profiles, not tested on labelled video",
             "predicted_platform": predicted_platform,
             "attribution_confidence": attrib_score,
             "is_ai_generated": attribution_info.get("is_ai_generated", False) if attribution_info else False,

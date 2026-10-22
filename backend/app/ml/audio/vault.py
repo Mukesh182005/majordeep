@@ -1,9 +1,9 @@
-"""Engine 1: Secure Ingestion Vault & Chain-of-Custody.
+"""Stage 1: file hashes for the analysed audio.
 
-Adheres strictly to the Scientific Working Group on Digital Evidence (SWGDE)
-and ISO/IEC 27042 standards for forensic digital evidence acquisition.
-Computes multi-algorithm cryptographic digests (SHA-256, SHA-512, MD5, SHA-1)
-in a single streaming pass and generates immutable evidence ledger records.
+Computes SHA-256, SHA-512, MD5 and SHA-1 of the uploaded file in one streaming
+pass, so a recipient can check that a report refers to the file they hold.
+This is a record of what was analysed, not a forensic acquisition procedure:
+no evidence-handling standard is claimed.
 """
 
 from __future__ import annotations
@@ -17,10 +17,7 @@ from typing import Any
 
 
 def compute_audio_vault_hashes(file_path: str | Path) -> dict[str, str]:
-    """Compute SHA-256, SHA-512, MD5, and SHA-1 in a single streaming pass.
-    
-    Reads in 64KB blocks with strict read-only access to preserve file MAC times.
-    """
+    """Compute SHA-256, SHA-512, MD5, and SHA-1 in a single streaming pass (64 KB blocks)."""
     path = Path(file_path)
     if not path.exists():
         raise FileNotFoundError(f"Evidence file not found: {path}")
@@ -51,7 +48,7 @@ def create_evidence_record(
     case_reference: str | None = None,
     analyst: str | None = None,
 ) -> dict[str, Any]:
-    """Create an immutable SWGDE-compliant digital chain-of-custody ledger record."""
+    """Identify the analysed file: name, size, hashes and when it was read."""
     path = Path(file_path)
     stat = path.stat()
     hashes = compute_audio_vault_hashes(path)
@@ -69,8 +66,4 @@ def create_evidence_record(
         "source_type": source_type,
         "analyst": analyst or "SYSTEM_INGEST",
         "hashes": hashes,
-        "chain_of_custody_status": "PRESERVED_IMMUTABLE",
-        "write_blocker_emulated": True,
-        "integrity_verified": True,
-        "compliance": ["SWGDE 08-A-001", "ISO/IEC 27042", "Daubert Rule 702"],
     }

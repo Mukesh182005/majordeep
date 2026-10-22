@@ -1,8 +1,10 @@
 """Phase 3: the ASVspoof-trained LCNN in the audio verdict, behind ``audio_model_source``.
 
-* the legacy mode reproduces the output recorded before the change
+* the legacy mode reproduces a recorded reference output
   (``fixtures/audio_legacy_reference.json``, written by running this file as a
-  script on the unchanged code);
+  script). The first reference (Phase 3, commit 1dd0aef) included the untrained
+  SincRawNet and spectral-smoothness branches; it was re-recorded on purpose
+  when P1 removed them, so legacy mode is now the hand-set rules alone;
 * the backend LFCC front end reproduces the cached training features;
 * class-balanced Platt scaling recovers known parameters;
 * in ``lcnn_asvspoof`` mode the model stage is the calibrated LCNN probability
@@ -48,26 +50,23 @@ def write_reference_clip(path: Path) -> Path:
     return path
 
 
-def run_suite(path: Path, evidence_dir: Path, torch_seed: int = 0) -> dict:
-    """The audio suite as analyze_audio runs it, with the untrained SincRawNet seeded."""
-    import torch
-
+def run_suite(path: Path, evidence_dir: Path) -> dict:
+    """The audio suite as analyze_audio runs it."""
     import app.ml.audio as audio
     from app.ml.preprocessing import load_audio, normalize_waveform
 
     waveform, rate = load_audio(path, SR)
-    torch.manual_seed(torch_seed)
-    audio._AUDIO_ENSEMBLE = None  # rebuild so the random SincRawNet weights follow the seed
-    kwargs = {"model_waveform": waveform} if "model_waveform" in audio.run_comprehensive_audio_forensics.__code__.co_varnames else {}
-    return audio.run_comprehensive_audio_forensics(path, normalize_waveform(waveform), rate, evidence_dir, "ref", **kwargs)
+    return audio.run_comprehensive_audio_forensics(
+        path, normalize_waveform(waveform), rate, evidence_dir, "ref", model_waveform=waveform
+    )
 
 
 def legacy_summary(result: dict) -> dict:
     models, fusion = result["models_output"], result["fusion_decision"]
     return {
         "fused_ai_probability": models["fused_ai_probability"],
-        "model_branch_scores": {k: v for k, v in models.get("model_branch_scores", {}).items()
-                                if isinstance(v, (int, float))},
+        "heuristic_scores": {k: v for k, v in models.get("heuristic_scores", {}).items()
+                             if isinstance(v, (int, float))},
         "generative_ai_risk_score": fusion.get("generative_ai_risk_score"),
         "structural_tampering_risk_score": fusion.get("structural_tampering_risk_score"),
         "calibrated_fake_probability": fusion.get("calibrated_fake_probability"),

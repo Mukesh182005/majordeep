@@ -29,7 +29,7 @@ DeepSentinel AI is a final-year engineering project: a full-stack forensic platf
 | Data builders | `ml/preprocessing/` | `build_audio_dataset.py` makes its own random speaker split. **Do not use it for ASVspoof**; the official protocol must be used. |
 | Shared helpers | `ml/common.py` | `split_by_group`, `set_seed`, manifest I/O. |
 | Evaluation | `ml/evaluation/` | `evaluate.py`, `metrics.py` (`compute_metrics`, `roc_auc`). |
-| Leaky manifest builder | `scripts/build_manifest_140k.py` | Split augmented copies at random, merged the test split, and labelled the upload folder as fake. Do not reuse without fixing. |
+| Face manifest builder | `scripts/expand_training_dataset.py` | Its old version (before `1de4b2e`) split augmented copies at random, merged the test split, and labelled the upload folder as fake. Now group-safe (Phase 8): copies follow their source face's split, uploads are refused. `scripts/build_manifest_140k.py` is a deprecated wrapper for it. |
 | Checkpoints | `checkpoints/` | `image_detector.pt` (EfficientNet-B4), `image_detector_b0.pt`, `audio_detector.pt` (trained on synthetic tones, not speech). |
 | Earlier results | `evaluation/`, `research_archive/` | Phase 18–30 artefacts in `research_archive/artifacts/` are placeholders, not measurements. |
 | Docs | `docs/models/MODEL_CARD.md`, `KNOWN_ISSUES.md`, `docs/research/EVALUATION.md` | `EVALUATION.md` contains tables with no supporting files. |

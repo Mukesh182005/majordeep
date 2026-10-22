@@ -101,6 +101,11 @@ def get_audio_model() -> LoadedModel:
     return _get_or_load("audio", _build_audio_model)
 
 
+def get_audio_lcnn_asvspoof() -> LoadedModel:
+    """The ASVspoof 2019 LA LCNN served when ``audio_model_source="lcnn_asvspoof"``."""
+    return _get_or_load("audio_lcnn_asvspoof", _build_audio_lcnn_asvspoof)
+
+
 def _get_or_load(kind: str, builder) -> LoadedModel:
     cached = _cache.get(kind)
     if cached is not None:
@@ -159,6 +164,49 @@ def _build_audio_model() -> LoadedModel:
         weights_status=status,
         version=str(metadata.get("version", settings.audio_model_version)),
         name="lcnn-logmel",
+        metadata=metadata,
+    )
+
+
+def _build_audio_lcnn_asvspoof() -> LoadedModel:
+    """Load the checkpoint named in the calibration file, refusing any other weights.
+
+    The calibration was fitted for one checkpoint; serving different weights
+    under it would produce probabilities nobody measured, so a missing file or
+    a sha256 mismatch makes the detector unavailable instead.
+    """
+    _require_torch()
+    import hashlib
+    import json
+
+    from app.ml.models_arch import build_audio_model
+
+    calibration_path = Path(settings.audio_lcnn_calibration_file)
+    if not calibration_path.is_file():
+        raise DetectorUnavailableError(f"Audio LCNN calibration file not found: {calibration_path}")
+    calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
+    ckpt_path = Path(settings.checkpoint_dir) / Path(calibration["checkpoint"]).name
+    if not ckpt_path.is_file():
+        raise DetectorUnavailableError(f"Audio LCNN checkpoint not found: {ckpt_path}")
+    sha256 = hashlib.sha256(ckpt_path.read_bytes()).hexdigest()
+    if sha256 != calibration["checkpoint_sha256"]:
+        raise DetectorUnavailableError(
+            f"{ckpt_path.name} sha256 {sha256[:12]}... does not match the calibration file "
+            f"({calibration['checkpoint_sha256'][:12]}...)."
+        )
+    payload = load_checkpoint(ckpt_path)
+    module = build_audio_model()
+    module.load_state_dict(extract_state_dict(payload))
+    device = resolve_device()
+    module.float().eval().to(device)  # inference in float32 only
+    metadata = extract_metadata(payload)
+    metadata.update({"calibration": calibration, "checkpoint": ckpt_path.name, "checkpoint_sha256": sha256})
+    return LoadedModel(
+        module=module,
+        device=device,
+        weights_status=TRAINED,
+        version=str(metadata.get("model_version", ckpt_path.stem)),
+        name="lcnn-lfcc-asvspoof2019la",
         metadata=metadata,
     )
 

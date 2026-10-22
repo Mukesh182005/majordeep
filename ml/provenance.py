@@ -87,7 +87,8 @@ def library_versions() -> dict[str, str | None]:
 
 def torch_environment() -> dict:
     """Torch, CUDA and GPU details; every field is None when torch is absent."""
-    info = {"torch": None, "cuda_build": None, "cuda_available": False, "gpu_name": None}
+    info: dict[str, object] = {"torch": None, "cuda_build": None, "cuda_available": False, "gpu_name": None,
+                               "cudnn_allow_tf32": None, "matmul_allow_tf32": None}
     try:
         import torch
     except ImportError:
@@ -97,6 +98,9 @@ def torch_environment() -> dict:
     info["cuda_available"] = bool(torch.cuda.is_available())
     if info["cuda_available"]:
         info["gpu_name"] = torch.cuda.get_device_name(0)
+    # TF32 (on by default for cuDNN convolutions) is not float32 arithmetic.
+    info["cudnn_allow_tf32"] = bool(torch.backends.cudnn.allow_tf32)
+    info["matmul_allow_tf32"] = bool(torch.backends.cuda.matmul.allow_tf32)
     return info
 
 

@@ -51,6 +51,15 @@ Last updated: 2026-10-14.
 - Timing on 20 dev files (scratch output): 1.34 s per utterance, so about **45 minutes** for all 2,000. Per `GOAL.md`, the full run waits for your go-ahead.
 - Early observation from those 20 files only (all bona fide; not a measurement): the splice-timeline detector fired on every file, R_tamper was 0.5 and the legacy verdict was INCONCLUSIVE for all of them. The full run will show whether this holds.
 
+### Phase 3 task 2: trained LCNN in the audio verdict, behind a setting (2026-10-22)
+- `AUDIO_MODEL_SOURCE` in `backend/app/config.py`: `legacy` (default, unchanged behaviour) or `lcnn_asvspoof`. `AUDIO_LCNN_CALIBRATION_FILE` points at `paper/config/audio_calibration.json`.
+- `ml/evaluation/calibrate_audio_lcnn.py` → `paper/config/audio_calibration.json` (dev only): served checkpoint = the frozen seed with the lowest dev EER, `audio_lcnn_asvspoof_lfcc_seed2.pt` (0.190 %); class-balanced Platt scaling of the mean window spoof logit, a = 1.420, b = −3.064 (p = 0.497 at the dev EER threshold). Dev is almost separable, so these probabilities are very confident; on unseen attacks they will be overconfident.
+- `backend/app/ml/asvspoof_frontend.py`: windows and LFCC moved here from `ml/preprocessing/asvspoof_features.py`, which now imports them, so training and serving share one implementation. On 15 dev and 15 eval utterances the backend features (via `load_audio`, no peak normalisation) equal the cached training features bit for bit.
+- `backend/app/ml/registry.py`: `get_audio_lcnn_asvspoof()` loads the checkpoint named in the calibration file and refuses it if its sha256 differs; the old `audio` entry is unchanged.
+- `backend/app/ml/audio/lcnn_asvspoof.py`: LFCC of every 4 s window, float32 model, mean window logit, calibrated probability. In `lcnn_asvspoof` mode `run_comprehensive_audio_forensics` replaces the model-stage probability with it (the legacy value is kept as `legacy_fused_ai_probability`, context only); `analyze_audio` and the video pipeline pass the waveform before peak normalisation. The evidence fusion weights and thresholds are unchanged until task 6.
+- Tests: `backend/tests/test_audio_lcnn_mode.py` (7): the legacy mode reproduces a reference recorded on the unchanged code (`backend/tests/fixtures/audio_legacy_reference.json`, identical across two processes); front-end shapes and float16 rounding; front end equals the training cache on real data (runs when `DEEPSENTINEL_DATA` is set); balanced Platt recovers known parameters and ignores class duplication; LCNN score equals the calibrated mean window logit; LCNN mode replaces the model stage; a checkpoint with the wrong sha256 is refused.
+- **Found: inference was not strict float32.** PyTorch enables TF32 for cuDNN convolutions by default (`torch.backends.cudnn.allow_tf32 = True`), so all Phase 2 dev and eval scores used TF32 convolutions, against `CLAUDE.md` §6. Strict float32 (CPU, or GPU with TF32 off) gives identical scores on both devices, differing from the stored scores by up to 0.034 on a ±10 scale. Re-scoring **dev** in strict float32 (scratch output, not committed): EER unchanged for seeds 0 and 1, seed 2 0.1901 % → 0.1878 %; min t-DCF changes in the 4th–5th decimal; the front-end choice and the served seed are unaffected. `ml/provenance.py` now records `cudnn_allow_tf32` and `matmul_allow_tf32`. Eval not re-scored: your decision (see Blocked).
+
 ### Phase 5 preparation (nothing frozen, nothing scored)
 - `ml/evaluation/baselines/`: `umm_maybe` (old detector C), `univfd`, `cnndetection`, and `verify_official.py`.
 - `paper/config/freeze_image_config.py`: writes `frozen_image_config.json` (detector revisions and file hashes, weights, threshold, band, rules, border-crop constants, implementation file hashes). Not run: when to freeze is your decision (see Blocked).
@@ -146,25 +155,16 @@ Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 sk
 
 ## Blocked (needs you)
 
-- **H560:** where are the 560 images, or are they lost? Phase 4 cannot re-measure the paper's image numbers without them. If they are lost, the image configuration can be frozen as it is now (`paper/config/freeze_image_config.py`) and the paper must say the H560 figures cannot be reproduced.
+- **TF32 and the eval numbers:** keep the Phase 2 eval results (computed with TF32 convolutions, PyTorch's default) and state this in the paper, or re-score eval once in strict float32 (logged with the reason; overwrites the committed eval score files, old ones stay in git history). On dev the difference is at most 0.002 percentage points of EER.
+- **Phase 3 heuristics table:** approve which audio signals stay in the synthesis risk (rule: bootstrap 95 % lower bound above 0.60) before `evidence_fusion.py` changes (task 6).
+- **Phase 7 option:** pulse and flow out of the video score (recommended) or dense sampling (+about 8 s per video).
+- **H560:** where are the 560 images, or are they lost? If lost, the image configuration can be frozen as it is now (`paper/config/freeze_image_config.py`) and the paper must say the H560 figures cannot be reproduced.
 - **RAISE-1k:** the download form needs your name, affiliation and email (see `RESOURCES.md`).
-- **Long runs:** the full LCNN trainings (Phase 2) are yours to run; commands follow in the Phase 1–2 report.
-- `pypdf` for the 11 skipped report tests (before Phase 7).
+- `pypdf` for the 11 skipped report tests (before Phase 7 changes the report).
 
 ## Next
 
-1. **You run the Phase 2 trainings** (PowerShell, repository root):
-   ```powershell
-   $env:DEEPSENTINEL_DATA = "C:\deepsentinel_data"
-   python ml\training\train_asvspoof.py --features logmel --seed 0
-   python ml\training\train_asvspoof.py --features lfcc --seed 0
-   python ml\evaluation\select_asvspoof_frontend.py
-   # it prints the selected front end and the two commands for seeds 1 and 2; run them, then:
-   python ml\evaluation\select_asvspoof_frontend.py --write
-   git add paper\config\audio_model_selection.json paper_results\audio_asvspoof2019la\dev_runs
-   git commit -m "Select ASVspoof front end on dev; freeze checkpoints before eval"
-   ```
-   Each run writes `checkpoints\audio_lcnn_asvspoof_<features>_seed<k>.pt` (not committed) and `paper_results\audio_asvspoof2019la\dev_runs\<run>\` (`train_log.csv`, `dev_scores.csv`, `dev_metrics.json`, `run_config.json`). An interrupted run continues with the same command plus `--resume`.
-2. Then I score eval once per seed (`eval_asvspoof.py --confirm-final-eval`), run `paper/analysis/audio_asvspoof_report.py`, and continue Phase 3.
-3. **Phase 3 heuristics run (about 45 minutes), when you approve:** `python ml\evaluation\audio_heuristics_dev.py` writes `paper_results\audio_heuristics_dev\` (`subsample.csv`, `scores.csv`, `config.json`). It does not need the LCNN; its column is added after Phase 2.
-4. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloaded; RAISE-1k needs your form; team photographs).
+1. After your approval of the heuristics table: Phase 3 task 6 (synthesis-risk weights and thresholds for the LCNN mode, on the dev subsample only, into `paper/config/frozen_audio_config.json`), then task 7 (end-to-end eval scoring, at least 4,000 stratified eval utterances; about 1.3 s each, so about 1.5 hours for 4,000: yours to run or approve).
+2. Phase 7 after your choice of option.
+3. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloaded; RAISE-1k needs your form; team photographs).
+4. Optional (Phase 8, only if you ask): retrain EfficientNet-B0 on the corrected face manifest.

@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 import numpy as np
 
+from app.config import settings
 from app.ml.audio.vault import create_evidence_record
 from app.ml.audio.file_dna import analyze_audio_dna
 from app.ml.audio.signal_intelligence import extract_signal_intelligence
@@ -52,8 +53,13 @@ def run_comprehensive_audio_forensics(
     evidence_dir: str | Path,
     job_id: str,
     case_reference: str | None = None,
+    model_waveform: np.ndarray | None = None,
 ) -> dict[str, Any]:
-    """Execute all 10 audio forensic engines and compile exhaustive evidentiary dossier."""
+    """Execute all 10 audio forensic engines and compile exhaustive evidentiary dossier.
+
+    ``model_waveform`` is the waveform before peak normalisation, used by the
+    ASVspoof LCNN when ``settings.audio_model_source == "lcnn_asvspoof"``.
+    """
     file_path = Path(file_path)
     evidence_dir = Path(evidence_dir)
     evidence_dir.mkdir(parents=True, exist_ok=True)
@@ -150,7 +156,27 @@ def run_comprehensive_audio_forensics(
     # ------------------------------------------------------------- STAGE 6: Multi-Model AI Detection & SSL Probing
     t0 = time.perf_counter()
     ensemble = get_audio_ensemble()
-    models_output = ensemble.classify_audio(waveform, sample_rate, signal_intel, glottal_physics, file_dna)
+    models_output: dict[str, Any] = ensemble.classify_audio(waveform, sample_rate, signal_intel, glottal_physics, file_dna)
+    lcnn_finding: list[str] = []
+    if settings.audio_model_source == "lcnn_asvspoof":
+        from app.ml.audio.lcnn_asvspoof import score_lcnn_asvspoof
+
+        lcnn = score_lcnn_asvspoof(
+            model_waveform if model_waveform is not None else waveform,
+            sample_rate,
+            peak_normalised=model_waveform is None,
+        )
+        models_output = {
+            **models_output,
+            "legacy_fused_ai_probability": models_output.get("fused_ai_probability"),
+            "fused_ai_probability": lcnn["probability"],
+            "model_stage_source": "lcnn_asvspoof",
+            "lcnn_asvspoof": lcnn,
+        }
+        lcnn_finding = [
+            f"Model stage: ASVspoof 2019 LA LCNN ({lcnn['model_version']}), {lcnn['n_windows']} window(s), "
+            f"calibrated spoof probability {lcnn['probability'] * 100:.1f}%; legacy branches shown as context only."
+        ]
     t1 = time.perf_counter()
     ai_prob = models_output.get("fused_ai_probability", 0.1)
     pipeline_modules.append({
@@ -160,7 +186,7 @@ def run_comprehensive_audio_forensics(
         "status": "ANOMALY_DETECTED" if ai_prob > 0.65 else "PASSED",
         "duration_ms": max(1, int((t1 - t0) * 1000)),
         "summary": f"Domain: {models_output.get('audio_domain')} | Sinc-RawNet: {models_output.get('model_branch_scores', {}).get('rawnet_waveform_prob')*100:.1f}% | WavLM L18: {models_output.get('model_branch_scores', {}).get('wavlm_l18_acoustic_prob')*100:.1f}%",
-        "findings": [
+        "findings": lcnn_finding + [
             f"Evaluated intermediate WavLM Layer 18 and Whisper Layer 4 representations.",
             f"Top Typology: Fully Synthetic TTS ({models_output.get('typology_breakdown', {}).get('tts_fully_synthetic_pct')}%) vs Bona Fide ({models_output.get('typology_breakdown', {}).get('bona_fide_authentic_pct')}%).",
         ],

@@ -52,18 +52,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from ml.common import REPO_ROOT  # noqa: E402  (also puts backend/ on sys.path)
 
-SAMPLE_RATE = 16000
-WINDOW_SAMPLES = 64000  # 4 seconds
-HOP = 160
-N_FFT = 512
-FRAMES_PER_WINDOW = 1 + WINDOW_SAMPLES // HOP  # 401 centred frames
-CACHE_DTYPE = np.float16
+# Windows and LFCC live in the backend so that serving computes the same features.
+from app.ml.asvspoof_frontend import (  # noqa: E402,F401
+    FRAMES_PER_WINDOW,
+    HOP,
+    LFCC_COEFFS,
+    N_FFT,
+    SAMPLE_RATE,
+    WINDOW_SAMPLES,
+    lfcc_features,
+    linear_filterbank,
+    utterance_windows,
+    window_count,
+)
 
-LFCC_FILTERS = 20
-LFCC_COEFFS = 20
-LFCC_WIN = 320  # 20 ms
-LFCC_DELTA_WIDTH = 3
-LOG_FLOOR = 1e-10
+CACHE_DTYPE = np.float16
 
 FRONTENDS = {
     "logmel": {"bands": 64, "description": "log-mel, 64 bands, n_fft 512, hop 160, dB re window max"},
@@ -77,30 +80,6 @@ FRONTENDS = {
 }
 
 
-# --------------------------------------------------------------------------- windows
-def window_count(num_samples: int, window: int = WINDOW_SAMPLES) -> int:
-    if num_samples <= 0:
-        raise ValueError("empty utterance")
-    if num_samples <= window:
-        return 1
-    return num_samples // window + (1 if num_samples % window else 0)
-
-
-def utterance_windows(waveform: np.ndarray, window: int = WINDOW_SAMPLES) -> np.ndarray:
-    """Cut one utterance into fixed-length windows, shape ``(n_windows, window)``."""
-    waveform = np.asarray(waveform, dtype=np.float32).ravel()
-    n = waveform.size
-    if n == 0:
-        raise ValueError("empty utterance")
-    if n <= window:
-        repeats = -(-window // n)  # ceiling division
-        return np.tile(waveform, repeats)[:window][None, :]
-    windows = [waveform[i * window : (i + 1) * window] for i in range(n // window)]
-    if n % window:
-        windows.append(waveform[-window:])
-    return np.stack(windows)
-
-
 # --------------------------------------------------------------------------- front ends
 def logmel_features(window: np.ndarray) -> np.ndarray:
     from app.ml.preprocessing import log_mel_spectrogram
@@ -108,46 +87,6 @@ def logmel_features(window: np.ndarray) -> np.ndarray:
     return log_mel_spectrogram(
         window, sample_rate=SAMPLE_RATE, n_mels=64, n_fft=N_FFT, hop_length=HOP
     ).astype(np.float32)
-
-
-def linear_filterbank(
-    sample_rate: int = SAMPLE_RATE, n_fft: int = N_FFT, n_filters: int = LFCC_FILTERS
-) -> np.ndarray:
-    """Triangular filters with centres equally spaced in Hz, shape (n_filters, n_fft//2+1)."""
-    fft_freqs = np.linspace(0.0, sample_rate / 2, n_fft // 2 + 1)
-    edges = np.linspace(0.0, sample_rate / 2, n_filters + 2)
-    bank = np.zeros((n_filters, fft_freqs.size), dtype=np.float64)
-    for m in range(n_filters):
-        left, centre, right = edges[m], edges[m + 1], edges[m + 2]
-        rising = (fft_freqs - left) / (centre - left)
-        falling = (right - fft_freqs) / (right - centre)
-        bank[m] = np.maximum(0.0, np.minimum(rising, falling))
-    return bank
-
-
-_FILTERBANK = linear_filterbank()
-
-
-def lfcc_features(window: np.ndarray) -> np.ndarray:
-    import librosa
-    from scipy.fft import dct
-
-    spectrum = librosa.stft(
-        window,
-        n_fft=N_FFT,
-        hop_length=HOP,
-        win_length=LFCC_WIN,
-        window="hamming",
-        center=True,
-        pad_mode="constant",
-    )
-    power = np.abs(spectrum) ** 2
-    energies = _FILTERBANK @ power
-    cepstra = dct(np.log(np.maximum(energies, LOG_FLOOR)), type=2, axis=0, norm="ortho")
-    cepstra = cepstra[:LFCC_COEFFS]
-    delta = librosa.feature.delta(cepstra, width=LFCC_DELTA_WIDTH, order=1)
-    delta2 = librosa.feature.delta(cepstra, width=LFCC_DELTA_WIDTH, order=2)
-    return np.concatenate([cepstra, delta, delta2]).astype(np.float32)
 
 
 FRONTEND_FUNCTIONS = {"logmel": logmel_features, "lfcc": lfcc_features}

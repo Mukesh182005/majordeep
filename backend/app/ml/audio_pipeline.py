@@ -24,7 +24,7 @@ import numpy as np
 from app.config import settings
 from app.ml.base import AnalysisResult
 from app.ml.preprocessing import load_audio, normalize_waveform
-from app.ml.registry import UNTRAINED, get_audio_model
+from app.ml.registry import TRAINED, UNTRAINED, get_audio_model
 from app.ml.audio import run_comprehensive_audio_forensics
 
 logger = logging.getLogger(__name__)
@@ -45,6 +45,7 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
 
     # ------------------------------------------------------------------ 2. Execute Comprehensive 10-Engine Forensics
     forensic_results = run_comprehensive_audio_forensics(
+        model_waveform=waveform,
         file_path=path,
         waveform=normalized,
         sample_rate=sample_rate,
@@ -154,6 +155,15 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "verbal_scale_interpretation": fusion.get("verbal_scale_interpretation"),
     }
 
+    lcnn = forensic_results["models_output"].get("lcnn_asvspoof")
+    if lcnn:
+        return AnalysisResult(
+            fake_probability=round(final_fake_prob, 4),
+            model_name="AudioSentinel suite + ASVspoof 2019 LA LCNN (LFCC)",
+            model_version=lcnn["model_version"],
+            weights_status=TRAINED,
+            evidence=evidence_payload,
+        )
     return AnalysisResult(
         fake_probability=round(final_fake_prob, 4),
         model_name="AudioSentinel 10-Engine Ensemble (Sinc-RawNet + WavLM L18 + IAIF + ENF)",

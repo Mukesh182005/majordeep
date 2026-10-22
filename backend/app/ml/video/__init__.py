@@ -282,6 +282,7 @@ def analyze_video(
                 sample_rate=sr,
                 evidence_dir=evidence_dir,
                 job_id=f"{job_id}_audio",
+                model_waveform=audio_np,
             )
     except Exception as exc:
         logger.debug("Audio demuxing and acoustic forensics skipped: %s", exc)

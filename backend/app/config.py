@@ -76,6 +76,12 @@ class Settings(BaseSettings):
     # faces, so its score is reported but kept out of verdicts until a
     # retrained model is validated.
     face_model_in_verdict: bool = False
+    # Audio model stage. "legacy": the untrained SincRawNet, spectral-smoothness
+    # and rule branches. "lcnn_asvspoof": the ASVspoof 2019 LA-trained LCNN chosen
+    # on dev, with the dev-fitted calibration and checkpoint hash recorded in
+    # audio_lcnn_calibration_file.
+    audio_model_source: str = "legacy"
+    audio_lcnn_calibration_file: Path = ROOT_DIR / "paper" / "config" / "audio_calibration.json"
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5
@@ -92,7 +98,16 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
-    @field_validator("storage_dir", "evidence_dir", "report_dir", "checkpoint_dir", mode="after")
+    @field_validator("audio_model_source", mode="after")
+    @classmethod
+    def _known_audio_source(cls, value: str) -> str:
+        if value not in {"legacy", "lcnn_asvspoof"}:
+            raise ValueError("AUDIO_MODEL_SOURCE must be 'legacy' or 'lcnn_asvspoof'")
+        return value
+
+    @field_validator(
+        "storage_dir", "evidence_dir", "report_dir", "checkpoint_dir", "audio_lcnn_calibration_file", mode="after"
+    )
     @classmethod
     def _anchor_path(cls, value: Path) -> Path:
         """Ensure directories are absolute and anchored to the project root."""

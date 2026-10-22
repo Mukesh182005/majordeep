@@ -14,6 +14,9 @@ import cv2
 import numpy as np
 from PIL import Image
 
+from app.config import settings
+from app.ml.preprocessing import MediaTooLongError
+
 logger = logging.getLogger(__name__)
 
 
@@ -70,7 +73,7 @@ def analyze_crossmodal_lipsync(
     try:
         from app.ml.preprocessing import extract_audio_waveform
 
-        audio_np, sr = extract_audio_waveform(video_path)
+        audio_np, sr = extract_audio_waveform(video_path, max_seconds=settings.max_video_seconds)
         if audio_np is not None and len(audio_np) > 0 and sr is not None:
             audio_present = True
             duration_s = len(audio_np) / float(sr)
@@ -94,6 +97,8 @@ def analyze_crossmodal_lipsync(
                 if std_prod > 1e-6:
                     correlation = float(np.mean(ap_norm * en_norm) / std_prod)
                     correlation = float(np.clip(correlation, -1.0, 1.0))
+    except MediaTooLongError:
+        raise  # an over-long video is refused, not analysed without its audio
     except Exception as exc:
         logger.debug("Audio stream extraction for lip-sync analysis skipped: %s", exc)
 

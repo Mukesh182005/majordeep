@@ -104,40 +104,81 @@ def sample_video_frames(
 
 
 # --------------------------------------------------------------------------- audio
-def load_audio(path: str | Path, sample_rate: int | None = None) -> tuple[np.ndarray, int]:
+class MediaTooLongError(ValueError):
+    """Decoded media runs past the length limit the caller passed.
+
+    Upload and worker check MAX_AUDIO_SECONDS / MAX_VIDEO_SECONDS against the
+    duration in the file's headers (``app.storage``), which the uploader writes.
+    This is the check that still holds when those headers are missing or false:
+    decoding stops one second past the limit. A ``ValueError``, so the worker
+    fails the job with this message.
+    """
+
+
+def _too_long(subject: str, media: str, limit: float) -> MediaTooLongError:
+    return MediaTooLongError(
+        f"{subject} is longer than {limit:g} s; this server analyses at most {limit:g} s of {media}."
+    )
+
+
+def load_audio(
+    path: str | Path, sample_rate: int | None = None, max_seconds: float | None = None
+) -> tuple[np.ndarray, int]:
     """Load audio as mono float32 at ``sample_rate``.
 
     Tries librosa (handles every format), then soundfile, then the standard
     library's ``wave`` module. The last fallback only reads PCM WAV, but it means
     a plain WAV upload still works on an install with no audio libraries at all.
+
+    ``max_seconds`` (the pipelines pass MAX_AUDIO_SECONDS): decode at most one
+    second past it and raise :class:`MediaTooLongError` if the audio is longer.
+    ``None`` (training, evaluation, tests) decodes the whole file exactly as before.
     """
     sample_rate = sample_rate or settings.audio_sample_rate
+    budget = None if max_seconds is None else float(max_seconds) + 1.0
     try:
         import librosa
 
-        waveform, rate = librosa.load(str(path), sr=sample_rate, mono=True)
-        return waveform.astype(np.float32), int(rate)
+        if budget is None:
+            waveform, rate = librosa.load(str(path), sr=sample_rate, mono=True)
+        else:
+            waveform, rate = librosa.load(str(path), sr=sample_rate, mono=True, duration=budget)
+        waveform, rate = waveform.astype(np.float32), int(rate)
     except ImportError:
-        pass
+        try:
+            import soundfile as sf
 
-    try:
-        import soundfile as sf
+            if budget is None:
+                waveform, rate = sf.read(str(path), dtype="float32", always_2d=True)
+            else:
+                with sf.SoundFile(str(path)) as handle:
+                    rate = handle.samplerate
+                    waveform = handle.read(frames=math.ceil(budget * rate), dtype="float32", always_2d=True)
+            waveform = waveform.mean(axis=1)
+        except ImportError:
+            waveform, rate = _read_wav_stdlib(path, max_seconds=budget)
 
-        waveform, rate = sf.read(str(path), dtype="float32", always_2d=True)
-        waveform = waveform.mean(axis=1)
-    except ImportError:
-        waveform, rate = _read_wav_stdlib(path)
+        if rate != sample_rate:
+            waveform = _resample_linear(waveform, rate, sample_rate)
+            rate = sample_rate
+        waveform = waveform.astype(np.float32)
 
-    if rate != sample_rate:
-        waveform = _resample_linear(waveform, rate, sample_rate)
-        rate = sample_rate
-    return waveform.astype(np.float32), rate
+    if max_seconds is not None and len(waveform) > max_seconds * rate:
+        raise _too_long("The audio", "audio", max_seconds)
+    return waveform, rate
 
 
-def extract_audio_waveform(path: str | Path, target_sr: int = 16000) -> tuple[np.ndarray, int] | tuple[None, None]:
+_FFMPEG_DEMUX_TIMEOUT_S = 120
+
+
+def extract_audio_waveform(
+    path: str | Path, target_sr: int = 16000, max_seconds: float | None = None
+) -> tuple[np.ndarray, int] | tuple[None, None]:
     """Extract audio waveform from audio or video files using imageio_ffmpeg, librosa, or soundfile.
 
     Returns (waveform_np_1d, sample_rate) or (None, None) if no audio stream exists or if unreadable.
+    With ``max_seconds`` (the video pipeline passes MAX_VIDEO_SECONDS) at most one second past it
+    is decoded, ffmpeg gets a timeout, and a longer track raises :class:`MediaTooLongError`.
     """
     path_obj = Path(path)
     if not path_obj.exists():
@@ -145,9 +186,13 @@ def extract_audio_waveform(path: str | Path, target_sr: int = 16000) -> tuple[np
 
     # 1. Try standard load_audio for plain audio files (.wav, .mp3, .flac)
     try:
-        wf, sr = load_audio(path_obj, sample_rate=target_sr)
+        wf, sr = load_audio(path_obj, sample_rate=target_sr, max_seconds=max_seconds)
         if wf is not None and wf.size > 0:
             return wf.astype(np.float32), sr
+    except MediaTooLongError as exc:
+        if max_seconds is None:  # pragma: no cover - load_audio only raises when given a limit
+            raise
+        raise _too_long("The video's audio track", "video", max_seconds) from exc
     except Exception:
         pass
 
@@ -163,20 +208,18 @@ def extract_audio_waveform(path: str | Path, target_sr: int = 16000) -> tuple[np
             tmp_wav = tmp.name
 
         try:
-            cmd = [
-                ffmpeg_exe,
-                "-y",
-                "-i", str(path_obj),
-                "-vn",
-                "-ac", "1",
-                "-ar", str(target_sr),
-                "-f", "wav",
-                tmp_wav,
-            ]
-            res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+            cmd = [ffmpeg_exe, "-y", "-i", str(path_obj)]
+            run_options: dict[str, Any] = {}
+            if max_seconds is not None:
+                cmd += ["-t", f"{float(max_seconds) + 1.0:g}"]  # output stops one second past the limit
+                run_options["timeout"] = _FFMPEG_DEMUX_TIMEOUT_S
+            cmd += ["-vn", "-ac", "1", "-ar", str(target_sr), "-f", "wav", tmp_wav]
+            res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, **run_options)
             if res.returncode == 0 and Path(tmp_wav).exists() and Path(tmp_wav).stat().st_size > 0:
                 data, sr = sf.read(tmp_wav, dtype="float32")
                 if data is not None and data.size > 0:
+                    if max_seconds is not None and len(data) > max_seconds * sr:
+                        raise _too_long("The video's audio track", "video", max_seconds)
                     return data.astype(np.float32), sr
         finally:
             if Path(tmp_wav).exists():
@@ -184,6 +227,8 @@ def extract_audio_waveform(path: str | Path, target_sr: int = 16000) -> tuple[np
                     Path(tmp_wav).unlink()
                 except Exception:
                     pass
+    except MediaTooLongError:
+        raise
     except Exception:
         pass
 
@@ -191,8 +236,8 @@ def extract_audio_waveform(path: str | Path, target_sr: int = 16000) -> tuple[np
 
 
 
-def _read_wav_stdlib(path: str | Path) -> tuple[np.ndarray, int]:
-    """Read a PCM WAV into mono float32 using only the standard library."""
+def _read_wav_stdlib(path: str | Path, max_seconds: float | None = None) -> tuple[np.ndarray, int]:
+    """Read a PCM WAV into mono float32 using only the standard library (at most ``max_seconds``)."""
     import wave
 
     try:
@@ -200,7 +245,10 @@ def _read_wav_stdlib(path: str | Path) -> tuple[np.ndarray, int]:
             channels = handle.getnchannels()
             width = handle.getsampwidth()
             rate = handle.getframerate()
-            frames = handle.readframes(handle.getnframes())
+            count = handle.getnframes()
+            if max_seconds is not None:
+                count = min(count, math.ceil(max_seconds * rate))
+            frames = handle.readframes(count)
     except wave.Error as exc:
         raise RuntimeError(
             f"Cannot decode '{Path(path).name}': install librosa or soundfile to support "

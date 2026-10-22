@@ -47,7 +47,9 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     evidence_dir.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------ 1. Load Audio
-    waveform, sample_rate = load_audio(path, settings.audio_sample_rate)
+    # Decodes at most MAX_AUDIO_SECONDS + 1 s and refuses longer audio, whatever
+    # duration the file's headers claimed at upload.
+    waveform, sample_rate = load_audio(path, settings.audio_sample_rate, max_seconds=settings.max_audio_seconds)
     normalized = normalize_waveform(waveform)
     duration_s = len(normalized) / sample_rate
 

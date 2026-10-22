@@ -1,0 +1,104 @@
+{
+  "recorded_run": "paper_results/audio_asvspoof2019la/dev_runs/audio_lcnn_asvspoof_lfcc_seed2",
+  "rerun": "paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2",
+  "best_epoch": {
+    "recorded": 20,
+    "rerun": 20,
+    "equal": true
+  },
+  "dev_metrics": {
+    "eer": {
+      "recorded": 0.0019006091299648119,
+      "rerun": 0.0019006091299648119,
+      "equal": true
+    },
+    "eer_threshold": {
+      "recorded": -2.1488367915153503,
+      "rerun": -2.1488367915153503,
+      "equal": true
+    },
+    "min_tdcf": {
+      "recorded": 0.0041743297918036505,
+      "rerun": 0.0041743297918036505,
+      "equal": true
+    },
+    "auc_bonafide_vs_spoof": {
+      "recorded": 0.9999787714207982,
+      "rerun": 0.9999787714207982,
+      "equal": true
+    },
+    "n_bonafide": {
+      "recorded": 2548,
+      "rerun": 2548,
+      "equal": true
+    },
+    "n_spoof": {
+      "recorded": 22296,
+      "rerun": 22296,
+      "equal": true
+    }
+  },
+  "dev_metrics_all_equal": true,
+  "dev_scores": {
+    "recorded_sha256": "4fd82c3a5c87965ce216e966d04a5aed6edda50ebcd5a4e8ab3a8024a36cda29",
+    "rerun_sha256": "4fd82c3a5c87965ce216e966d04a5aed6edda50ebcd5a4e8ab3a8024a36cda29",
+    "byte_identical": true
+  },
+  "weights": {
+    "recorded": {
+      "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+      "sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3"
+    },
+    "rerun": {
+      "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2_repro.pt",
+      "sha256": "1f189050e84bdd327be87fe9d6652bd4cae8ef7bd9e886c33da573354ff0896c"
+    },
+    "n_tensors": 57,
+    "same_tensor_names": true,
+    "tensors_differing": [],
+    "max_abs_difference": 0.0,
+    "bit_identical": true
+  },
+  "provenance": {
+    "git_commit": "72cb7c5e3566f451e94a024ee89ad055c544680b",
+    "git_branch": "ml/audio-repro",
+    "git_dirty": false,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-22T07:07:49+00:00",
+    "command_line": [
+      "ml/evaluation/compare_dev_runs.py",
+      "--recorded",
+      "paper_results/audio_asvspoof2019la/dev_runs/audio_lcnn_asvspoof_lfcc_seed2",
+      "--rerun",
+      "paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2",
+      "--recorded-checkpoint",
+      "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+      "--rerun-checkpoint",
+      "checkpoints/audio_lcnn_asvspoof_lfcc_seed2_repro.pt"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": null
+  }
+}

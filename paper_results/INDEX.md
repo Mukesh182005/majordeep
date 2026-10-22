@@ -61,3 +61,9 @@ value that no file contains.
 | Audio dev subsample: legacy verdict INCONCLUSIVE, spoof | 87.0% (870/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.spoof.INCONCLUSIVE.rate`` | 3 |
 | Audio dev subsample: legacy verdict MANIPULATED, spoof | 12.9% (129/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.spoof.MANIPULATED.rate`` | 3 |
 <!-- end:audio_heuristics_dev -->
+<!-- begin:audio_lcnn_repro -->
+| Re-run lfcc_seed2 vs recorded audio_lcnn_asvspoof_lfcc_seed2: best epoch equal | yes (20 / 20) | ``paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2/comparison.json`` | ``best_epoch.equal`` | 3 |
+| Re-run lfcc_seed2 vs recorded audio_lcnn_asvspoof_lfcc_seed2: dev EER, EER threshold, min t-DCF and AUC equal | yes | ``paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2/comparison.json`` | ``dev_metrics_all_equal`` | 3 |
+| Re-run lfcc_seed2 vs recorded audio_lcnn_asvspoof_lfcc_seed2: per-utterance dev scores byte-identical | yes | ``paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2/comparison.json`` | ``dev_scores.byte_identical`` | 3 |
+| Re-run lfcc_seed2 vs recorded audio_lcnn_asvspoof_lfcc_seed2: checkpoint weights bit-identical | yes | ``paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2/comparison.json`` | ``weights.bit_identical`` | 3 |
+<!-- end:audio_lcnn_repro -->

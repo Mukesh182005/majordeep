@@ -145,33 +145,19 @@ def test_balanced_platt_recovers_parameters_and_ignores_class_ratio():
 # --------------------------------------------------------------------------- LCNN mode
 @pytest.fixture()
 def lcnn_setup(tmp_path, monkeypatch):
-    """A random-weight LCNN checkpoint and a calibration file pointing at it."""
-    import torch
+    """A random-weight LCNN checkpoint, its calibration and a frozen verdict config."""
+    from conftest import write_test_audio_lcnn
 
     from app.config import settings
     from app.ml import registry
-    from app.ml.models_arch import build_audio_model
 
-    torch.manual_seed(3)
-    ckpt_dir = tmp_path / "checkpoints"
-    ckpt_dir.mkdir()
-    ckpt = ckpt_dir / "audio_lcnn_test.pt"
-    torch.save({"state_dict": build_audio_model().state_dict(), "frontend": "lfcc"}, ckpt)
-    calibration = {
-        "checkpoint": "checkpoints/audio_lcnn_test.pt",
-        "checkpoint_sha256": hashlib.sha256(ckpt.read_bytes()).hexdigest(),
-        "frontend": "lfcc",
-        "method": "platt_balanced",
-        "a": 0.8,
-        "b": 0.1,
-    }
-    calibration_path = tmp_path / "audio_calibration.json"
-    calibration_path.write_text(json.dumps(calibration), encoding="utf-8")
-    monkeypatch.setattr(settings, "checkpoint_dir", ckpt_dir)
-    monkeypatch.setattr(settings, "audio_lcnn_calibration_file", calibration_path, raising=False)
-    monkeypatch.setattr(settings, "audio_model_source", "lcnn_asvspoof", raising=False)
+    written = write_test_audio_lcnn(tmp_path / "checkpoints", tmp_path, seed=3)
+    monkeypatch.setattr(settings, "checkpoint_dir", tmp_path / "checkpoints")
+    monkeypatch.setattr(settings, "audio_lcnn_calibration_file", tmp_path / "audio_calibration.json")
+    monkeypatch.setattr(settings, "audio_verdict_config_file", tmp_path / "frozen_audio_config.json")
+    monkeypatch.setattr(settings, "audio_model_source", "lcnn_asvspoof")
     registry.reset_cache()
-    yield calibration
+    yield written["calibration"]
     registry.reset_cache()
 
 

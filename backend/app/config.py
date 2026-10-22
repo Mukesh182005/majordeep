@@ -102,12 +102,15 @@ class Settings(BaseSettings):
     # faces, so its score is reported but kept out of verdicts until a
     # retrained model is validated.
     face_model_in_verdict: bool = False
-    # Audio model stage. "legacy": hand-set rules only, no trained model (results
-    # are marked experimental). "lcnn_asvspoof": the ASVspoof 2019 LA-trained LCNN chosen
-    # on dev, with the dev-fitted calibration and checkpoint hash recorded in
-    # audio_lcnn_calibration_file.
-    audio_model_source: str = "legacy"
+    # Audio model stage. "lcnn_asvspoof" (default): the ASVspoof 2019 LA-trained
+    # LCNN chosen on dev, with the dev-fitted calibration and checkpoint hash in
+    # audio_lcnn_calibration_file and the verdict rule frozen on dev in
+    # audio_verdict_config_file; its probability alone decides the audio verdict.
+    # "legacy": hand-set rules only, no trained model (results are marked
+    # experimental); kept so the previous behaviour can be restored.
+    audio_model_source: str = "lcnn_asvspoof"
     audio_lcnn_calibration_file: Path = ROOT_DIR / "paper" / "config" / "audio_calibration.json"
+    audio_verdict_config_file: Path = ROOT_DIR / "paper" / "config" / "frozen_audio_config.json"
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5
@@ -153,7 +156,8 @@ class Settings(BaseSettings):
         return value
 
     @field_validator(
-        "storage_dir", "evidence_dir", "report_dir", "checkpoint_dir", "audio_lcnn_calibration_file", mode="after"
+        "storage_dir", "evidence_dir", "report_dir", "checkpoint_dir", "audio_lcnn_calibration_file",
+        "audio_verdict_config_file", mode="after",
     )
     @classmethod
     def _anchor_path(cls, value: Path) -> Path:

@@ -65,11 +65,18 @@ services:
       MAX_VIDEO_SECONDS: ${MAX_VIDEO_SECONDS:-300}
       # Only the frontend nginx (fixed address below) may set X-Real-IP.
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-172.28.0.10}
+      # Audio verdict: the ASVspoof 2019 LA LCNN with its dev-fitted calibration
+      # and the verdict rule frozen on dev (paper/config, mounted below). The
+      # checkpoint itself comes from ./checkpoints (weights are not in git).
+      AUDIO_MODEL_SOURCE: ${AUDIO_MODEL_SOURCE:-lcnn_asvspoof}
+      AUDIO_LCNN_CALIBRATION_FILE: /app/paper_config/audio_calibration.json
+      AUDIO_VERDICT_CONFIG_FILE: /app/paper_config/frozen_audio_config.json
     volumes:
       # Shared with the worker: the API writes uploads, the worker reads them
       # and writes evidence back.
       - media:/app/storage
       - ./checkpoints:/app/checkpoints:ro
+      - ./paper/config:/app/paper_config:ro
     ports:
       - "8000:8000"
     depends_on:
@@ -85,6 +92,7 @@ services:
     volumes:
       - media:/app/storage
       - ./checkpoints:/app/checkpoints:ro
+      - ./paper/config:/app/paper_config:ro
     depends_on:
       db: { condition: service_healthy }
       redis: { condition: service_healthy }

@@ -1,5 +1,18 @@
 """Stage 8 of the audio suite: synthesis and tampering risk, and the verdict.
 
+Two rules, chosen by the model stage:
+
+**Trained model** (``AUDIO_MODEL_SOURCE=lcnn_asvspoof``, the default). The
+verdict is the calibrated LCNN spoof probability p against the thresholds
+frozen on ASVspoof 2019 LA dev (``paper/config/frozen_audio_config.json``):
+authentic below ``authentic_below``, AI-generated at or above
+``flagged_at_or_above``, inconclusive in between. Glottal, coarticulation,
+mains-hum, splice, container and steganography signals are computed and
+reported as context with no weight: none separated bona fide from spoofed
+speech on dev (paper_results/audio_heuristics_dev/signal_auc.json).
+
+**Hand-set rule** (``legacy``, no trained model; results are experimental):
+
     R_synth  = 0.50 x model stage + 0.35 x glottal anomaly + 0.15 x coarticulation anomaly
     R_tamper = 0.25 x (3 ENF splice + 2 splice-timeline flag + 2 trailing bytes + 1 steganography),
                clipped to [0.02, 0.98]
@@ -36,8 +49,13 @@ def compute_evidence_fusion_and_risk(
     enf_environment: dict[str, Any],
     security_provenance: dict[str, Any],
     speech_semantics: dict[str, Any],
+    verdict_config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Combine the stage outputs into synthesis risk, tampering risk and a verdict."""
+    """Combine the stage outputs into synthesis risk, tampering risk and a verdict.
+
+    ``verdict_config`` (the frozen audio config) selects the trained-model rule
+    when the model stage is the ASVspoof LCNN.
+    """
 
     # ------------------------------------------------------------- 1. Synthesis risk (R_synth)
     ai_ml_prob = models_output.get("fused_ai_probability", 0.10)
@@ -63,6 +81,14 @@ def compute_evidence_fusion_and_risk(
         tamper_signals += 1
 
     r_tamper = float(min(0.98, max(0.02, tamper_signals * 0.25)))
+
+    if verdict_config is not None and models_output.get("model_stage_source") == "lcnn_asvspoof":
+        return _trained_model_decision(
+            float(ai_ml_prob), r_tamper, verdict_config, vault_record, file_dna, glottal_physics, models_output,
+            splicing_timeline, enf_environment, glottal_err, coarticulation_err,
+            {"enf_splice": enf_splice, "timeline_splice": timeline_splice, "trailing_bytes": trailing_bytes,
+             "stego": stego_detected},
+        )
 
     # ------------------------------------------------------------- 3. Decision (fixed thresholds)
     decision_set = []
@@ -116,12 +142,78 @@ def compute_evidence_fusion_and_risk(
         "is_inconclusive": is_inconclusive,
         "flagged_signals_count": len(flagged_signals),
         "flagged_signals": flagged_signals,
+        "verdict_source": "hand_set_rule",
         "evidence_graph": graph,
     }
 
 
+def _trained_model_decision(
+    p: float,
+    r_tamper: float,
+    config: dict[str, Any],
+    vault_record: dict[str, Any],
+    file_dna: dict[str, Any],
+    glottal_physics: dict[str, Any],
+    models_output: dict[str, Any],
+    splicing_timeline: dict[str, Any],
+    enf_environment: dict[str, Any],
+    glottal_err: float,
+    coarticulation_err: float,
+    flags: dict[str, bool],
+) -> dict[str, Any]:
+    """Verdict from the calibrated LCNN probability alone; heuristics are context."""
+    low, high = float(config["authentic_below"]), float(config["flagged_at_or_above"])
+    if p >= high:
+        verdict, decision_set = "AI_GENERATED", ["AI_GENERATED"]
+    elif p < low:
+        verdict, decision_set = "AUTHENTIC", ["AUTHENTIC"]
+    else:
+        verdict, decision_set = "INCONCLUSIVE", ["AUTHENTIC", "AI_GENERATED"]
+
+    context = []
+    if glottal_err >= 0.60:
+        context.append("Glottal anomaly score at or above 0.60 (heuristic, unvalidated; no weight)")
+    if flags["enf_splice"]:
+        context.append("Mains-hum (ENF) phase discontinuity (heuristic, unvalidated; no weight)")
+    if flags["timeline_splice"]:
+        context.append("Splice-timeline boundary spikes (heuristic, unvalidated; no weight)")
+    if flags["trailing_bytes"]:
+        context.append(f"Container: {file_dna.get('trailing_bytes_count')} bytes appended after the audio data (no weight)")
+    if flags["stego"]:
+        context.append("Possible steganographic payload (heuristic, unvalidated; no weight)")
+
+    signals = [f"LCNN spoof probability {p * 100:.1f}% (threshold {config['threshold']:.3f}, "
+               f"inconclusive band {low:.3f}-{high:.3f})"]
+    return {
+        "final_verdict": verdict,
+        "calibrated_fake_probability": round(p, 4),
+        "generative_ai_risk_score": round(p, 4),
+        "structural_tampering_risk_score": round(r_tamper, 4),
+        "decision_set": decision_set,
+        "decision_rule": config["decision_rule"],
+        "decision_threshold": float(config["threshold"]),
+        "uncertain_band": float(config["inconclusive_band"]),
+        "is_inconclusive": verdict == "INCONCLUSIVE",
+        "flagged_signals_count": len(context),
+        "flagged_signals": signals + context,
+        "context_signals": {
+            "note": "computed and shown, no weight in the verdict (none separated bona fide from spoof on dev)",
+            "structural_tampering_risk": round(r_tamper, 4),
+            "glottal_anomaly": round(float(glottal_err), 4),
+            "coarticulation_anomaly": round(float(coarticulation_err), 4),
+            "hand_set_rule_score": models_output.get("legacy_fused_ai_probability"),
+        },
+        "verdict_source": "lcnn_asvspoof",
+        "evidence_graph": _build_evidence_graph(
+            vault_record, file_dna, glottal_physics, models_output, splicing_timeline, enf_environment, verdict,
+            trained_model_only=True,
+        ),
+    }
+
+
 def _build_evidence_graph(
-    vault: dict, dna: dict, phys: dict, models: dict, splice: dict, enf: dict, verdict: str
+    vault: dict, dna: dict, phys: dict, models: dict, splice: dict, enf: dict, verdict: str,
+    trained_model_only: bool = False,
 ) -> dict[str, Any]:
     """Which stage outputs feed the verdict. Edges carry no weights: see the module docstring."""
     model_label = models.get("model_stage_label") or "trained model"
@@ -136,6 +228,17 @@ def _build_evidence_graph(
         {"id": "splice_node", "label": f"Splice timeline: {splice.get('first_order_f1_spikes_count', 0)} spikes (heuristic, unvalidated)", "type": "temporal", "status": "ALERT" if splice.get("splicing_detected") else "NORMAL"},
         {"id": "verdict_node", "label": f"Verdict: {verdict}", "type": "verdict", "status": "CRITICAL" if verdict in ("AI_GENERATED", "MANIPULATED") else ("INCONCLUSIVE" if verdict == "INCONCLUSIVE" else "SECURE")},
     ]
+
+    if trained_model_only:
+        return {
+            "nodes": nodes,
+            "edges": [
+                {"source": "file_root", "target": "model_node", "label": "model stage"},
+                {"source": "model_node", "target": "verdict_node", "label": "decides the verdict"},
+                *({"source": "file_root", "target": node, "label": "context only"}
+                  for node in ("vault_node", "dna_node", "glottal_node", "enf_node", "splice_node")),
+            ],
+        }
 
     edges = [
         {"source": "file_root", "target": "vault_node", "label": "hashing"},

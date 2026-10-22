@@ -68,3 +68,21 @@ The report download and the job WebSocket no longer read a token from the query 
 
 ### Client IP behind a proxy
 `X-Forwarded-For` is never used. `X-Real-IP` is used only when the connection comes from `TRUSTED_PROXIES` (docker-compose: the frontend nginx at 172.28.0.10). If another proxy (Caddy, Cloudflare Tunnel) sits in front of nginx, nginx must be configured with `set_real_ip_from` and `real_ip_header` so its `$remote_addr` is the visitor, or every visitor shares one rate-limit bucket.
+
+## ml/audio-wire
+
+The ASVspoof 2019 LA LCNN is now the audio verdict (`AUDIO_MODEL_SOURCE=lcnn_asvspoof`, the default).
+
+| Field | Meaning |
+|---|---|
+| `fake_probability` | The LCNN's calibrated spoof probability alone. |
+| `verdict` | From the thresholds frozen on ASVspoof dev: AUTHENTIC below `evidence.decision_threshold - evidence.uncertain_band` (0.417), MANIPULATED at or above `+ band` (0.577), INCONCLUSIVE between. |
+| `experimental` | `false` (trained model). `true` only with `AUDIO_MODEL_SOURCE=legacy`. |
+| `model_name` / `model_version` | `"LCNN (LFCC), ASVspoof 2019 LA"` / `audio-lcnn-asvspoof2019la-lfcc-seed2`. |
+| `evidence.segment_scores` | The LCNN's per-window probabilities, the main timeline: `segment_index`, `start_s`, `end_s`, `fake_probability`, `status` (`FLAGGED` / `INCONCLUSIVE` / `AUTHENTIC`), `source: "lcnn_asvspoof"`. `evidence.segment_scores_source` says which timeline it is. |
+| `evidence.splice_segment_scores` | The old splice-timeline heuristic, context only. |
+| `evidence.fusion_decision.verdict_source` | `"lcnn_asvspoof"` or `"hand_set_rule"`. |
+| `evidence.fusion_decision.context_signals` | Tampering risk, glottal and coarticulation scores and the hand-set rule score: shown as "Supporting signals (unvalidated)", **no weight**. |
+| `evidence.models_output.lcnn_asvspoof.windows` | Per-window spoof logit and probability with times. |
+
+`evidence.notes[0]` states the model's validation scope (ASVspoof 2019 LA only; not real-world recordings); show it next to the result.

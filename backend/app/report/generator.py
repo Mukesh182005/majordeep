@@ -376,6 +376,9 @@ def _section_analysis_summary(job, charts, styles) -> list[Any]:
     label, colour = VERDICT_STYLING.get(job.verdict, ("NOT ANALYSED", MUTED))
     probability = job.fake_probability if job.fake_probability is not None else 0.0
     confidence = job.confidence if job.confidence is not None else 0.0
+    # Audio carries its own thresholds, frozen on ASVspoof dev; other media use the platform's.
+    threshold = float((job.evidence or {}).get("decision_threshold", settings.fake_threshold))
+    band = float((job.evidence or {}).get("uncertain_band", settings.uncertain_band))
 
     verdict_table = Table(
         [
@@ -389,8 +392,8 @@ def _section_analysis_summary(job, charts, styles) -> list[Any]:
                 Paragraph(
                     f"<b>P(manipulated) = {probability * 100:.1f}%</b><br/>"
                     f"<font size=8>Decision confidence {confidence * 100:.1f}% · "
-                    f"threshold {settings.fake_threshold:.2f} "
-                    f"± {settings.uncertain_band:.2f} uncertain band</font>",
+                    f"threshold {threshold:.3f} "
+                    f"± {band:.2f} uncertain band</font>",
                     ParagraphStyle("vd", fontSize=10, leading=13, alignment=1),
                 ),
             ]
@@ -418,7 +421,7 @@ def _section_analysis_summary(job, charts, styles) -> list[Any]:
         ("Weights status", _weights_label(job.weights_status)),
         (
             "Decision threshold",
-            f"{settings.fake_threshold:.2f} (± {settings.uncertain_band:.2f} inconclusive band)",
+            f"{threshold:.3f} (± {band:.2f} inconclusive band)",
         ),
         ("Processing time", f"{job.processing_ms} ms" if job.processing_ms else "—"),
     ]

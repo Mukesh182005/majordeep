@@ -172,16 +172,51 @@ def test_evidence_fusion_and_risk(sample_wav):
 
 
 def test_analyze_audio_pipeline_end_to_end(sample_wav, tmp_path):
+    """Default mode: the verdict is the LCNN's (a random-weight test LCNN here, see conftest)."""
+    from app.ml.audio.lcnn_asvspoof import load_verdict_config
+    from app.models import Verdict
+
     file_path, _, _ = sample_wav
     ev_dir = tmp_path / "evidence"
     res = analyze_audio(file_path, ev_dir, "job_test_full")
+    models, fusion = res.evidence["models_output"], res.evidence["fusion_decision"]
+    assert res.model_name == "LCNN (LFCC), ASVspoof 2019 LA"
+    assert res.weights_status == "trained"
+    assert res.evidence["experimental"] is False and res.evidence["experimental_reason"] is None
+    assert models["model_stage_source"] == "lcnn_asvspoof"
+
+    # The probability and the verdict are the LCNN's alone, against the frozen thresholds.
+    p = models["lcnn_asvspoof"]["probability"]
+    assert res.fake_probability == round(p, 4)
+    frozen = load_verdict_config()
+    expected = (Verdict.MANIPULATED if p >= frozen["flagged_at_or_above"]
+                else Verdict.AUTHENTIC if p < frozen["authentic_below"] else Verdict.INCONCLUSIVE)
+    assert res.verdict is expected
+    assert fusion["verdict_source"] == "lcnn_asvspoof"
+    assert res.evidence["decision_threshold"] == frozen["threshold"]
+    assert "structural_tampering_risk" in fusion["context_signals"]
+
+    # The timeline is the LCNN's windows (3 s clip: one window).
+    assert res.evidence["segment_scores_source"] == "lcnn_asvspoof"
+    assert [w["start_s"] for w in res.evidence["segment_scores"]] == [0.0]
+    assert res.evidence["segments_analysed"] == 1
+
+    assert res.evidence["media"] == "audio"
+    assert len(res.evidence["pipeline_modules"]) == 8
+    assert (ev_dir / res.evidence["spectrogram_file"]).exists()
+    assert (ev_dir / res.evidence["lfcc_scalogram_file"]).exists()
+
+
+def test_legacy_mode_is_experimental(sample_wav, tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "audio_model_source", "legacy")
+    file_path, _, _ = sample_wav
+    res = analyze_audio(file_path, tmp_path / "evidence", "job_test_legacy")
     assert 0.0 <= res.fake_probability <= 1.0
     assert res.model_name == "Hand-set audio rules (heuristic, unvalidated)"
     assert res.weights_status == "untrained-backbone"
     assert res.evidence["experimental"] is True
     assert "No trained audio model" in res.evidence["experimental_reason"]
-    assert res.evidence["media"] == "audio"
-    assert len(res.evidence["pipeline_modules"]) == 8
-    assert res.evidence["risk_tier"] in ("LOW_RISK", "MODERATE_RISK", "HIGH_RISK", "CRITICAL_RISK")
-    assert (ev_dir / res.evidence["spectrogram_file"]).exists()
-    assert (ev_dir / res.evidence["lfcc_scalogram_file"]).exists()
+    assert res.evidence["fusion_decision"]["verdict_source"] == "hand_set_rule"
+    assert res.evidence["segment_scores_source"] == "splice_timeline_heuristic"

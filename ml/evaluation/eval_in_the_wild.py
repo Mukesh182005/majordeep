@@ -31,6 +31,7 @@ Usage (PowerShell; about 31,800 files)::
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import json
 import sys
@@ -79,8 +80,8 @@ def strict_float32() -> None:
 
 def load_models(checkpoints: list[dict], device):
     import torch
-
     from app.ml.models_arch import build_audio_model
+
     from ml.provenance import sha256_file
 
     models = []
@@ -100,7 +101,6 @@ def load_models(checkpoints: list[dict], device):
 def score_file(path: Path, models, device) -> dict[str, float]:
     """CM score (minus the mean window spoof logit) of one file for every model."""
     import torch
-
     from app.ml.asvspoof_frontend import utterance_lfcc
     from app.ml.preprocessing import load_audio
 
@@ -140,7 +140,10 @@ def compute_metrics(output_dir: Path, stems: list[str], rows: list[dict], served
         }
     eers = np.array([m["eer"] * 100 for m in per_checkpoint.values()])
     aucs = np.array([m["auc_bonafide_vs_spoof"] for m in per_checkpoint.values()])
-    sd = (lambda v: float(v.std(ddof=1)) if v.size > 1 else None)
+
+    def sd(values: np.ndarray) -> float | None:
+        return float(values.std(ddof=1)) if values.size > 1 else None
+
     return {
         "dataset": "In-the-Wild (external test; models trained and chosen on ASVspoof 2019 LA only)",
         "score_convention": "higher = bona fide; score = -mean window spoof logit",
@@ -199,15 +202,15 @@ def main(argv: list[str] | None = None) -> dict | None:
     print(f"{len(rows) - len(todo):,} of {len(rows):,} already scored; scoring {len(todo):,} on {device} "
           f"with {', '.join(stems)}", flush=True)
 
-    handles = {}
-    for stem, path in paths.items():
-        new = not path.is_file()
-        handles[stem] = open(path, "a", newline="", encoding="utf-8")
-        if new:
-            csv.writer(handles[stem]).writerow(["utt_id", "label", "score"])
     already = {stem: done_ids(path) for stem, path in paths.items()}
     t0 = time.perf_counter()
-    try:
+    with contextlib.ExitStack() as stack:
+        handles = {}
+        for stem, path in paths.items():
+            new = not path.is_file()
+            handles[stem] = stack.enter_context(open(path, "a", newline="", encoding="utf-8"))
+            if new:
+                csv.writer(handles[stem]).writerow(["utt_id", "label", "score"])
         for i, row in enumerate(todo, start=1):
             scores = score_file(args.root / row["relative_path"], models, device)
             for stem, score in scores.items():
@@ -218,9 +221,6 @@ def main(argv: list[str] | None = None) -> dict | None:
                     handle.flush()
                 rate = i / (time.perf_counter() - t0)
                 print(f"  {i:,}/{len(todo):,} files, {rate:.1f}/s, ETA {(len(todo) - i) / rate / 60:.1f} min", flush=True)
-    finally:
-        for handle in handles.values():
-            handle.close()
 
     served = served_checkpoint_name()
     metrics = compute_metrics(args.output_dir, stems, rows, Path(served).stem if served else None)

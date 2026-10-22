@@ -39,6 +39,33 @@ from app.ml.audio.xai_interpretability import generate_audio_xai_explanations
 logger = logging.getLogger(__name__)
 
 
+def lcnn_window_segments(models_output: dict[str, Any], verdict_config: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """The LCNN's per-window probabilities as timeline segments (empty in legacy mode).
+
+    Same keys as the splice-timeline segments, so the plates, the report and
+    the UI draw them unchanged. Status uses the frozen verdict thresholds; the
+    verdict itself uses the mean over windows, not any single window.
+    """
+    lcnn = models_output.get("lcnn_asvspoof")
+    if not lcnn or verdict_config is None:
+        return []
+    low, high = float(verdict_config["authentic_below"]), float(verdict_config["flagged_at_or_above"])
+    segments = []
+    for window in lcnn.get("windows", []):
+        p = float(window["probability"])
+        status = "FLAGGED" if p >= high else ("AUTHENTIC" if p < low else "INCONCLUSIVE")
+        segments.append({
+            "segment_index": window["index"],
+            "start_s": window["start_s"],
+            "end_s": window["end_s"],
+            "fake_probability": round(p, 4),
+            "status": status,
+            "source": "lcnn_asvspoof",
+            "reasons": [],
+        })
+    return segments
+
+
 def run_comprehensive_audio_forensics(
     file_path: str | Path,
     waveform: np.ndarray,
@@ -153,8 +180,11 @@ def run_comprehensive_audio_forensics(
         "No trained model in this mode: hand-set rules over glottal, voice-quality and cepstral "
         "descriptors (heuristic, unvalidated)."
     ]
+    verdict_config = None
     if settings.audio_model_source == "lcnn_asvspoof":
-        from app.ml.audio.lcnn_asvspoof import score_lcnn_asvspoof
+        from app.ml.audio.lcnn_asvspoof import load_verdict_config, score_lcnn_asvspoof
+
+        verdict_config = load_verdict_config()
 
         lcnn = score_lcnn_asvspoof(
             model_waveform if model_waveform is not None else waveform,
@@ -213,7 +243,7 @@ def run_comprehensive_audio_forensics(
     fusion_decision = compute_evidence_fusion_and_risk(
         vault_record, file_dna, signal_intel, glottal_physics,
         models_output, splicing_timeline, enf_environment, security_provenance,
-        speech_semantics
+        speech_semantics, verdict_config=verdict_config,
     )
     t1 = time.perf_counter()
     pipeline_modules.append({
@@ -227,14 +257,17 @@ def run_comprehensive_audio_forensics(
     })
 
     # ------------------------------------------------------------- Visual Scalograms & XAI Plates
+    model_windows = lcnn_window_segments(models_output, verdict_config)
     visual_files = generate_signal_lab_plates(
-        waveform, sample_rate, evidence_dir, job_id, segment_scores=splicing_timeline.get("segments")
+        waveform, sample_rate, evidence_dir, job_id,
+        segment_scores=model_windows if model_windows else splicing_timeline.get("segments"),
     )
     xai_files = generate_audio_xai_explanations(
         waveform, sample_rate, evidence_dir, job_id, ai_prob=fusion_decision.get("calibrated_fake_probability", 0.5)
     )
 
     return {
+        "model_windows": model_windows,
         "pipeline_modules": pipeline_modules,
         "vault_record": vault_record,
         "file_dna": file_dna,

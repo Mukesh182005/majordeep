@@ -1,9 +1,10 @@
 """Audio analysis: runs the audio suite (app/ml/audio) and packages its evidence.
 
-The probability comes from the suite's risk rule (app/ml/audio/evidence_fusion.py).
-Its model stage is the ASVspoof 2019 LA LCNN when ``audio_model_source`` is
-"lcnn_asvspoof"; in "legacy" mode no trained model runs at all and the result
-is marked experimental.
+With ``audio_model_source="lcnn_asvspoof"`` (the default) the probability and
+the verdict are the ASVspoof 2019 LA LCNN's alone, with the thresholds frozen
+on dev (paper/config/frozen_audio_config.json); the per-window LCNN scores are
+the timeline, and every other signal is context with no weight. In "legacy"
+mode no trained model runs and the result is marked experimental.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ import numpy as np
 
 from app.config import settings
 from app.ml.base import AnalysisResult
+from app.models import Verdict
 from app.ml.preprocessing import load_audio, normalize_waveform
 from app.ml.registry import TRAINED, UNTRAINED
 from app.ml.audio import run_comprehensive_audio_forensics
@@ -29,6 +31,13 @@ LCNN_SCOPE_NOTE = (
     "Model stage: LCNN trained and evaluated on ASVspoof 2019 LA (studio-quality English read speech). "
     "It has not been evaluated on real-world recordings, phone calls or other languages."
 )
+
+
+_AUDIO_VERDICT = {
+    "AUTHENTIC": Verdict.AUTHENTIC,
+    "AI_GENERATED": Verdict.MANIPULATED,
+    "INCONCLUSIVE": Verdict.INCONCLUSIVE,
+}
 
 
 def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> AnalysisResult:
@@ -53,6 +62,7 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     )
 
     fusion = forensic_results["fusion_decision"]
+    model_windows = forensic_results.get("model_windows") or []
     final_fake_prob = fusion["calibrated_fake_probability"]
     splicing = forensic_results["splicing_timeline"]
     visuals = forensic_results["visual_evidence"]
@@ -66,6 +76,12 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     lcnn = forensic_results["models_output"].get("lcnn_asvspoof")
     experimental = lcnn is None
     notes: list[str] = [EXPERIMENTAL_REASON if experimental else LCNN_SCOPE_NOTE]
+    if not experimental:
+        notes.append(
+            "The verdict is the trained model's alone. Glottal, mains-hum, splice, container and watermark "
+            "checks below are shown as context and carry no weight: none separated genuine from synthetic "
+            "speech on development data."
+        )
 
     if file_dna.get("trailing_data_detected"):
         notes.append(
@@ -124,9 +140,13 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "multi_resolution_plate_file": visuals.get("multi_resolution_plate_file"),
         "heatmap_file": visuals.get("gradcam_heatmap_file"),
 
-        # Temporal timeline segments
-        "segments_analysed": splicing.get("total_segments_analyzed", 0),
-        "segment_scores": splicing.get("segments", []),
+        # Timeline: the LCNN's per-window probabilities (trained model), else
+        # the splice-timeline heuristic (legacy mode)
+        "segments_analysed": len(model_windows) if model_windows else splicing.get("total_segments_analyzed", 0),
+        "flagged_segments": sum(1 for w in model_windows if w["status"] == "FLAGGED") if model_windows else None,
+        "segment_scores": model_windows or splicing.get("segments", []),
+        "segment_scores_source": "lcnn_asvspoof" if model_windows else "splice_timeline_heuristic",
+        "splice_segment_scores": splicing.get("segments", []),
         "suspicious_intervals": splicing.get("suspicious_intervals", []),
 
         # Per-stage audit trail
@@ -153,14 +173,20 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "decision_rule": fusion.get("decision_rule"),
         "is_inconclusive": fusion.get("is_inconclusive"),
     }
+    if fusion.get("verdict_source") == "lcnn_asvspoof":
+        evidence_payload["decision_threshold"] = fusion["decision_threshold"]
+        evidence_payload["uncertain_band"] = fusion["uncertain_band"]
 
     if lcnn:
         return AnalysisResult(
             fake_probability=round(final_fake_prob, 4),
-            model_name="LCNN (LFCC), ASVspoof 2019 LA, with hand-set signal rules",
+            model_name="LCNN (LFCC), ASVspoof 2019 LA",
             model_version=lcnn["model_version"],
             weights_status=TRAINED,
             evidence=evidence_payload,
+            # The audio thresholds were frozen on ASVspoof dev and differ from the
+            # platform-wide FAKE_THRESHOLD, so the verdict is set from them here.
+            verdict_override=_AUDIO_VERDICT.get(fusion.get("final_verdict")),
         )
     return AnalysisResult(
         fake_probability=round(final_fake_prob, 4),

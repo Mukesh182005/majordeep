@@ -84,7 +84,6 @@ def test_builder_needs_the_licence_confirmed(monkeypatch):
 def frozen_random_lcnns(tmp_path):
     """Two random-weight LFCC LCNN checkpoints and a selection file freezing them."""
     import torch
-
     from app.ml.models_arch import build_audio_model
 
     entries = []
@@ -111,7 +110,6 @@ def _run_itw(fake_itw, tmp_path, selection, *extra):
 
 def test_itw_scoring_metrics_resume_and_guards(fake_itw, tmp_path, frozen_random_lcnns):
     import torch
-
     from app.ml.asvspoof_frontend import utterance_lfcc
     from app.ml.models_arch import build_audio_model
     from app.ml.preprocessing import load_audio
@@ -175,7 +173,7 @@ def test_audio_eval_summary_refuses_inconsistent_files(tmp_path):
     with open(eval_dir / "m_eval_scores.csv", "w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow(["utt_id", "attack_id", "label", "score"])
-        writer.writerows([f"u{i}", "A07" if y else "-", int(y), f"{s:.6f}"] for i, (y, s) in enumerate(zip(labels, scores)))
+        writer.writerows([f"u{i}", "A07" if y else "-", int(y), f"{s:.6f}"] for i, (y, s) in enumerate(zip(labels, scores, strict=False)))
     stored = {**score_metrics(labels, np.round(scores, 6)), "min_tdcf": 0.1, "per_attack": {}}
     (eval_dir / "m_eval_metrics.json").write_text(json.dumps(stored), encoding="utf-8")
 

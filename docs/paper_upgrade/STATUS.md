@@ -3,7 +3,38 @@
 Branch `paper-upgrade`, started from `main` at `1de4b2e`. Rules: `CLAUDE.md`.
 Plan: `PLAN.md`. Phase prompts: `GOAL.md`. External resources: `RESOURCES.md`.
 
-Last updated: 2026-10-14.
+Last updated: 2026-10-22 (completion plan, days 1-5).
+
+## Completion plan, days 1-5 (2026-10-22)
+
+The project completion plan (Phases 0-7) is run as one branch per task, each started from the previous one so they merge in order; nothing is pushed. `docs/API_CHANGES.md` records every API change for the frontend agent.
+
+| Branch | Commit | What |
+|---|---|---|
+| `fix/p0-deps` | `efa14dd` | librosa, scipy, soundfile, imagehash in requirements-ml; pypdf in dev; `backend/requirements.lock` / `requirements-dev.lock` pinned to the tested versions (Linux, Python 3.11, CPU torch 2.12.0); GPU wheels in `requirements-gpu.txt` (cu130); Dockerfile installs the lock; RELEASE_MANIFEST torch agrees. |
+| `fix/p1-honest-outputs` | `6fd6fad` | Untrained SincRawNet and the "WavLM/Whisper" formula removed (tabular rule kept, labelled unvalidated); conformal and likelihood-ratio claims removed; SWGDE / ISO 27037 / 27042 / Daubert / write-blocker / cybercrime-complaint claims removed from backend, PDF and API; filename rules removed from video attribution, which is labelled unvalidated; audio results without the trained model marked experimental; plain disclaimer on page 1 of the PDF. |
+| `fix/p5-security` | `ba2e8a4` | Trusted-proxy X-Real-IP only; compose passes the limits; hourly retention purge of guest jobs (beat service); full Delete scan; 5-minute HMAC-signed links replace `?token=`; httpOnly SameSite=Lax login cookie; MAX_AUDIO/VIDEO_SECONDS and ENABLED_MEDIA_TYPES at upload; weights_only checkpoint loading. Also fixed: list settings in the comma form crashed startup. |
+| `ml/audio-asvspoof` | `ff3e675` | `audio_detector.pt` retired (not loaded; file kept); its scripts archived; In-the-Wild builder and scorer (not run: licence conflict); `results/audio_eval.json` from the saved LA eval scores. |
+| `ml/audio-wire` | (this commit) | The LCNN decides the audio verdict by default (`AUDIO_MODEL_SOURCE=lcnn_asvspoof`); verdict rule frozen on dev in `paper/config/frozen_audio_config.json` (Phase 3 task 6); heuristics are context with no weight; per-window LCNN scores are the timeline; deterministic float32 scoring; regression and two-process tests. |
+
+**Phase 3 task 5/6 decision:** the completion plan says to keep glottal, ENF and signal checks "as notes with no weight until each is validated", which is the outcome of the dev AUC rule (no signal's lower bound exceeded 0.60). Frozen with `ml/evaluation/freeze_audio_config.py` (dev data only): threshold = calibrated probability at the dev EER point (0.497); inconclusive band = the platform default 0.08, fixed in advance; authentic below 0.417, flagged at or above 0.577. Dev verdict rates under the rule (information only, optimistic: dev holds only the training attacks): bona fide 99.80 % authentic, 0.08 % inconclusive, 0.12 % flagged; spoofed 99.80 % flagged, 0.04 % inconclusive, 0.16 % authentic (`frozen_audio_config.json`, `dev_verdict_rates_information_only`).
+
+**Measured this session**
+- `results/audio_eval.json` (from `paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_scores.csv`, recomputed and checked against the stored metrics): served seed 2 EER 4.78 %, min t-DCF 0.102, AUC 0.986; three seeds 5.26 +/- 0.65 % (unchanged).
+- Regression set (20 LA eval clips, seed 0, 10 bona fide + one spoof each of A07-A16; exported to a scratch folder, not committed): AUC 1.0 with the served model, within 0.05 of 0.986. A17-A19 are not in the default set.
+- The same clip scored in two fresh processes (CUDA, TF32 off, deterministic cuDNN) gives identical scores, for the test LCNN and the served checkpoint.
+- An LA eval clip (attack A16) uploaded through `/api/upload` gets its verdict from the trained model (test passes locally with DEEPSENTINEL_DATA).
+- Backend tests at the end of `ml/audio-wire`: see the commit message.
+
+**Blocked / needs you**
+- **Docker:** WSL is not installed on this machine ("no virtualization available"), so Docker Desktop cannot start and `docker compose up --build` has not been run. The lock installs on Linux x86_64 / Python 3.11 (checked with a pip dry run of all 117 packages).
+- **In-the-Wild licence** (Apache 2.0 vs CC BY-SA 4.0): decide before downloading.
+- **Two agents share one working tree:** Antigravity's uncommitted edits (frontend, `backend/app/main.py`, `docker-compose.yml`) sit in the same checkout as these branches; each commit here staged only its own files.
+- **Frontend:** until the frontend uses the cookie and signed links, report download and live status of signed-in users' jobs fail (`?token=` is no longer read); the audio page still shows the removed fields with invented defaults (list in `docs/API_CHANGES.md`).
+- Still open from before: TF32 and the eval numbers; Phase 7 video option; H560; RAISE-1k.
+
+**Next:** Phase 3 task 7 (end-to-end LA eval verdict rates with the frozen config, at least 4,000 stratified utterances; script to write); video verdict still uses the unvalidated generator-profile match (it can raise the video probability to 0.88); image and video methodology text in the PDF still describes a face-crop CNN that is not in the image verdict.
+
 
 ## Done
 

@@ -1,0 +1,69 @@
+{
+  "rule": "lower pooled dev EER at seed 0 selects the front end; seeds 0-2 of it are the final models",
+  "dev_eer_seed0": {
+    "logmel": 0.004619768334592262,
+    "lfcc": 0.0035377092792900884
+  },
+  "selected_frontend": "lfcc",
+  "selected_checkpoints": [
+    {
+      "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed0.pt",
+      "sha256": "99d24c2ea1a1807b21674a40d28186d60dd2eb34b160c413fee62cf9214ef649",
+      "seed": 0,
+      "best_epoch": 4,
+      "dev_eer": 0.0035377092792900884,
+      "dev_min_tdcf": 0.011283048811644844
+    },
+    {
+      "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed1.pt",
+      "sha256": "c0b76dfa73131a4b926b8d78b0b523275ff1f3033a01990cbcf58bfe31432a9b",
+      "seed": 1,
+      "best_epoch": 23,
+      "dev_eer": 0.003139647015550445,
+      "dev_min_tdcf": 0.01038284890861048
+    },
+    {
+      "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+      "sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3",
+      "seed": 2,
+      "best_epoch": 20,
+      "dev_eer": 0.0019006091299648119,
+      "dev_min_tdcf": 0.0041743297918036505
+    }
+  ],
+  "decided_utc": "2026-10-22T05:14:24+00:00",
+  "provenance": {
+    "git_commit": "9fab1a3935491e2fbef049653d415e965bcb37e1",
+    "git_branch": "paper-upgrade",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-22T05:14:28+00:00",
+    "command_line": [
+      "ml\\evaluation\\select_asvspoof_frontend.py",
+      "--write"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": null
+  },
+  "note": "Chosen on the dev split only. Commit this file before scoring the eval split."
+}

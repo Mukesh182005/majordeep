@@ -1,0 +1,15 @@
+# CUDA torch wheels, installed on top of requirements.lock for a GPU host:
+#
+#   pip install -r requirements.lock
+#   pip install -r requirements-gpu.txt
+#
+# Kept out of the CPU image: the CUDA wheels are several GB and useless
+# without a GPU. RTX 50-series cards (sm_120) need a CUDA 12.8 or newer build.
+# The versions match the CPU pins in requirements.lock; the PyTorch cu128 index
+# stops at 2.11, so 2.12 comes from the CUDA 13.0 index (NVIDIA driver 580 or
+# newer).
+
+--index-url https://download.pytorch.org/whl/cu130
+
+torch==2.12.0
+torchvision==0.27.0

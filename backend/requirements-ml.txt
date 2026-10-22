@@ -1,10 +1,12 @@
-# Inference/training dependencies, separated from the API requirements so an
-# API-only container does not pull ~2 GB of CUDA wheels.
+# Inference/training dependencies, separated from the API requirements.
 #
-# For a CPU-only deployment install torch from the CPU index instead:
-#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
---extra-index-url https://download.pytorch.org/whl/cu124
+# These are the direct dependencies with lower bounds. The versions that were
+# actually tested are pinned in requirements.lock (Linux, Python 3.11, CPU
+# torch), which is what the Docker image installs. Regenerate it with
+# scripts/compile_requirements_lock.ps1 after changing this file.
+#
+# torch comes from whichever index the installer is pointed at: the lock uses
+# the CPU index; for a CUDA build install requirements-gpu.txt afterwards.
 
 -r requirements.txt
 
@@ -12,7 +14,12 @@ torch>=2.2.0
 torchvision>=0.17.0
 facenet-pytorch>=2.5.3  # MTCNN face detection/cropping
 opencv-python-headless>=4.10.0.84
-
-pillow-heif>=0.16.0
 imageio-ffmpeg>=0.5.1
 transformers>=4.30.0
+
+# Imported by the audio, video and image-forensics pipelines; without them
+# every analysis job fails on import.
+librosa>=0.10.2
+scipy>=1.11
+soundfile>=0.12.1
+imagehash>=4.3.1

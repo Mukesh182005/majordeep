@@ -13,12 +13,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY requirements.txt requirements-ml.txt ./
-# Install the CPU torch build: the GPU wheels are ~2 GB and pointless without
-# a GPU. Override with a CUDA base image when deploying to a GPU instance.
-RUN pip install --index-url https://download.pytorch.org/whl/cpu \
-        torch==2.4.1 torchvision==0.19.1 \
-    && pip install -r requirements-ml.txt
+COPY requirements.lock ./
+# Every package pinned to the tested version (scripts/compile_requirements_lock.ps1).
+# The lock takes torch from the PyTorch CPU index: the GPU wheels are several
+# GB and pointless without a GPU. For a GPU host, install requirements-gpu.txt
+# on top, in a CUDA base image.
+RUN pip install -r requirements.lock
 
 COPY . .
 

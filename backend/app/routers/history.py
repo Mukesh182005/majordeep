@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import get_current_user
 from app.models import Job, Report, User
+from app.retention import delete_job_files
 from app.schemas import HistoryItem, HistoryPage
-from app.storage import delete_job_artifacts
 
 router = APIRouter(tags=["history"])
 
@@ -60,16 +60,7 @@ def delete_scan(
     if job is None or job.user_id != user.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found.")
 
-    evidence = job.evidence or {}
-    from app.config import settings
-
-    artifacts = [job.stored_path]
-    for key in ("heatmap_file", "spectrogram_file"):
-        if evidence.get(key):
-            artifacts.append(Path(settings.evidence_dir) / evidence[key])
-    artifacts += [report.file_path for report in job.reports]
-
-    delete_job_artifacts(*artifacts)
+    delete_job_files(job)  # upload, every evidence image, reports and their charts
     db.delete(job)
     db.commit()
 

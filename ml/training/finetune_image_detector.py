@@ -141,7 +141,7 @@ def main() -> None:
     
     if args.checkpoint.exists():
         print(f"  Loading existing checkpoint from {args.checkpoint}...")
-        ckpt = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
+        ckpt = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
         state_dict = extract_state_dict(ckpt)
         model.load_state_dict(state_dict)
         print("  Pre-trained weights loaded successfully into model!")

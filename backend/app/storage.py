@@ -15,7 +15,7 @@ the generated forensic report.
 
 
 import hashlib
-import shutil
+import re
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
@@ -215,13 +215,69 @@ def save_upload(
     )
 
 
-def delete_job_artifacts(*paths: str | Path | None) -> None:
-    """Remove stored media/evidence for a job (data-retention policy support)."""
-    for path in paths:
-        if not path:
-            continue
-        target = Path(path)
-        if target.is_dir():
-            shutil.rmtree(target, ignore_errors=True)
-        else:
-            target.unlink(missing_ok=True)
+_FFMPEG_DURATION = re.compile(r"Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)")
+
+
+def probe_duration_seconds(path: str | Path, media_type: MediaType) -> float | None:
+    """Playing time of an audio or video file from its headers, or ``None`` if unknown.
+
+    Reads metadata only (soundfile or OpenCV first, then the ``Duration:`` line
+    ffmpeg prints without decoding), so a long file is rejected without being
+    decoded.
+    """
+    path = Path(path)
+    if media_type is MediaType.AUDIO:
+        try:
+            import soundfile as sf
+
+            info = sf.info(str(path))
+            if info.samplerate and info.frames > 0:
+                return float(info.frames) / float(info.samplerate)
+        except Exception:
+            pass
+    elif media_type is MediaType.VIDEO:
+        try:
+            import cv2
+
+            capture = cv2.VideoCapture(str(path))
+            try:
+                fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
+                frames = float(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0.0)
+            finally:
+                capture.release()
+            if fps > 0 and frames > 0:
+                return frames / fps
+        except Exception:
+            pass
+    else:
+        return None
+    try:
+        import subprocess
+
+        import imageio_ffmpeg
+
+        result = subprocess.run(  # noqa: S603 - fixed executable, path argument only
+            [imageio_ffmpeg.get_ffmpeg_exe(), "-hide_banner", "-i", str(path)],
+            capture_output=True, text=True, timeout=30, check=False,
+        )
+        match = _FFMPEG_DURATION.search(result.stderr or "")
+        if match:
+            hours, minutes, seconds = match.groups()
+            return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+    except Exception:
+        pass
+    return None
+
+
+def duration_limit_error(path: str | Path, media_type: MediaType) -> str | None:
+    """A user-facing message if the file is longer than MAX_AUDIO_SECONDS / MAX_VIDEO_SECONDS."""
+    limit = {MediaType.AUDIO: settings.max_audio_seconds, MediaType.VIDEO: settings.max_video_seconds}.get(media_type)
+    if limit is None:
+        return None
+    duration = probe_duration_seconds(path, media_type)
+    if duration is not None and duration > limit:
+        return (
+            f"The {media_type.value} is {duration:.0f} s long; this server analyses at most "
+            f"{limit:.0f} s of {media_type.value}."
+        )
+    return None

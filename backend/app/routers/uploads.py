@@ -5,7 +5,16 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Request, UploadFile, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    HTTPException,
+    Request,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -13,7 +22,12 @@ from app.database import get_db
 from app.deps import client_ip, enforce_upload_rate_limit, get_current_user_optional
 from app.models import Job, JobStatus, User
 from app.schemas import JobCreated
-from app.storage import UploadValidationError, save_upload
+from app.storage import (
+    UploadValidationError,
+    duration_limit_error,
+    media_type_for_extension,
+    save_upload,
+)
 from app.worker.tasks import enqueue_analysis
 
 router = APIRouter(tags=["upload"])
@@ -34,6 +48,18 @@ def upload_media(
     """
     enforce_upload_rate_limit(db, user, client_ip(request))
 
+    try:
+        declared = media_type_for_extension(file.filename or "upload")
+    except UploadValidationError as exc:
+        file.file.close()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    if declared.value not in settings.enabled_media_types:
+        file.file.close()
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"{declared.value.capitalize()} analysis is not enabled on this server.",
+        )
+
     job_id = uuid.uuid4().hex
     try:
         stored = save_upload(
@@ -46,6 +72,11 @@ def upload_media(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     finally:
         file.file.close()
+
+    too_long = duration_limit_error(stored.path, stored.media_type)
+    if too_long:
+        stored.path.unlink(missing_ok=True)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=too_long)
 
     job = Job(
         id=job_id,
@@ -84,10 +115,14 @@ def upload_limits() -> dict:
 
     return {
         "max_upload_mb": settings.max_upload_mb,
+        "enabled_media_types": list(settings.enabled_media_types),
         "allowed_extensions": {
             media_type.value: sorted(extensions)
             for media_type, extensions in ALLOWED_EXTENSIONS.items()
+            if media_type.value in settings.enabled_media_types
         },
+        "max_duration_seconds": {"audio": settings.max_audio_seconds, "video": settings.max_video_seconds},
+        "guest_retention_hours": settings.retention_hours,
         "rate_limit_per_hour": {
             "registered": settings.upload_rate_limit_per_hour,
             "guest": settings.guest_rate_limit_per_hour,

@@ -21,7 +21,7 @@ from app.ml import registry
 
 def direct_model_load(ckpt_path):
     model = build_image_model("efficientnet_b4", pretrained=False)
-    state = torch.load(ckpt_path, map_location="cpu")
+    state = torch.load(ckpt_path, map_location="cpu", weights_only=True)
     model.load_state_dict(state, strict=False)
     model.eval()
     return model

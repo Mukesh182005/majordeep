@@ -213,6 +213,8 @@ def main() -> None:
     start_epoch, best_eer, best_epoch, stale = 1, float("inf"), 0, 0
     log_path = run_dir / "train_log.csv"
     if args.resume and last_path.exists():
+        # The resume file holds Python and NumPy RNG states, which the safe loader
+        # rejects; it is this script's own output in its own run folder.
         state = torch.load(last_path, map_location="cpu", weights_only=False)
         model.load_state_dict(state["model"])
         optimizer.load_state_dict(state["optimizer"])
@@ -281,7 +283,7 @@ def main() -> None:
         )
 
     # Re-score dev with the selected epoch and record everything about the run.
-    best = torch.load(output, map_location="cpu", weights_only=False)
+    best = torch.load(output, map_location="cpu", weights_only=True)
     model.load_state_dict(best["state_dict"])
     dev_scores = cm_scores(dev_cache, score_split(model, dev_set, device))
     write_scores(run_dir / "dev_scores.csv", dev_cache, dev_scores)

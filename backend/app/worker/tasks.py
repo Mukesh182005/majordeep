@@ -86,6 +86,18 @@ def _fail(session, job: Job, message: str) -> dict:
     return {"job_id": job.id, "status": job.status.value, "error": message}
 
 
+@celery_app.task(name="maintenance.purge_expired_guest_jobs")
+def purge_expired_guest_jobs() -> dict:
+    """Delete guest jobs older than RETENTION_HOURS with every file they produced."""
+    from app.retention import purge_expired_guest_jobs as purge
+
+    session = SessionLocal()
+    try:
+        return purge(session)
+    finally:
+        session.close()
+
+
 def enqueue_analysis(job_id: str) -> str | None:
     """Queue a job; returns the Celery task id (``None`` in eager mode)."""
     async_result = analyze_job.delay(job_id)

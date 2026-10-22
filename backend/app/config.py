@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 
 from pydantic import Field, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 # Repository root: backend/app/config.py -> backend/app -> backend -> <root>
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -15,6 +17,13 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 # every token with a value published in this repository.
 INSECURE_JWT_SECRET = "change-me-in-production"
 MIN_JWT_SECRET_LENGTH = 32
+
+MEDIA_TYPES = ("image", "audio", "video")
+
+# A list setting read from the environment as "a,b,c" or as a JSON list. Without
+# NoDecode, pydantic-settings accepts only JSON, so the comma form documented in
+# .env.example (and docker-compose's CORS_ORIGINS default) failed at startup.
+CsvList = Annotated[list[str], NoDecode]
 
 
 class InsecureConfigurationError(RuntimeError):
@@ -59,6 +68,23 @@ class Settings(BaseSettings):
     # --- Rate limiting ---
     upload_rate_limit_per_hour: int = 500
     guest_rate_limit_per_hour: int = 500
+    # Reverse proxies (IP addresses or CIDR networks) whose X-Real-IP header is
+    # believed. Requests from anywhere else are counted by their own address:
+    # X-Forwarded-For and X-Real-IP from a client are never trusted.
+    trusted_proxies: CsvList = Field(default_factory=list)
+
+    # --- Public-upload limits and retention ---
+    enabled_media_types: CsvList = Field(default_factory=lambda: list(MEDIA_TYPES))
+    max_audio_seconds: float = 600.0
+    max_video_seconds: float = 300.0
+    # Guest jobs (no account) and their files are deleted after this many hours.
+    retention_hours: int = 72
+
+    # --- Login cookie and signed links ---
+    auth_cookie_name: str = "deepsentinel_session"
+    # None: Secure in production only, so plain-http local development works.
+    auth_cookie_secure: bool | None = None
+    signed_url_ttl_seconds: int = 300
 
     # --- Models ---
     checkpoint_dir: Path = ROOT_DIR / "checkpoints"
@@ -88,14 +114,35 @@ class Settings(BaseSettings):
     uncertain_band: float = 0.08
 
     # --- Frontend ---
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    cors_origins: CsvList = Field(default_factory=lambda: ["http://localhost:5173"])
 
-    @field_validator("cors_origins", mode="before")
+    @field_validator("cors_origins", "trusted_proxies", "enabled_media_types", mode="before")
     @classmethod
-    def _split_origins(cls, value: object) -> object:
-        """Accept a comma-separated string from the environment."""
+    def _split_list(cls, value: object) -> object:
+        """Accept a JSON list or a comma-separated string from the environment."""
         if isinstance(value, str):
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
+            text = value.strip()
+            if text.startswith("["):
+                return [str(item).strip() for item in json.loads(text) if str(item).strip()]
+            return [item.strip() for item in text.split(",") if item.strip()]
+        return value
+
+    @field_validator("enabled_media_types", mode="after")
+    @classmethod
+    def _known_media_types(cls, value: list[str]) -> list[str]:
+        value = [item.lower() for item in value]
+        unknown = sorted(set(value) - set(MEDIA_TYPES))
+        if unknown:
+            raise ValueError(f"ENABLED_MEDIA_TYPES has unknown entries {unknown}; allowed: {', '.join(MEDIA_TYPES)}")
+        return value
+
+    @field_validator("trusted_proxies", mode="after")
+    @classmethod
+    def _valid_proxies(cls, value: list[str]) -> list[str]:
+        import ipaddress
+
+        for entry in value:
+            ipaddress.ip_network(entry, strict=False)  # raises on anything that is not an IP or CIDR
         return value
 
     @field_validator("audio_model_source", mode="after")
@@ -146,6 +193,12 @@ class Settings(BaseSettings):
                 + "\n  - ".join(problems)
             )
         return self
+
+    @property
+    def cookie_secure(self) -> bool:
+        if self.auth_cookie_secure is not None:
+            return self.auth_cookie_secure
+        return self.environment.lower() == "production"
 
     @property
     def max_upload_bytes(self) -> int:

@@ -44,3 +44,27 @@ Counts of matching lines at commit time (`grep` for WavLM, Whisper, RawNet, SWGD
 | `frontend/src/components/PipelineAuditVisualizer.jsx` | 2 |
 | `frontend/src/components/VideoPipelineVisualizer.jsx` | 1 |
 | `frontend/src/pages/Upload.jsx` | 1 |
+
+## fix/p5-security
+
+### Login: httpOnly cookie
+- `POST /api/auth/login` and `POST /api/auth/register` now set the cookie `deepsentinel_session` (httpOnly, SameSite=Lax, `Path=/api`, Secure in production). They still return `access_token` in the body for API clients.
+- Every endpoint accepts the cookie or `Authorization: Bearer`. Browsers: send requests with `credentials: 'include'` and stop storing the token in localStorage.
+- `POST /api/auth/logout` (204) clears the cookie.
+
+### `?token=` is gone
+The report download and the job WebSocket no longer read a token from the query string. Use:
+- **Signed links**: `POST /api/jobs/{id}/links` (cookie, Bearer, or a guest job) returns `{"report_url", "ws_url", "expires_at"}`. Both URLs are relative to the API origin, carry `exp` and `sig`, open only this job, and expire after 5 minutes (`SIGNED_URL_TTL_SECONDS`). Ask for new links when they expire.
+- Same-origin requests with the cookie also work for both endpoints.
+
+### Upload limits
+- `ENABLED_MEDIA_TYPES` (default `image,audio,video`): an upload of a disabled type gets **403** "… analysis is not enabled on this server."
+- `MAX_AUDIO_SECONDS` (600) / `MAX_VIDEO_SECONDS` (300): longer files get **400** "The audio is N s long; this server analyses at most M s of audio."
+- `GET /api/upload/limits` now also returns `enabled_media_types`, `max_duration_seconds` (`{"audio", "video"}`) and `guest_retention_hours`; `allowed_extensions` lists enabled types only.
+
+### Retention and deletion
+- Guest jobs (no account) are deleted with every file after `RETENTION_HOURS` (default 72) by the hourly `beat` service. Registered users' jobs are kept until they delete them.
+- `DELETE /api/history/{id}` now removes the upload, every evidence image (every `*_file` value and every `EVIDENCE_DIR/<job id>_*` file), the report PDFs and their charts.
+
+### Client IP behind a proxy
+`X-Forwarded-For` is never used. `X-Real-IP` is used only when the connection comes from `TRUSTED_PROXIES` (docker-compose: the frontend nginx at 172.28.0.10). If another proxy (Caddy, Cloudflare Tunnel) sits in front of nginx, nginx must be configured with `set_real_ip_from` and `real_ip_header` so its `$remote_addr` is the visitor, or every visitor shares one rate-limit bucket.

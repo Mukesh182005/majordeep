@@ -169,7 +169,7 @@ def main() -> None:
     print("\nLoading EfficientNet-B4 pre-trained model...", flush=True)
     model = build_image_model("efficientnet_b4", pretrained=False)
     if ckpt_path.exists():
-        ckpt = torch.load(ckpt_path, map_location="cpu")
+        ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=True)
         state_dict = extract_state_dict(ckpt)
         model.load_state_dict(state_dict)
         print("  Pre-trained weights loaded successfully!", flush=True)

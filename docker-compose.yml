@@ -54,6 +54,17 @@ services:
       CHECKPOINT_DIR: /app/checkpoints
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-100}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+      # Inside Docker the app never reads .env, so every limit is passed here;
+      # without these it ran at the 500-uploads-per-hour code defaults.
+      UPLOAD_RATE_LIMIT_PER_HOUR: ${UPLOAD_RATE_LIMIT_PER_HOUR:-20}
+      GUEST_RATE_LIMIT_PER_HOUR: ${GUEST_RATE_LIMIT_PER_HOUR:-3}
+      FACE_MODEL_IN_VERDICT: ${FACE_MODEL_IN_VERDICT:-false}
+      RETENTION_HOURS: ${RETENTION_HOURS:-72}
+      ENABLED_MEDIA_TYPES: ${ENABLED_MEDIA_TYPES:-image,audio,video}
+      MAX_AUDIO_SECONDS: ${MAX_AUDIO_SECONDS:-600}
+      MAX_VIDEO_SECONDS: ${MAX_VIDEO_SECONDS:-300}
+      # Only the frontend nginx (fixed address below) may set X-Real-IP.
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-172.28.0.10}
     volumes:
       # Shared with the worker: the API writes uploads, the worker reads them
       # and writes evidence back.
@@ -85,13 +96,35 @@ services:
       start_period: 60s
     restart: unless-stopped
 
+  # Sends the hourly retention purge (guest jobs older than RETENTION_HOURS)
+  # to the worker, which deletes the files and database rows.
+  beat:
+    build: ./backend
+    command: ["celery", "-A", "app.worker.celery_app.celery_app", "beat",
+              "--loglevel=info", "--schedule", "/tmp/celerybeat-schedule"]
+    environment: *backend_env
+    depends_on:
+      redis: { condition: service_healthy }
+    restart: unless-stopped
+
   frontend:
     build: ./frontend
     ports:
       - "8080:80"
     depends_on:
       - api
+    networks:
+      default:
+        # Fixed so the API can trust X-Real-IP from this container alone
+        # (TRUSTED_PROXIES above).
+        ipv4_address: 172.28.0.10
     restart: unless-stopped
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
 
 volumes:
   db_data:

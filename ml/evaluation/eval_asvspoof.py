@@ -98,7 +98,7 @@ def load_model(checkpoint_path: Path, device):
     import torch
     from app.ml.models_arch import build_audio_model
 
-    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
     model = build_audio_model()
     model.load_state_dict(checkpoint["state_dict"])
     model.to(device).float().eval()

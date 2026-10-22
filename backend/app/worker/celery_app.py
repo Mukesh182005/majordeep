@@ -41,6 +41,13 @@ celery_app.conf.update(
     task_always_eager=not settings.queue_enabled,
     task_eager_propagates=False,
     broker_connection_retry_on_startup=True,
+    # Run by the `beat` service in docker-compose.yml.
+    beat_schedule={
+        "purge-expired-guest-jobs": {
+            "task": "maintenance.purge_expired_guest_jobs",
+            "schedule": 3600.0,
+        },
+    },
 )
 
 

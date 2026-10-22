@@ -130,6 +130,14 @@ class HistoryPage(BaseModel):
     offset: int
 
 
+class JobLinksOut(BaseModel):
+    """Short-lived signed URLs (see app/signing.py)."""
+
+    report_url: str
+    ws_url: str
+    expires_at: datetime
+
+
 class ReportOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

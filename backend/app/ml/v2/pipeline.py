@@ -24,11 +24,11 @@ class PipelineV2:
         self.calibrator = ProbabilityCalibrator(temperature=1.25)
         # Force load models
         if resnet_checkpoint:
-            import torch
+            from app.ml.checkpoints import extract_state_dict, load_checkpoint
             from app.ml.models_arch import build_image_model
             from app.ml.registry import LoadedModel
             model = build_image_model("efficientnet_b4", pretrained=False)
-            state = torch.load(resnet_checkpoint, map_location="cpu")
+            state = extract_state_dict(load_checkpoint(resnet_checkpoint))  # weights_only=True
             model.load_state_dict(state, strict=False)
             model.eval()
             self.face_model = LoadedModel(

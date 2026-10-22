@@ -113,20 +113,22 @@ class TestRateLimiting:
         Previously the attempt was recorded but only committed alongside a
         successfully created job, so invalid uploads were unlimited.
 
-        The request carries its own X-Forwarded-For so this test gets a fresh
+        The requests come from their own peer address so this test gets a fresh
         rate-limit bucket and does not depend on what the rest of the suite
-        uploaded first.
+        uploaded first. (It used to send its own X-Forwarded-For for that, which
+        is exactly the bypass the limiter no longer allows.)
         """
         from app.config import settings
+        from app.main import app
+        from fastapi.testclient import TestClient
 
-        headers = {"X-Forwarded-For": "203.0.113.77"}
+        peer = TestClient(app, client=("203.0.113.77", 50000))
         attempts = settings.guest_rate_limit_per_hour + 2
 
         statuses = [
-            client.post(
+            peer.post(
                 "/api/upload",
                 files={"file": ("bad.exe", io.BytesIO(b"MZ\x00\x00"), "application/exe")},
-                headers=headers,
             ).status_code
             for _ in range(attempts)
         ]

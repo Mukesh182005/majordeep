@@ -61,9 +61,22 @@ def client():
         yield test_client
 
 
+@pytest.fixture(autouse=True)
+def _anonymous_client_by_default(request):
+    """The shared client must not carry a login cookie set by an earlier test.
+
+    Login sets an httpOnly session cookie, and the session-scoped TestClient
+    keeps cookies, so without this every request after any login would be
+    authenticated. Tests that exercise the cookie set it themselves.
+    """
+    if "client" in request.fixturenames:
+        request.getfixturevalue("client").cookies.clear()
+    yield
+
+
 @pytest.fixture
 def auth_headers(client):
-    """Register a fresh user and return its Authorization header."""
+    """Register a fresh user and return its Authorization header (no cookie kept)."""
     import uuid
 
     email = f"user-{uuid.uuid4().hex[:8]}@example.com"
@@ -72,6 +85,7 @@ def auth_headers(client):
         json={"email": email, "password": "correct-horse-battery", "full_name": "Test User"},
     )
     assert response.status_code == 201, response.text
+    client.cookies.clear()
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
 

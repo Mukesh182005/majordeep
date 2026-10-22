@@ -33,6 +33,12 @@ def analyze(
     media_type: MediaType, path: str | Path, evidence_dir: str | Path, job_id: str
 ) -> AnalysisResult:
     """Run the pipeline matching ``media_type``."""
+    from app.storage import duration_limit_error
+
+    # Also enforced at upload; repeated here so no path to the worker skips it.
+    too_long = duration_limit_error(path, media_type)
+    if too_long:
+        raise ValueError(too_long)
     if media_type is MediaType.IMAGE:
         from app.ml.image_pipeline import analyze_image
         result = analyze_image(path, evidence_dir, job_id)

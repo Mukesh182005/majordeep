@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import ipaddress
 from datetime import UTC, datetime, timedelta
+from functools import lru_cache
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -18,13 +20,8 @@ from app.security import decode_access_token
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def get_current_user_optional(
-    request: Request,
-    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
-    db: Session = Depends(get_db),
-) -> User | None:
-    """Resolve the bearer token to a user, or ``None`` for guests."""
-    token = credentials.credentials if credentials else request.query_params.get("token")
+def user_from_token(token: str | None, db: Session) -> User | None:
+    """The active user a session token belongs to, or ``None``."""
     if not token:
         return None
     payload = decode_access_token(token)
@@ -34,6 +31,21 @@ def get_current_user_optional(
     if user is None or not user.is_active:
         return None
     return user
+
+
+def get_current_user_optional(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> User | None:
+    """Resolve the Bearer token (API clients) or the httpOnly session cookie (browser).
+
+    Tokens are never read from the query string: URLs end up in proxy logs and
+    browser history. Links that must work without headers (report download,
+    WebSocket) use short-lived signed URLs instead (app/signing.py).
+    """
+    token = credentials.credentials if credentials else request.cookies.get(settings.auth_cookie_name)
+    return user_from_token(token, db)
 
 
 def get_current_user(user: User | None = Depends(get_current_user_optional)) -> User:
@@ -47,12 +59,33 @@ def get_current_user(user: User | None = Depends(get_current_user_optional)) -> 
     return user
 
 
+@lru_cache(maxsize=8)
+def _trusted_networks(entries: tuple[str, ...]) -> tuple[ipaddress.IPv4Network | ipaddress.IPv6Network, ...]:
+    return tuple(ipaddress.ip_network(entry, strict=False) for entry in entries)
+
+
+def _parse_ip(value: str | None) -> ipaddress.IPv4Address | ipaddress.IPv6Address | None:
+    try:
+        return ipaddress.ip_address((value or "").strip())
+    except ValueError:
+        return None
+
+
 def client_ip(request: Request) -> str:
-    """Best-effort client IP, honouring a reverse proxy's X-Forwarded-For."""
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    """The address a request is counted under for rate limiting.
+
+    X-Real-IP is used only when the connection itself comes from a trusted
+    reverse proxy (``TRUSTED_PROXIES``; the nginx in frontend/ sets it from
+    $remote_addr). Any other client can write whatever headers it likes, so
+    X-Forwarded-For is never used and X-Real-IP from an untrusted peer is ignored.
+    """
+    peer = request.client.host if request.client else "unknown"
+    peer_ip = _parse_ip(peer)
+    if peer_ip is not None and any(peer_ip in net for net in _trusted_networks(tuple(settings.trusted_proxies))):
+        real = _parse_ip(request.headers.get("x-real-ip"))
+        if real is not None:
+            return str(real)
+    return peer
 
 
 def enforce_upload_rate_limit(db: Session, user: User | None, ip: str) -> None:

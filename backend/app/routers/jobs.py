@@ -3,20 +3,22 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC, datetime
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
+from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, status
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app import signing
 from app.config import settings
 from app.database import get_db
-from app.deps import get_current_user_optional
+from app.deps import get_current_user_optional, user_from_token
 from app.models import Job, JobStatus, Report, User
 from app.report.generator import generate_report
-from app.schemas import RESULT_DISCLAIMER, JobResultOut, JobStatusOut, ReportOut
+from app.schemas import RESULT_DISCLAIMER, JobLinksOut, JobResultOut, JobStatusOut, ReportOut
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -49,20 +51,50 @@ def job_status(
     return _get_job(job_id, db, user)
 
 
+def _get_job_signed(
+    job_id: str, db: Session, user: User | None, purpose: str, exp: str | None, sig: str | None
+) -> Job:
+    """Like ``_get_job``, but a valid signed URL for this job and purpose also grants access."""
+    if signing.verify(job_id, purpose, exp, sig):
+        job = db.get(Job, job_id)
+        if job is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found.")
+        return job
+    return _get_job(job_id, db, user)
+
+
+@router.post("/{job_id}/links", response_model=JobLinksOut)
+def job_links(
+    job_id: str,
+    db: Session = Depends(get_db),
+    user: User | None = Depends(get_current_user_optional),
+) -> JobLinksOut:
+    """Short-lived signed URLs for the report download and the status WebSocket.
+
+    Use these instead of putting a login token in a URL. Each link opens only
+    this job, for one purpose, for SIGNED_URL_TTL_SECONDS (default 5 minutes).
+    """
+    job = _get_job(job_id, db, user)
+    base = f"{settings.api_v1_prefix}/jobs/{job.id}"
+    report = signing.sign(job.id, "report")
+    return JobLinksOut(
+        report_url=f"{base}/report?{signing.signed_query(job.id, 'report')}",
+        ws_url=f"{base}/ws?{signing.signed_query(job.id, 'ws')}",
+        expires_at=datetime.fromtimestamp(int(report["exp"]), UTC),
+    )
+
+
 def _resolve_ws_user(websocket: WebSocket, db: Session) -> User | None:
-    token = websocket.query_params.get("token")
-    if not token:
-        auth_header = websocket.headers.get("authorization")
-        if auth_header and auth_header.lower().startswith("bearer "):
-            token = auth_header[7:].strip()
-    if not token:
-        return None
-    from app.security import decode_access_token
-    payload = decode_access_token(token)
-    if not payload or not payload.get("sub"):
-        return None
-    user = db.get(User, payload["sub"])
-    return user if user and user.is_active else None
+    """WebSocket identity: the session cookie, or a Bearer header from API clients.
+
+    Tokens in the query string are not accepted; browsers use the cookie or a
+    signed URL from ``POST /jobs/{id}/links``.
+    """
+    token = None
+    auth_header = websocket.headers.get("authorization")
+    if auth_header and auth_header.lower().startswith("bearer "):
+        token = auth_header[7:].strip()
+    return user_from_token(token or websocket.cookies.get(settings.auth_cookie_name), db)
 
 
 @router.websocket("/{job_id}/ws")
@@ -77,6 +109,7 @@ async def job_ws(
     The connection is closed (code 1000) once the job reaches done or failed.
     """
     user = _resolve_ws_user(websocket, db)
+    signed = signing.verify(job_id, "ws", websocket.query_params.get("exp"), websocket.query_params.get("sig"))
     await websocket.accept()
     try:
         while True:
@@ -85,8 +118,8 @@ async def job_ws(
                 await websocket.send_json({"status": "error", "message": "Job not found."})
                 break
 
-            # Ownership check — same rule as the REST endpoints.
-            if job.user_id is not None and (user is None or user.id != job.user_id):
+            # Ownership check — same rule as the REST endpoints, or a valid signed URL.
+            if not signed and job.user_id is not None and (user is None or user.id != job.user_id):
                 await websocket.send_json({"status": "error", "message": "Job not found."})
                 break
 
@@ -219,6 +252,11 @@ def create_report(
 ) -> ReportOut:
     """Generate the forensic PDF report for a completed job."""
     job = _get_job(job_id, db, user)
+    return _ensure_report(job, db, user)
+
+
+def _ensure_report(job: Job, db: Session, user: User | None) -> ReportOut:
+    """Reuse the job's report PDF if it exists on disk, otherwise generate it."""
     if job.status is not JobStatus.DONE:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -288,11 +326,16 @@ def _find_by_reference(db: Session, report_reference: str) -> Report | None:
 @router.get("/{job_id}/report")
 def download_report(
     job_id: str,
+    exp: str | None = Query(default=None, description="Expiry of a signed link (from POST /links)"),
+    sig: str | None = Query(default=None, description="Signature of a signed link (from POST /links)"),
     db: Session = Depends(get_db),
     user: User | None = Depends(get_current_user_optional),
 ) -> FileResponse:
-    """Download the latest PDF report, generating one if none exists yet."""
-    job = _get_job(job_id, db, user)
+    """Download the latest PDF report, generating one if none exists yet.
+
+    Authorised by the session cookie, a Bearer header, or a signed link.
+    """
+    job = _get_job_signed(job_id, db, user, "report", exp, sig)
     if job.status is not JobStatus.DONE:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -314,7 +357,7 @@ def download_report(
             db.commit()
             db.refresh(report)
         else:
-            created = create_report(job_id, db=db, user=user)
+            created = _ensure_report(job, db, user)
             report = _find_by_reference(db, created.report_reference)
             if report is None:
                 report = db.scalar(select(Report).where(Report.job_id == job.id))

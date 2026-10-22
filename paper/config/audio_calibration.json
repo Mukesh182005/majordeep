@@ -1,0 +1,66 @@
+{
+  "purpose": "Phase 3: served LCNN and its probability calibration, fitted on ASVspoof 2019 LA dev only",
+  "serving_rule": "of the frozen seeds, the lowest dev EER (ties: lower seed)",
+  "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+  "checkpoint_sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3",
+  "seed": 2,
+  "dev_eer": 0.0019006091299648119,
+  "frontend": "lfcc",
+  "input": "16 kHz waveform as read from the file, without peak normalisation; 4 s windows; mean of the window spoof logits",
+  "method": "platt_balanced",
+  "formula": "p_spoof = 1 / (1 + exp(-(a * mean_spoof_logit + b)))",
+  "a": 1.4203856014199086,
+  "b": -3.0641959546000512,
+  "class_weighting": "each class half the total weight (equal priors)",
+  "fit_data": {
+    "file": "paper_results/audio_asvspoof2019la/dev_runs/audio_lcnn_asvspoof_lfcc_seed2/dev_scores.csv",
+    "sha256": "4fd82c3a5c87965ce216e966d04a5aed6edda50ebcd5a4e8ab3a8024a36cda29",
+    "n_bonafide": 2548,
+    "n_spoof": 22296
+  },
+  "dev_diagnostics": {
+    "balanced_log_loss_uncalibrated": 0.011656344931590316,
+    "balanced_log_loss_calibrated": 0.005587489148737854,
+    "mean_p_spoof_bonafide": 0.0027693493951394853,
+    "mean_p_spoof_spoof": 0.9972306506046611,
+    "p_spoof_at_dev_eer_threshold": 0.49699533116869854,
+    "dev_eer_check": 0.0019006091299648119
+  },
+  "decided_utc": "2026-10-22T05:39:39+00:00",
+  "provenance": {
+    "git_commit": "eefc915166c911908cffeaa0780afb3a7fa7bfd4",
+    "git_branch": "paper-upgrade",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-22T05:39:40+00:00",
+    "command_line": [
+      "ml\\evaluation\\calibrate_audio_lcnn.py"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": [
+      2
+    ]
+  }
+}

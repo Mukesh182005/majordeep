@@ -6,9 +6,11 @@ import glob
 
 random.seed(42)
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
 def build_dataset():
-    src_base = Path("C:/Users/STUDENT/Desktop/deepfake/deepfake/data/raw/massive_social")
-    dst_base = Path("C:/Users/STUDENT/Desktop/deepfake/deepfake/accuracy_test")
+    src_base = REPO_ROOT / "data" / "raw" / "massive_social"
+    dst_base = REPO_ROOT / "accuracy_test"
     
     # We will sample 20 images per category for a quick empirical run
     num_samples = 20

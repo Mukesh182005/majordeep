@@ -37,7 +37,7 @@ def sha256_file(filepath):
 
 def build_training_dataset():
     # Gather 60 new images (not from accuracy_test)
-    raw_base = Path("C:/Users/STUDENT/Desktop/deepfake/deepfake/data/raw/massive_social")
+    raw_base = Path(__file__).resolve().parents[2] / "data" / "raw" / "massive_social"
     
     # We'll use linkedin_real (clean), snapchat_real (whatsapp-like), instagram_fake (AI)
     # Exclude any file already in accuracy_test just in case (though it used snapchat_real, etc. so we use different indices)

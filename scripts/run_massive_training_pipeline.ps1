@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$REPO_ROOT = "C:\Users\STUDENT\Desktop\deepfake\deepfake"
+$REPO_ROOT = Split-Path -Parent $PSScriptRoot
 Set-Location $REPO_ROOT
 
 Write-Host "==========================================================="

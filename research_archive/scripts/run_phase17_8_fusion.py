@@ -35,8 +35,8 @@ OUT_DIR = Path("evaluation/PHASE17.8")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def build_fusion_dataset():
-    raw_base = Path("C:/Users/STUDENT/Desktop/deepfake/deepfake/data/raw/massive_social")
-    exp_base = Path("C:/Users/STUDENT/Desktop/deepfake/deepfake/data/raw/expansion_300k")
+    raw_base = Path(__file__).resolve().parents[2] / "data" / "raw" / "massive_social"
+    exp_base = Path(__file__).resolve().parents[2] / "data" / "raw" / "expansion_300k"
     
     data = []
     

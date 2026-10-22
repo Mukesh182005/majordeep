@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import scipy.io.wavfile as wavfile
 
-REPO_ROOT = Path(r"C:\Users\STUDENT\Desktop\deepfake\deepfake")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 OUT_BASE = REPO_ROOT / "data" / "raw" / "massive_audio"
 OUT_BONAFIDE = OUT_BASE / "bonafide"
 OUT_SPOOFED = OUT_BASE / "spoofed"

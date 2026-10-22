@@ -27,8 +27,8 @@ for sub in ["false_positives", "false_negatives", "detector_disagreement", "genu
     (OUT_DIR / sub).mkdir(parents=True, exist_ok=True)
 
 def build_independent_test_set():
-    raw_base = Path("C:/Users/STUDENT/Desktop/deepfake/deepfake/data/raw/massive_social")
-    exp_base = Path("C:/Users/STUDENT/Desktop/deepfake/deepfake/data/raw/expansion_300k")
+    raw_base = Path(__file__).resolve().parents[2] / "data" / "raw" / "massive_social"
+    exp_base = Path(__file__).resolve().parents[2] / "data" / "raw" / "expansion_300k"
     
     data = []
     

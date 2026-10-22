@@ -26,7 +26,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from PIL import Image, ImageEnhance, ImageFilter, ImageDraw
 
-REPO_ROOT = Path(r"C:\Users\STUDENT\Desktop\deepfake\deepfake")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC_REAL = REPO_ROOT / "data" / "raw" / "faces-140k" / "real_vs_fake" / "real-vs-fake" / "train" / "real"
 SRC_FAKE = REPO_ROOT / "data" / "raw" / "faces-140k" / "real_vs_fake" / "real-vs-fake" / "train" / "fake"
 OUT_BASE = REPO_ROOT / "data" / "raw" / "massive_social"

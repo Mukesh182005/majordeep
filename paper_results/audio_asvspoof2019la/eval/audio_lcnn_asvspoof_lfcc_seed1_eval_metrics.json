@@ -1,0 +1,135 @@
+{
+  "n_bonafide": 7355,
+  "n_spoof": 63882,
+  "eer": 0.049901269997489214,
+  "eer_threshold": 5.415781259536743,
+  "auc_bonafide_vs_spoof": 0.9843821229194862,
+  "per_attack": {
+    "A07": {
+      "n_spoof": 4914,
+      "eer": 0.0024446585969359596,
+      "min_tdcf": 0.006234174372701722
+    },
+    "A08": {
+      "n_spoof": 4914,
+      "eer": 0.032527466993816416,
+      "min_tdcf": 0.066149200950611
+    },
+    "A09": {
+      "n_spoof": 4914,
+      "eer": 0.00023771203240951713,
+      "min_tdcf": 0.0020918955204444005
+    },
+    "A10": {
+      "n_spoof": 4914,
+      "eer": 0.006281377559419708,
+      "min_tdcf": 0.015488646992177585
+    },
+    "A11": {
+      "n_spoof": 4914,
+      "eer": 0.0032595447959146125,
+      "min_tdcf": 0.009085806527986724
+    },
+    "A12": {
+      "n_spoof": 4914,
+      "eer": 0.0017995034650371156,
+      "min_tdcf": 0.004911383271551585
+    },
+    "A13": {
+      "n_spoof": 4914,
+      "eer": 0.0030218327635050954,
+      "min_tdcf": 0.008592238113059255
+    },
+    "A14": {
+      "n_spoof": 4914,
+      "eer": 0.016060011947163545,
+      "min_tdcf": 0.04430716345501413
+    },
+    "A15": {
+      "n_spoof": 4914,
+      "eer": 0.009778634387743838,
+      "min_tdcf": 0.027179071303339696
+    },
+    "A16": {
+      "n_spoof": 4914,
+      "eer": 0.0038367189624837483,
+      "min_tdcf": 0.010414328405431385
+    },
+    "A17": {
+      "n_spoof": 4914,
+      "eer": 0.25821673228199404,
+      "min_tdcf": 0.9818603824105959
+    },
+    "A18": {
+      "n_spoof": 4914,
+      "eer": 0.017112610178551715,
+      "min_tdcf": 0.0939960246294159
+    },
+    "A19": {
+      "n_spoof": 4914,
+      "eer": 0.031950292827247276,
+      "min_tdcf": 0.11397667832518894
+    }
+  },
+  "min_tdcf": 0.10201749622469931,
+  "tdcf_details": {
+    "min_tdcf": 0.10201749622469931,
+    "cm_threshold": -0.4129233956336975,
+    "C1": 0.9150441201314283,
+    "C2": 0.38032622648007264,
+    "asv_eer": 0.02457783738686887,
+    "asv_threshold": -5.680051,
+    "asv_p_fa": 0.024604674888228765,
+    "asv_p_miss": 0.024581005586592177,
+    "asv_p_miss_spoof": 0.23934754703985472
+  },
+  "split": "eval",
+  "frontend": "lfcc",
+  "checkpoint": "audio_lcnn_asvspoof_lfcc_seed1.pt",
+  "checkpoint_sha256": "c0b76dfa73131a4b926b8d78b0b523275ff1f3033a01990cbcf58bfe31432a9b",
+  "checkpoint_epoch": 23,
+  "checkpoint_dev_eer": 0.003139647015550445,
+  "seed": 1,
+  "asv_scores": "ASVspoof2019_LA_asv_scores/ASVspoof2019.LA.asv.eval.gi.trl.scores.txt",
+  "score_convention": "higher = bona fide; score = -mean window spoof logit",
+  "scores_file": "audio_lcnn_asvspoof_lfcc_seed1_eval_scores.csv",
+  "provenance": {
+    "git_commit": "0d74dc1038c8eaf1b3737ec91d0e0c391e1652af",
+    "git_branch": "paper-upgrade",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-22T05:15:18+00:00",
+    "command_line": [
+      "ml\\evaluation\\eval_asvspoof.py",
+      "--checkpoint",
+      "checkpoints\\audio_lcnn_asvspoof_lfcc_seed1.pt",
+      "--split",
+      "eval",
+      "--confirm-final-eval"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": [
+      1
+    ]
+  }
+}

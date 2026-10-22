@@ -1,0 +1,54 @@
+{
+  "inputs_sha256": {
+    "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed0_eval_metrics.json": "c9829eed07c8f2990a63799510976aec8057a2719a6c270bf16b6f0b5a2870f5",
+    "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed0_eval_scores.csv": "e0d892dc9b74929da4c8f5669fc7a4bb378dc9cd034439fb1f86e06f6e378372",
+    "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed1_eval_metrics.json": "d148b9a048a0439e27aecbddb016d210fd6f1d8efc274938053a9388cda50a37",
+    "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed1_eval_scores.csv": "115a6e831ad9a4fda25ec4252b8d4da7926e87eac6f9beba79d3095edfa7e60f",
+    "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_metrics.json": "9a6617b7aa4b3b92a4c29f0f6054e4f6e86581b8a3875621b8a88f5d412ed89f",
+    "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_scores.csv": "23dc27ff0f44059cd8594c31b6505a5f3b3b822271889182e04dc5f16b47f5c5"
+  },
+  "selection_file": "paper/config/audio_model_selection.json",
+  "outputs": [
+    "paper/tables/audio_asvspoof_pooled.tex",
+    "paper/tables/audio_asvspoof_per_attack.tex",
+    "paper/figures/audio_asvspoof_det.pdf",
+    "paper/figures/audio_asvspoof_det.png"
+  ],
+  "sd": "sample standard deviation over seeds (ddof=1)",
+  "provenance": {
+    "git_commit": "0d74dc1038c8eaf1b3737ec91d0e0c391e1652af",
+    "git_branch": "paper-upgrade",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-22T05:15:52+00:00",
+    "command_line": [
+      "paper\\analysis\\audio_asvspoof_report.py"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": [
+      0,
+      1,
+      2
+    ]
+  }
+}

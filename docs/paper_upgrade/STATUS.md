@@ -19,13 +19,15 @@ Last updated: 2026-10-14.
 - References for every dataset, baseline and statistical method checked on Crossref (DOIs in `RESOURCES.md`).
 - H560 searched for on C:, D: and Google Drive: not found. A paper draft exists as a Google Doc (link in `RESOURCES.md`); no LaTeX source found.
 
-### Phase 1: ASVspoof 2019 LA protocol pipeline (code done; data run in progress)
+### Phase 1: ASVspoof 2019 LA protocol pipeline (done)
 - `ml/preprocessing/build_asvspoof2019_la.py`: manifest from the three official CM protocol files; checks files, sample rate, utterance and speaker split integrity, attack design and the official totals; records protocol sha256s.
 - `ml/preprocessing/asvspoof_features.py`: `logmel` (the serving function, 64 bands) and `lfcc` (20 + deltas + double deltas, 20 ms / 10 ms, 512-point FFT); 4 s windows (repeat if short; consecutive windows plus the tail if long); resumable float16 cache.
 - `ml/training/asvspoof_dataset.py`: datasets returning (features, label, utt_id); window 0 for training, all windows for scoring.
 - Tests: `backend/tests/test_asvspoof_pipeline.py` (parser, split integrity, attack sets, windows, front ends, cache round trip and resume).
 
-### Phase 2: LCNN on ASVspoof 2019 LA (code done; runs not started)
+### Phase 2: LCNN on ASVspoof 2019 LA (done 2026-10-22; results under Measured)
+- Runs (2026-10-22, inside the agent session at your request): logmel and lfcc with seed 0 in parallel, then lfcc seeds 1 and 2 in parallel; about 23 s per epoch, 6–12 minutes per run with early stopping.
+- Dev-based selection committed alone in `0d74dc1` (`paper/config/audio_model_selection.json`), before any eval scoring; eval then scored once per seed, all three at that commit (`paper_results/audio_asvspoof2019la/eval_log.csv`).
 - `ml/evaluation/asvspoof_metrics.py`: EER and minimum normalised t-DCF exactly as in the 2019 evaluation plan; matches the official code to 1e-12 on random scores with ties.
 - `ml/training/train_asvspoof.py`: LCNN from `build_audio_model`, weighted loss (or balanced sampler), epoch chosen by dev EER, resumable, refuses to overwrite any checkpoint.
 - `ml/evaluation/eval_asvspoof.py`: per-utterance scores (higher = bona fide), pooled and per-attack EER, AUC, min t-DCF with the organisers' ASV scores; eval scoring needs `--confirm-final-eval` and a committed dev-based selection, and is logged.
@@ -62,6 +64,13 @@ Last updated: 2026-10-14.
 - Test: `backend/tests/test_face_manifest.py` (9 tests: official splits kept, test never in training, copies follow their source, inpaint source matching and refusal, unverified sets excluded, `--extra` split by group, uploads refused, group / file leak checks).
 - Not done: retraining EfficientNet-B0 on the corrected manifest (GOAL: only if you ask).
 
+### Phase 7 preparation: video timing (2026-10-22; nothing changed in the backend)
+- `ml/evaluation/video_pipeline_timing.py` → `paper_results/video_timing/timing.json`: three synthetic 640×480, 30 fps clips of StyleGAN faces (10, 30, 60 s; no real person, no audio track because ffmpeg is not installed), run through `analyze_video`, then the extra cost of a dense 10 s window at 10 fps around the keyframe. A decision aid, not a paper result; another CPU-bound job ran at the same time.
+- Now (1 fps, at most 32 frames): 1.7 s, 4.1 s and 4.2 s for the 10, 30 and 60 s clips; the per-frame face model (stage 3, 0.6–1.9 s) and optical flow (stage 9, 0.4–1.4 s) take most of it. The audio stage adds 1.9–4.0 s for 10–60 s of speech.
+- Dense window for pulse and flow: +7.5 to +8.0 s per clip (face detection on 100 frames 2.6–3.0 s, optical flow 4.7–4.8 s, pulse 0.1 s), so about 3–5× the current video time.
+- See audit finding 13: at 1 fps the pulse and flow results carry no physiological or motion meaning.
+- **Recommendation (needs your choice; GOAL asks before implementing):** Option B, with the pulse and flow stages taken out of the video score and kept as context, and the pulse stage reporting "not measurable" below 5 fps instead of clamping. Reason: no labelled video data exists to show either stage works even when sampled densely, so the extra 8 s per video would buy plausibility, not evidence. Dense sampling is affordable if you prefer it (or if Option A with FakeAVCeleb is chosen later).
+
 ### Phase 9 (part): hard-coded paths removed (2026-10-22)
 - The 8 files in audit finding 7 now derive the repository root from their own location (`Path(__file__).resolve().parents[k]`; the PowerShell script uses `$PSScriptRoot`); checked to resolve to the same folders as before. `git grep "C:/Users"` over `*.py`, `*.ps1`, `Makefile` and `*.toml` finds nothing. `checkpoints/*.summary.json` still record absolute paths; they describe past runs and were left unchanged.
 
@@ -85,8 +94,34 @@ From `data/processed/asvspoof2019_la/dataset_summary.json` (copy in `paper_resul
 - ASV scores for t-DCF are present (`ASVspoof2019.LA.asv.{dev,eval}.gi.trl.scores.txt`, with per-attack spoof scores), so min t-DCF will be computed, not skipped.
 - Feature smoke test (first 200 utterances per split, both front ends): log-mel values in [-80, 0] dB, LFCC finite, shapes (64, 401) and (60, 401).
 
+### ASVspoof 2019 LA: LCNN results (Phase 2)
+Dev (front-end choice, from `paper_results/audio_asvspoof2019la/dev_runs/*/run_config.json`):
+
+| Run | Best epoch | Dev EER | Dev min t-DCF |
+|---|---|---|---|
+| logmel seed 0 | 7 | 0.462 % | 0.0126 |
+| lfcc seed 0 | 4 | 0.354 % | 0.0113 |
+| lfcc seed 1 | 23 | 0.314 % | 0.0104 |
+| lfcc seed 2 | 20 | 0.190 % | 0.0042 |
+
+Selected front end: **lfcc** (lower seed-0 dev EER, the rule fixed beforehand).
+
+Eval, 71,237 utterances, 3 seeds (`paper_results/audio_asvspoof2019la/metrics.json`, `summary.*`; per seed in `eval/*_eval_metrics.json`):
+
+| | EER (%) | min t-DCF | AUC |
+|---|---|---|---|
+| Seeds 0 / 1 / 2 | 5.99 / 4.99 / 4.78 | 0.1268 / 0.1020 / 0.1025 | 0.978 / 0.984 / 0.986 |
+| Mean ± SD | **5.26 ± 0.65** | **0.110 ± 0.014** | 0.983 ± 0.004 |
+| B01 CQCC-GMM (published) | 9.57 | 0.2366 | |
+| B02 LFCC-GMM (published) | 8.09 | 0.2116 | |
+
+- Per attack (mean EER %): A07 0.32, A08 1.74, A09 0.10, A10 0.78, A11 0.41, A12 0.30, A13 0.39, A14 2.44, A15 2.74, A16 0.55, **A17 26.90 ± 3.87**, A18 2.06, A19 3.53. A17 is the clear weakness; all other attacks are below 4 %.
+- Dev EER (0.19–0.35 %) is far below eval EER (4.8–6.0 %): dev contains only the training attacks A01–A06, eval only unseen attacks A07–A19, so dev is no estimate of eval performance.
+- Tables `paper/tables/audio_asvspoof_pooled.tex`, `audio_asvspoof_per_attack.tex`; figure `paper/figures/audio_asvspoof_det.pdf`; rows in `paper_results/INDEX.md`.
+- The backend serves log-mel features; the selected model uses LFCC, so Phase 3 needs an LFCC front end in the backend. The model was also trained on waveforms **without** the peak normalisation `analyze_audio` applies, which changes the LFCC energy coefficient; Phase 3 must feed it the un-normalised waveform.
+
 ### Backend tests
-Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 skipped (the 11 `pypdf` report tests, plus the real-manifest test, which now runs and passes). `pypdf` is in no requirements file.
+Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 skipped (the 11 `pypdf` report tests, plus the real-manifest test, which now runs and passes). After Phase 3 preparation and Phase 8 (2026-10-22): 256 passed, 11 skipped (`pypdf`). `pypdf` is in no requirements file.
 
 ## Audit findings (facts for later phases and for the paper's audit section)
 
@@ -107,6 +142,7 @@ Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 sk
 10. **torch is a nightly build**; Phase 9 should pin it.
 11. **The audio "conformal prediction" is not implemented.** `backend/app/ml/audio/evidence_fusion.py` labels its decision step "Conformal Prediction Set (alpha = 0.01)" with the comment "Bounded false positive rate: P(Authentic flagged as fake) <= 1%" and returns `conformal_alpha_guarantee: 0.01`, but the thresholds are fixed constants (0.35 and 0.70), nothing is calibrated on held-out data, and `alpha` is never used. No such guarantee can be claimed.
 12. **The audio "likelihood ratios" are constants** (25,000, 450 or 0.0001 by verdict), not computed from data.
+13. **The video pulse (rPPG) stage misreads its own frame rate.** `backend/app/ml/video/rppg_biometrics.py:102` clamps the measured sampling rate to at least 5 fps, but the pipeline samples at 1 fps, so every frequency is read 5 times too high: slow changes at 0.15–0.5 Hz (head motion, lighting drift) land in the 0.75–2.5 Hz "cardiac band" and are reported as a heart rate. At 1 fps no frequency above 0.5 Hz can be measured at all. On the synthetic StyleGAN-face clips of the Phase 7 timing it reported `PHYSIOLOGICAL_PULSE_CONFIRMED` for 2 of 3 clips. The optical-flow stage likewise compares frames 1 s apart, not consecutive frames.
 
 ## Blocked (needs you)
 

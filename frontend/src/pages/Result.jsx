@@ -119,6 +119,7 @@ export default function Result() {
   const [activeWhyItem, setActiveWhyItem] = useState('all')
   const [imageZoom, setImageZoom] = useState(1)
   const [activePlateKind, setActivePlateKind] = useState('combined')
+  const [reportUrl, setReportUrl] = useState('')
 
   useEffect(() => {
     let active = true
@@ -137,6 +138,17 @@ export default function Result() {
       .catch((err)   => { if (active) setError(err.message) })
     return () => { active = false }
   }, [jobId])
+
+  useEffect(() => {
+    if (result?.id && typeof api.jobLinks === 'function') {
+      api.jobLinks(result.id)
+        .then((links) => {
+          const p = links?.report_url
+          if (p) setReportUrl(p.startsWith('http') ? p : `${api.evidenceUrl(p)}`)
+        })
+        .catch(() => {})
+    }
+  }, [result?.id])
 
   if (error) {
     return (
@@ -218,6 +230,7 @@ export default function Result() {
   const isAudio = result.media_type === 'audio' || evidence.media === 'audio'
   const isVideo = result.media_type === 'video' || evidence.media === 'video'
   const isImage = !isAudio && !isVideo
+  const isExperimentalAudio = isAudio && (result.experimental || evidence.experimental || result.is_experimental)
 
   // Phase 31.6: Canonical Verdict and Decision Semantics
   const meta = verdictMeta(result.verdict)
@@ -297,6 +310,11 @@ export default function Result() {
 
   return (
     <div className="mx-auto max-w-[1440px] animate-in pb-16 printable-dossier px-4 mt-6">
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-500 flex items-center gap-2 mb-4">
+        <AlertTriangle size={18} />
+        <span>Automated assessment only. Not forensic or legal evidence.</span>
+      </div>
+
       {untrained && (
         <Notice tone="critical" title="Demonstration mode -- this score is not evidence">
           No trained checkpoint loaded on this deployment.
@@ -334,7 +352,7 @@ export default function Result() {
             <button onClick={handleExportJSON} className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5">
               <Download size={13} /> JSON Telemetry
             </button>
-            <a href={api.reportUrl(result.id)} target="_blank" rel="noreferrer" className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5">
+            <a href={reportUrl || (typeof api.reportUrl === 'function' ? api.reportUrl(result.id) : `/api/jobs/${result.id}/report`)} target="_blank" rel="noreferrer" className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5">
               <FileText size={13} /> Forensic Report (PDF)
             </a>
           </div>
@@ -353,10 +371,17 @@ export default function Result() {
             
             {/* Level 1: Forensic Assessment Header */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-surface-1 mb-3 text-[0.65rem] font-bold uppercase tracking-widest text-ink-muted"
-                   style={{ borderColor: 'var(--border-subtle)' }}>
-                <Shield size={12} style={{ color: meta.color }} />
-                Level 1 Forensic Assessment
+              <div className="flex items-center gap-2 mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-surface-1 text-[0.65rem] font-bold uppercase tracking-widest text-ink-muted"
+                     style={{ borderColor: 'var(--border-subtle)' }}>
+                  <Shield size={12} style={{ color: meta.color }} />
+                  Level 1 Forensic Assessment
+                </div>
+                {isExperimentalAudio && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-purple-500/15 text-purple-400 border border-purple-500/30">
+                    Experimental
+                  </span>
+                )}
               </div>
               <h1 className="text-3xl font-black tracking-tight" style={{ color: meta.color }}>
                 {meta.label.toUpperCase()}

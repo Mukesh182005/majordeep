@@ -1,0 +1,30 @@
+# Cloudflare Tunnel Configuration for DeepSentinel Lab RTX 5070 Deployment
+# Place your tunnel credentials file in ~/.cloudflared/<tunnel-id>.json
+#
+# Run with:
+#   cloudflared tunnel --config deploy/cloudflare-tunnel.yml run deepsentinel-beta
+
+tunnel: deepsentinel-beta
+credentials-file: /etc/cloudflared/credentials.json
+
+# Ingress rules routing traffic to the local Docker stack
+ingress:
+  - hostname: beta.deepsentinel.ai
+    service: http://localhost:8080
+    originRequest:
+      connectTimeout: 30s
+      noTLSVerify: false
+      httpHostHeader: beta.deepsentinel.ai
+      originServerName: beta.deepsentinel.ai
+      tcpKeepAlive: 30s
+      keepAliveConnections: 100
+      keepAliveTimeout: 90s
+      # Support large file uploads up to MAX_UPLOAD_MB (100MB)
+      disableChunkedEncoding: false
+
+  # Health check routing (optional dedicated endpoint)
+  - hostname: status.deepsentinel.ai
+    service: http://localhost:8080/api/health
+
+  # Default catch-all rule (required by Cloudflare Tunnel)
+  - service: http_status:404

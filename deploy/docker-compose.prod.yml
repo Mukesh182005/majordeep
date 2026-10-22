@@ -1,0 +1,37 @@
+# Production Docker Compose Override for DeepSentinel Beta
+# Usage:
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml --env-file deploy/.env.production up -d --build
+
+services:
+  # Caddy reverse proxy providing automatic TLS and 100MB body limit
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN:-beta.deepsentinel.ai}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - caddy_logs:/var/log/caddy
+    depends_on:
+      - frontend
+
+  # Worker GPU Acceleration (when deployed on the lab RTX 5070 machine)
+  # Uncomment the deploy section below on NVIDIA GPU machines:
+  # worker:
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+
+volumes:
+  caddy_data:
+  caddy_config:
+  caddy_logs:

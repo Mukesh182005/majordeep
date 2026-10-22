@@ -18,9 +18,8 @@ export default function AuthedImage({ src, alt, className }) {
 
     async function load() {
       try {
-        const token = getToken()
         const response = await fetch(src, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: 'include',
         })
         if (!response.ok) throw new Error(`Evidence image unavailable (${response.status})`)
         created = URL.createObjectURL(await response.blob())

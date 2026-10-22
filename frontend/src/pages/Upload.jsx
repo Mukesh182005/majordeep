@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { formatBytes } from '../lib/format'
 import { useAuth } from '../lib/useAuth'
@@ -65,7 +65,7 @@ const MEDIA_PANELS = [
     id: 'audio',
     label: 'Voice & Audio',
     subLabel: 'WAV · MP3 · FLAC · OGG · M4A · AAC · OPUS',
-    description: '10-engine analysis: IAIF glottal flow, ENF grid, SSL probing & conformal risk',
+    description: 'Multi-feature analysis: IAIF glottal flow, ENF grid, acoustic probing & conformal risk',
     icon: AudioIcon,
     accentVar: '--purple',
     glowColor: 'rgba(124,58,237,0.3)',
@@ -382,6 +382,14 @@ export default function UploadPage() {
             : `Guest limit: ${limits.rate_limit_per_hour.guest} files/hr — sign in for ${limits.rate_limit_per_hour.registered}.`}
         </p>
       )}
+
+      {/* ── Privacy Policy Link ── */}
+      <p className="text-center text-ink-muted text-xs">
+        Files are stored ephemerally and automatically purged. Read our{' '}
+        <Link to="/privacy" className="text-accent underline hover:text-accent/80 font-medium">
+          Privacy & Data Retention policy
+        </Link>.
+      </p>
     </div>
   )
 }

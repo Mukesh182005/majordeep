@@ -5,17 +5,14 @@ const AuthContext = createContext({ user: null, setUser: () => {}, loading: true
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getStoredUser)
-  const [loading, setLoading] = useState(Boolean(getToken()))
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!getToken()) {
-      setLoading(false)
-      return
-    }
-    // Confirm the stored token is still valid rather than trusting localStorage.
     api
       .me()
-      .then(setUser)
+      .then((currentUser) => {
+        setUser(currentUser)
+      })
       .catch(() => {
         clearSession()
         setUser(null)

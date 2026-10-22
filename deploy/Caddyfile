@@ -1,0 +1,50 @@
+# Caddy reverse proxy for DeepSentinel Beta
+# Enforces automatic HTTPS via Let's Encrypt / ZeroSSL,
+# sets max body size to match MAX_UPLOAD_MB (100MB),
+# and forwards traffic to the frontend container.
+
+{
+    email admin@deepsentinel.ai
+    # Optional debug logging for troubleshooting during beta rollout:
+    # debug
+}
+
+{$DOMAIN:beta.deepsentinel.ai} {
+    # Match MAX_UPLOAD_MB (100MB)
+    request_body {
+        max_size 100MB
+    }
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # Reverse proxy to the frontend container
+    # (WebSocket support is automatically handled by Caddy)
+    reverse_proxy frontend:80 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+
+        # Match backend processing timeouts
+        transport http {
+            response_header_timeout 300s
+            read_timeout 300s
+            write_timeout 300s
+        }
+    }
+
+    # Logging
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 50MiB
+            roll_keep 7
+        }
+        format json
+    }
+}

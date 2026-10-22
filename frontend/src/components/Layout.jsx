@@ -166,6 +166,11 @@ export default function Layout() {
               <p className="mt-4 text-ink-muted opacity-60">
                 © {new Date().getFullYear()} Veritas Forensics Platform
               </p>
+              <p className="mt-2">
+                <Link to="/privacy" className="text-[0.75rem] text-accent underline-offset-4 hover:underline font-medium">
+                  Privacy & Data Retention Policy
+                </Link>
+              </p>
             </div>
           </div>
         </div>

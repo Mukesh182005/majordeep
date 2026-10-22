@@ -29,9 +29,9 @@ const CAPABILITIES = [
   {
     id: 'audio', label: 'Voice & Audio',
     icon: Waveform, color: '#8b5cf6',
-    tag: 'SincRawNet3 + WavLM L18',
-    desc: '10-engine ensemble: IAIF glottal inverse filtering, ENF power grid phase, WavLM SSL probing, conformal prediction bounding & temporal splicing.',
-    pills: ['IAIF Glottal Flow', 'ENF Phase Grid', 'SSL Probing', 'Conformal Risk', 'Vocoder Signature', 'Splicing Timeline'],
+    tag: 'Trained LCNN (ASVspoof 2019 LA)',
+    desc: 'Trained LCNN deepfake detector with calibrated per-window timeline, corroborated by glottal flow, mains-hum, and temporal splice analysis.',
+    pills: ['Trained LCNN', 'Per-Window Timeline', 'IAIF Glottal Flow', 'ENF Phase Grid', 'LFCC Scalograms'],
     accuracy: 98,
   },
   {
@@ -46,10 +46,10 @@ const CAPABILITIES = [
 
 const PIPELINE = [
   { num: '01', phase: 'INGESTION & SEAL', title: 'Cryptographic Chain of Custody', color: '#3b82f6',
-    icon: Hash, detail: 'SHA-256 · Zero Cloud Exposure · SWGDE Evidence Ledger',
+    icon: Hash, detail: 'SHA-256 · Zero Cloud Exposure · Evidence Ledger',
     desc: 'On arrival, an immutable SHA-256 digest is computed and the file is locked in an isolated enclave. Every byte is verified before analysis begins.' },
   { num: '02', phase: 'NEURAL ATTRIBUTION', title: 'CUDA Tensor Matrix Scoring', color: '#8b5cf6',
-    icon: Cpu, detail: 'EfficientNet-B4 · LCNN · WavLM · Multi-Face MTCNN',
+    icon: Cpu, detail: 'EfficientNet-B4 · LCNN · Multi-Face MTCNN',
     desc: 'High-throughput neural backbones evaluate spatial, frequency, and temporal domains. Ensemble fusion prevents single-model bias.' },
   { num: '03', phase: 'EXPLAINABLE FORENSICS', title: 'Grad-CAM Visual Attribution', color: '#f59e0b',
     icon: Eye, detail: 'Pixel-Level Heatmaps · Per-Frame Timelines · Spectral Anomalies',

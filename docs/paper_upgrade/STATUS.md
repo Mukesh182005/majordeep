@@ -129,8 +129,35 @@ Eval, 71,237 utterances, 3 seeds (`paper_results/audio_asvspoof2019la/metrics.js
 - Tables `paper/tables/audio_asvspoof_pooled.tex`, `audio_asvspoof_per_attack.tex`; figure `paper/figures/audio_asvspoof_det.pdf`; rows in `paper_results/INDEX.md`.
 - The backend serves log-mel features; the selected model uses LFCC, so Phase 3 needs an LFCC front end in the backend. The model was also trained on waveforms **without** the peak normalisation `analyze_audio` applies, which changes the LFCC energy coefficient; Phase 3 must feed it the un-normalised waveform.
 
+### Audio signals on the balanced dev subsample (Phase 3, tasks 3–5)
+From `paper_results/audio_heuristics_dev/signal_auc.json` (computed from `scores.csv` by `paper/analysis/audio_heuristics_table.py`): 1,000 bona fide and 1,000 spoofed ASVspoof 2019 LA dev utterances (A01–A06), the full legacy suite with the untrained SincRawNet seeded 0, 1.42 s per utterance. AUC for spoof against bona fide with a 2,000-resample bootstrap 95 % interval, in each signal's designed direction (not flipped):
+
+| Signal | AUC [95 % CI] | Rule (lower bound > 0.60) |
+|---|---|---|
+| LCNN, ASVspoof-trained (served seed, calibrated) | 1.000 [1.000, 1.000] | synthesis risk |
+| Untrained SincRawNet branch | 0.568 [0.544, 0.592] | context |
+| Tampering risk R_tamper | 0.560 [0.549, 0.570] | context |
+| Legacy final probability | 0.556 [0.543, 0.569] | context |
+| Glottal anomaly | 0.552 [0.527, 0.578] | context |
+| Tabular rules branch | 0.552 [0.527, 0.578] | context |
+| Coarticulation anomaly | 0.518 [0.494, 0.543] | context |
+| Environment / mains-hum anomaly | 0.504 [0.499, 0.509] | context |
+| Splice timeline: worst segment | 0.499 [0.498, 0.500] | context |
+| Splice timeline flag | 0.499 [0.498, 0.500] | context |
+| Synthesis risk R_synth | 0.470 [0.444, 0.496] | context |
+| Splice timeline: F1 spikes | 0.428 [0.404, 0.453] | context |
+| Legacy model stage (fused) | 0.419 [0.394, 0.444] | context |
+| Spectral-smoothness branch ("WavLM") | 0.414 [0.389, 0.440] | context |
+| Mains-hum splice flag, phase slips | constant | context |
+
+- Only the LCNN passes the rule. Its dev AUC is optimistic: dev has the training attacks, and the model was chosen and calibrated on dev (eval AUC is 0.983). Every legacy signal lies between 0.41 and 0.57; four are below 0.5, so they point the wrong way.
+- The splice-timeline flag fired on 1,999 of 2,000 utterances; mains hum was detected in 3 and an ENF splice in none; R_tamper takes only the values 0.02, 0.5 and 0.75.
+- Legacy verdicts (Wilson 95 %): bona fide 99.1 % inconclusive [98.3, 99.5], 0.9 % manipulated, 0 authentic; spoofed 87.0 % inconclusive [84.8, 88.9], 12.9 % manipulated [11.0, 15.1], 0.1 % authentic. The legacy audio verdict almost never says authentic and catches about one spoof in eight.
+- Caveat: ASVspoof bona fide speech is clean read speech; the mains-hum and splice detectors are meant for field recordings, so this tests them outside their intended domain. They are nevertheless in the verdict for every upload.
+- **Waiting for your approval** (GOAL task 5): by the rule, every legacy signal moves to context and the synthesis risk becomes the LCNN alone; `evidence_fusion.py` is unchanged until you approve.
+
 ### Backend tests
-Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 skipped (the 11 `pypdf` report tests, plus the real-manifest test, which now runs and passes). After Phase 3 preparation and Phase 8 (2026-10-22): 256 passed, 11 skipped (`pypdf`). `pypdf` is in no requirements file.
+Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 skipped (the 11 `pypdf` report tests, plus the real-manifest test, which now runs and passes). After Phase 3 preparation and Phase 8 (2026-10-22): 256 passed, 11 skipped (`pypdf`). After Phase 3 task 2: 263 passed, 11 skipped (`pypdf`), with `DEEPSENTINEL_DATA` set so the real-data front-end test runs. `pypdf` is in no requirements file.
 
 ## Audit findings (facts for later phases and for the paper's audit section)
 

@@ -1,0 +1,22 @@
+\begin{tabular}{lcc}
+\toprule
+Signal & AUC [95\% CI] & Role \\
+\midrule
+LCNN (ASVspoof-trained) probability & 1.000 [1.000, 1.000] & synthesis risk \\
+Glottal anomaly score & 0.552 [0.527, 0.578] & context \\
+Coarticulation anomaly score & 0.518 [0.494, 0.543] & context \\
+Environment / mains-hum anomaly & 0.504 [0.499, 0.509] & context \\
+Mains-hum splice flag & -- & context \\
+Mains-hum phase slips & -- & context \\
+Splice timeline: worst segment & 0.499 [0.498, 0.500] & context \\
+Splice timeline: F1 spikes & 0.428 [0.404, 0.453] & context \\
+Splice timeline flag & 0.499 [0.498, 0.500] & context \\
+Untrained SincRawNet branch & 0.568 [0.544, 0.592] & context \\
+Spectral-smoothness branch (labelled WavLM) & 0.414 [0.389, 0.440] & context \\
+Tabular rules branch & 0.552 [0.527, 0.578] & context \\
+Legacy model stage (fused) & 0.419 [0.394, 0.444] & context \\
+Synthesis risk R_synth & 0.470 [0.444, 0.496] & context \\
+Tampering risk R_tamper & 0.560 [0.549, 0.570] & context \\
+Legacy final probability & 0.556 [0.543, 0.569] & context \\
+\bottomrule
+\end{tabular}

@@ -39,3 +39,25 @@ value that no file contains.
 | Baseline B01 CQCC-GMM eval EER (%) [published] | 9.57 | `paper_results/audio_asvspoof2019la/baselines.json` | `eval.B01_CQCC_GMM.eer_percent` | 2 |
 | Baseline B02 LFCC-GMM eval EER (%) [published] | 8.09 | `paper_results/audio_asvspoof2019la/baselines.json` | `eval.B02_LFCC_GMM.eer_percent` | 2 |
 <!-- end:audio_asvspoof2019la -->
+<!-- begin:audio_heuristics_dev -->
+| Audio dev subsample: AUC of LCNN (ASVspoof-trained) probability | 1.000 [1.000, 1.000] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.lcnn_prob.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Glottal anomaly score | 0.552 [0.527, 0.578] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.glottal_anomaly.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Coarticulation anomaly score | 0.518 [0.494, 0.543] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.coarticulation_anomaly.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Environment / mains-hum anomaly | 0.504 [0.499, 0.509] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.environment_anomaly.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Splice timeline: worst segment | 0.499 [0.498, 0.500] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.splice_worst_segment.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Splice timeline: F1 spikes | 0.428 [0.404, 0.453] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.splice_f1_spikes.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Splice timeline flag | 0.499 [0.498, 0.500] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.splice_flag.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Untrained SincRawNet branch | 0.568 [0.544, 0.592] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.model_rawnet.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Spectral-smoothness branch (labelled WavLM) | 0.414 [0.389, 0.440] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.model_spectral_smoothness.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Tabular rules branch | 0.552 [0.527, 0.578] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.model_tabular.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Legacy model stage (fused) | 0.419 [0.394, 0.444] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.model_stage_fused.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Synthesis risk R_synth | 0.470 [0.444, 0.496] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.r_synth.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Tampering risk R_tamper | 0.560 [0.549, 0.570] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.r_tamper.auc`, `.ci95`` | 3 |
+| Audio dev subsample: AUC of Legacy final probability | 0.556 [0.543, 0.569] | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``signals.legacy_final_prob.auc`, `.ci95`` | 3 |
+| Audio dev subsample: legacy verdict AUTHENTIC, bonafide | 0.0% (0/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.bonafide.AUTHENTIC.rate`` | 3 |
+| Audio dev subsample: legacy verdict INCONCLUSIVE, bonafide | 99.1% (991/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.bonafide.INCONCLUSIVE.rate`` | 3 |
+| Audio dev subsample: legacy verdict MANIPULATED, bonafide | 0.9% (9/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.bonafide.MANIPULATED.rate`` | 3 |
+| Audio dev subsample: legacy verdict AUTHENTIC, spoof | 0.1% (1/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.spoof.AUTHENTIC.rate`` | 3 |
+| Audio dev subsample: legacy verdict INCONCLUSIVE, spoof | 87.0% (870/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.spoof.INCONCLUSIVE.rate`` | 3 |
+| Audio dev subsample: legacy verdict MANIPULATED, spoof | 12.9% (129/1000) | ``paper_results/audio_heuristics_dev/signal_auc.json`` | ``legacy_verdict_rates.spoof.MANIPULATED.rate`` | 3 |
+<!-- end:audio_heuristics_dev -->

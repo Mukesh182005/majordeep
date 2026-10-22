@@ -1,0 +1,302 @@
+{
+  "scores_file": "scores.csv",
+  "rule": "keep in synthesis risk only if the bootstrap 95% lower bound > 0.6",
+  "direction": "higher signal = more likely spoof (as designed; not flipped)",
+  "lcnn_prob_source": {
+    "scores_file": "paper_results/audio_asvspoof2019la/dev_runs/audio_lcnn_asvspoof_lfcc_seed2/dev_scores.csv",
+    "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+    "note": "selected and calibrated on dev, so its dev AUC is optimistic"
+  },
+  "signals": {
+    "lcnn_prob": {
+      "description": "LCNN (ASVspoof-trained) probability",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.9999600000000001,
+      "ci95": [
+        0.999898,
+        0.9999979999999999
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "synthesis risk"
+    },
+    "glottal_anomaly": {
+      "description": "Glottal anomaly score",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.5523315,
+      "ci95": [
+        0.5265927,
+        0.5776931375
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "coarticulation_anomaly": {
+      "description": "Coarticulation anomaly score",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.5180229999999999,
+      "ci95": [
+        0.49376996249999994,
+        0.543193825
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "environment_anomaly": {
+      "description": "Environment / mains-hum anomaly",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.5045,
+      "ci95": [
+        0.4995,
+        0.5095
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "enf_splice_flag": {
+      "description": "Mains-hum splice flag",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": null,
+      "ci95": null,
+      "decision": "context (constant or one class)"
+    },
+    "enf_phase_slips": {
+      "description": "Mains-hum phase slips",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": null,
+      "ci95": null,
+      "decision": "context (constant or one class)"
+    },
+    "splice_worst_segment": {
+      "description": "Splice timeline: worst segment",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.4995,
+      "ci95": [
+        0.4985,
+        0.5
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "splice_f1_spikes": {
+      "description": "Splice timeline: F1 spikes",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.4280815,
+      "ci95": [
+        0.4039205375,
+        0.45305905
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "splice_flag": {
+      "description": "Splice timeline flag",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.4995,
+      "ci95": [
+        0.4985,
+        0.5
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "model_rawnet": {
+      "description": "Untrained SincRawNet branch",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.5681695,
+      "ci95": [
+        0.544256675,
+        0.5923365374999999
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "model_spectral_smoothness": {
+      "description": "Spectral-smoothness branch (labelled WavLM)",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.41365699999999994,
+      "ci95": [
+        0.38874771250000006,
+        0.439856225
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "model_tabular": {
+      "description": "Tabular rules branch",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.5523465000000001,
+      "ci95": [
+        0.5266253125,
+        0.5776501999999999
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "model_stage_fused": {
+      "description": "Legacy model stage (fused)",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.4185015,
+      "ci95": [
+        0.3938360375,
+        0.44426966249999994
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "r_synth": {
+      "description": "Synthesis risk R_synth",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.469777,
+      "ci95": [
+        0.44439175,
+        0.49557914999999997
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "r_tamper": {
+      "description": "Tampering risk R_tamper",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.5595045000000001,
+      "ci95": [
+        0.5485179625,
+        0.5700000749999999
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    },
+    "legacy_final_prob": {
+      "description": "Legacy final probability",
+      "n": 2000,
+      "n_missing": 0,
+      "auc": 0.555685,
+      "ci95": [
+        0.5426977125,
+        0.5690440875
+      ],
+      "n_resamples": 2000,
+      "seed": 0,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "decision": "context"
+    }
+  },
+  "legacy_verdict_rates": {
+    "bonafide": {
+      "AUTHENTIC": {
+        "count": 0,
+        "n": 1000,
+        "rate": 0.0,
+        "ci95": [
+          2.168404344971009e-19,
+          0.0038267584855551234
+        ]
+      },
+      "INCONCLUSIVE": {
+        "count": 991,
+        "n": 1000,
+        "rate": 0.991,
+        "ci95": [
+          0.982984183834662,
+          0.9952579393325229
+        ]
+      },
+      "MANIPULATED": {
+        "count": 9,
+        "n": 1000,
+        "rate": 0.009,
+        "ci95": [
+          0.004742060667477063,
+          0.01701581616533807
+        ]
+      }
+    },
+    "spoof": {
+      "AUTHENTIC": {
+        "count": 1,
+        "n": 1000,
+        "rate": 0.001,
+        "ci95": [
+          0.00017654637062607809,
+          0.0056425585979579355
+        ]
+      },
+      "INCONCLUSIVE": {
+        "count": 870,
+        "n": 1000,
+        "rate": 0.87,
+        "ci95": [
+          0.8477319733455312,
+          0.8894362253751581
+        ]
+      },
+      "MANIPULATED": {
+        "count": 129,
+        "n": 1000,
+        "rate": 0.129,
+        "ci95": [
+          0.10963544529450506,
+          0.1512040095017769
+        ]
+      }
+    }
+  },
+  "seconds_per_utterance": {
+    "median": 1.277,
+    "mean": 1.4217570000000002
+  }
+}

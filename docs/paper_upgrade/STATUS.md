@@ -118,5 +118,5 @@ Phase 0: 178 passed, 11 skipped. After Phases 1, 2 and 4 code: 244 passed, 12 sk
    ```
    Each run writes `checkpoints\audio_lcnn_asvspoof_<features>_seed<k>.pt` (not committed) and `paper_results\audio_asvspoof2019la\dev_runs\<run>\` (`train_log.csv`, `dev_scores.csv`, `dev_metrics.json`, `run_config.json`). An interrupted run continues with the same command plus `--resume`.
 2. Then I score eval once per seed (`eval_asvspoof.py --confirm-final-eval`), run `paper/analysis/audio_asvspoof_report.py`, and continue Phase 3.
-3. **Phase 3 heuristics run (about 45 minutes), when you approve:** `python ml\evaluationudio_heuristics_dev.py` writes `paper_resultsudio_heuristics_dev\` (`subsample.csv`, `scores.csv`, `config.json`). It does not need the LCNN; its column is added after Phase 2.
+3. **Phase 3 heuristics run (about 45 minutes), when you approve:** `python ml\evaluation\audio_heuristics_dev.py` writes `paper_results\audio_heuristics_dev\` (`subsample.csv`, `scores.csv`, `config.json`). It does not need the LCNN; its column is added after Phase 2.
 4. Decide H560; then freeze the image configuration and build T2 (Synthbuster is downloaded; RAISE-1k needs your form; team photographs).

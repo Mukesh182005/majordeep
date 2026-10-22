@@ -104,14 +104,21 @@ def sample_video_frames(
 
 
 # --------------------------------------------------------------------------- audio
-class MediaTooLongError(ValueError):
+class MediaRefusedError(ValueError):
+    """The file is refused before analysis.
+
+    A ``ValueError``, so the worker fails the job with this message; the video
+    stages that skip other audio failures re-raise it.
+    """
+
+
+class MediaTooLongError(MediaRefusedError):
     """Decoded media runs past the length limit the caller passed.
 
     Upload and worker check MAX_AUDIO_SECONDS / MAX_VIDEO_SECONDS against the
     duration in the file's headers (``app.storage``), which the uploader writes.
     This is the check that still holds when those headers are missing or false:
-    decoding stops one second past the limit. A ``ValueError``, so the worker
-    fails the job with this message.
+    decoding stops one second past the limit.
     """
 
 
@@ -214,7 +221,15 @@ def extract_audio_waveform(
                 cmd += ["-t", f"{float(max_seconds) + 1.0:g}"]  # output stops one second past the limit
                 run_options["timeout"] = _FFMPEG_DEMUX_TIMEOUT_S
             cmd += ["-vn", "-ac", "1", "-ar", str(target_sr), "-f", "wav", tmp_wav]
-            res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, **run_options)
+            try:
+                res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, **run_options)
+            except subprocess.TimeoutExpired:
+                # Demuxing at most limit + 1 s takes seconds; a file that stalls ffmpeg
+                # is refused rather than analysed without its audio track.
+                raise MediaRefusedError(
+                    f"The video's audio track could not be decoded within {_FFMPEG_DEMUX_TIMEOUT_S} s; "
+                    "the file is refused."
+                ) from None
             if res.returncode == 0 and Path(tmp_wav).exists() and Path(tmp_wav).stat().st_size > 0:
                 data, sr = sf.read(tmp_wav, dtype="float32")
                 if data is not None and data.size > 0:
@@ -227,7 +242,7 @@ def extract_audio_waveform(
                     Path(tmp_wav).unlink()
                 except Exception:
                     pass
-    except MediaTooLongError:
+    except MediaRefusedError:
         raise
     except Exception:
         pass

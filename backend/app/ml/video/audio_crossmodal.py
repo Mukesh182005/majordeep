@@ -15,7 +15,7 @@ import numpy as np
 from PIL import Image
 
 from app.config import settings
-from app.ml.preprocessing import MediaTooLongError
+from app.ml.preprocessing import MediaRefusedError
 
 logger = logging.getLogger(__name__)
 
@@ -97,8 +97,8 @@ def analyze_crossmodal_lipsync(
                 if std_prod > 1e-6:
                     correlation = float(np.mean(ap_norm * en_norm) / std_prod)
                     correlation = float(np.clip(correlation, -1.0, 1.0))
-    except MediaTooLongError:
-        raise  # an over-long video is refused, not analysed without its audio
+    except MediaRefusedError:
+        raise  # an over-long or undecodable video is refused, not analysed without its audio
     except Exception as exc:
         logger.debug("Audio stream extraction for lip-sync analysis skipped: %s", exc)
 

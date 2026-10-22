@@ -29,7 +29,7 @@ from app.ml.faces import extract_faces
 from app.ml.forensics import run_comprehensive_forensics
 from app.ml.gradcam import compute_gradcam, overlay_heatmap
 from app.ml.image_pipeline import score_scene
-from app.ml.preprocessing import MediaTooLongError, normalize_waveform, preprocess_image, sample_video_frames
+from app.ml.preprocessing import MediaRefusedError, normalize_waveform, preprocess_image, sample_video_frames
 from app.ml.registry import UNTRAINED, get_image_model
 from app.ml.video.audio_crossmodal import analyze_crossmodal_lipsync
 from app.ml.video.compression_dna import extract_compression_fingerprint
@@ -285,8 +285,8 @@ def analyze_video(
                 job_id=f"{job_id}_audio",
                 model_waveform=audio_np,
             )
-    except MediaTooLongError:
-        raise  # an over-long video is refused, not analysed without its audio
+    except MediaRefusedError:
+        raise  # an over-long or undecodable video is refused, not analysed without its audio
     except Exception as exc:
         logger.debug("Audio demuxing and acoustic forensics skipped: %s", exc)
 

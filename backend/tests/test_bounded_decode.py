@@ -19,7 +19,7 @@ import numpy as np
 import pytest
 
 from app.ml import preprocessing
-from app.ml.preprocessing import MediaTooLongError, extract_audio_waveform, load_audio
+from app.ml.preprocessing import MediaRefusedError, MediaTooLongError, extract_audio_waveform, load_audio
 
 RATE = 16000
 
@@ -127,7 +127,7 @@ class TestVideoAudioTrack:
         waveform, rate = extract_audio_waveform(video, max_seconds=2.0)
         cmd, options = calls[-1]
         assert cmd[cmd.index("-t") + 1] == "3" and options.get("timeout")
-        assert rate == RATE and len(waveform) == int(1.5 * RATE)
+        assert waveform is not None and rate == RATE and len(waveform) == int(1.5 * RATE)
 
     def test_a_longer_track_refuses_the_video(self, tmp_path, monkeypatch):
         self._ffmpeg_demuxes(monkeypatch, seconds=3.0)  # what ffmpeg returns when cut at limit + 1 s
@@ -148,14 +148,27 @@ class TestVideoAudioTrack:
         with pytest.raises(MediaTooLongError, match="at most 2 s of video"):
             extract_audio_waveform(_wav(tmp_path / "long.wav", 5.0), max_seconds=2.0)
 
-    def test_the_lip_sync_stage_does_not_swallow_the_refusal(self, tmp_path, monkeypatch):
+    def test_an_ffmpeg_timeout_refuses_the_video(self, tmp_path, monkeypatch):
+        self._ffmpeg_demuxes(monkeypatch, seconds=1.0)
+
+        def stalls(cmd, *args, **kwargs):
+            raise subprocess.TimeoutExpired(cmd, kwargs.get("timeout"))
+
+        monkeypatch.setattr(subprocess, "run", stalls)
+        video = tmp_path / "clip.mp4"
+        video.write_bytes(b"\x00" * 64)
+        with pytest.raises(MediaRefusedError, match="could not be decoded within"):
+            extract_audio_waveform(video, max_seconds=2.0)
+
+    @pytest.mark.parametrize("refusal", [MediaTooLongError, MediaRefusedError])
+    def test_the_lip_sync_stage_does_not_swallow_a_refusal(self, tmp_path, monkeypatch, refusal):
         from app.ml.video.audio_crossmodal import analyze_crossmodal_lipsync
 
-        def too_long(*args, **kwargs):
-            raise MediaTooLongError("The video's audio track is longer than 2 s; this server analyses at most 2 s of video.")
+        def refused(*args, **kwargs):
+            raise refusal("refused")
 
-        monkeypatch.setattr(preprocessing, "extract_audio_waveform", too_long)
-        with pytest.raises(MediaTooLongError):
+        monkeypatch.setattr(preprocessing, "extract_audio_waveform", refused)
+        with pytest.raises(refusal):
             analyze_crossmodal_lipsync(tmp_path / "clip.mp4", [], [])
 
 

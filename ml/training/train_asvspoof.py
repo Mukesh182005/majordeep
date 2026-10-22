@@ -210,6 +210,18 @@ def main() -> None:
         "n_dev": len(dev_cache),
     }
 
+    # Recorded in every checkpoint so it states what it was trained on (P2).
+    from ml.provenance import git_state
+
+    summary_path = args.manifest.parent / "dataset_summary.json"
+    dataset_record = {
+        "dataset": "ASVspoof 2019 logical access (LA)",
+        "split_policy": "official CM protocol files: trained on train, epoch chosen on dev, eval unused",
+        "protocol_sha256": (json.loads(summary_path.read_text(encoding="utf-8")).get("protocol_sha256")
+                            if summary_path.is_file() else None),
+        "git_commit": git_state().get("git_commit"),
+    }
+
     start_epoch, best_eer, best_epoch, stale = 1, float("inf"), 0, 0
     log_path = run_dir / "train_log.csv"
     if args.resume and last_path.exists():
@@ -260,6 +272,7 @@ def main() -> None:
                     "seed": args.seed,
                     "train_config": train_config,
                     "manifest_sha256": train_cache.manifest_sha256,
+                    **dataset_record,
                     "score_convention": "model outputs a spoof logit; CM score = -mean window logit",
                     "model_version": f"audio-lcnn-asvspoof2019la-{args.features}-seed{args.seed}",
                 },

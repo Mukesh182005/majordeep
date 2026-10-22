@@ -1,0 +1,96 @@
+{
+  "model": {
+    "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+    "checkpoint_sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3",
+    "selection": "served seed = lowest dev EER of the frozen seeds (paper/config/audio_calibration.json)",
+    "decision_threshold_from_dev": 0.49699533116869854
+  },
+  "score_convention": "higher = bona fide; score = -mean window spoof logit",
+  "asvspoof2019_la_eval": {
+    "n_bonafide": 7355,
+    "n_spoof": 63882,
+    "eer": 0.04782491984552331,
+    "eer_threshold": 5.47933,
+    "auc_bonafide_vs_spoof": 0.9864838736171686,
+    "min_tdcf": 0.10248516265946211,
+    "per_attack_eer": {
+      "A07": 0.0017995034650371156,
+      "A08": 0.008794017121685375,
+      "A09": 0.0006451551318988436,
+      "A10": 0.007503706857887687,
+      "A11": 0.0030218327635050954,
+      "A12": 0.0020372154974466327,
+      "A13": 0.0022069465645264425,
+      "A14": 0.019489287810157966,
+      "A15": 0.019964711874977,
+      "A16": 0.004244162061973075,
+      "A17": 0.2368599600414692,
+      "A18": 0.02729868766578488,
+      "A19": 0.02828330493184334
+    },
+    "sources": {
+      "scores": {
+        "file": "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_scores.csv",
+        "sha256": "23dc27ff0f44059cd8594c31b6505a5f3b3b822271889182e04dc5f16b47f5c5"
+      },
+      "metrics": {
+        "file": "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_metrics.json",
+        "sha256": "9a6617b7aa4b3b92a4c29f0f6054e4f6e86581b8a3875621b8a88f5d412ed89f",
+        "key_min_tdcf": "min_tdcf"
+      }
+    },
+    "all_seeds": {
+      "file": "paper_results/audio_asvspoof2019la/metrics.json",
+      "eer_percent": {
+        "mean": 5.255576235112222,
+        "sd": 0.647959765152372,
+        "n": 3
+      },
+      "min_tdcf": {
+        "mean": 0.1104198433369915,
+        "sd": 0.01415021327498642,
+        "n": 3
+      },
+      "auc_bonafide_vs_spoof": {
+        "mean": 0.9830861112162861,
+        "sd": 0.004198568268341118,
+        "n": 3
+      }
+    }
+  },
+  "figure": "results/figures/audio_roc.png",
+  "provenance": {
+    "git_commit": "ba2e8a44a7400d78bf62119c22a787dd66481310",
+    "git_branch": "ml/audio-asvspoof",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-22T06:33:06+00:00",
+    "command_line": [
+      "ml/evaluation/eval_audio.py"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": null
+  }
+}

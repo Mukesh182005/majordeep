@@ -7,23 +7,22 @@ Write-Host "DEEPFAKE DETECTION: MASSIVE SCALE-UP PIPELINE"
 Write-Host "==========================================================="
 Write-Host ""
 
-Write-Host "[1/4] Generating 360,000 Social Media / Diffusion Images..."
+Write-Host "[1/3] Generating 360,000 Social Media / Diffusion Images..."
 python scripts\generate_massive_social_dataset.py
 if ($LASTEXITCODE -ne 0) { throw "Image generation failed." }
 
-Write-Host "`n[2/4] Expanding Training Dataset Manifest to 500,000 Images..."
+Write-Host "`n[2/3] Expanding Training Dataset Manifest to 500,000 Images..."
 python scripts\expand_training_dataset.py
 if ($LASTEXITCODE -ne 0) { throw "Manifest expansion failed." }
 
-Write-Host "`n[3/4] Generating 20 Hours of Audio..."
-python scripts\generate_massive_audio_dataset.py
-if ($LASTEXITCODE -ne 0) { throw "Audio generation failed." }
+# The synthetic-audio steps were removed: they generated NumPy tones and trained
+# checkpoints/audio_detector.pt on them (retired; see KNOWN_ISSUES.md and
+# scripts/archive/). The audio model is trained on ASVspoof 2019 LA with
+# ml/training/train_asvspoof.py.
 
-Write-Host "`n[4/4] Kicking off Fine-Tuning..."
+Write-Host "`n[3/3] Kicking off Fine-Tuning..."
 Write-Host "  -> Launching Image Fine-Tuning (CPU Pipeline)..."
 Start-Process "python" -ArgumentList "ml\training\finetune_image_detector.py --device cpu --batch-size 128 --workers 16" -NoNewWindow
-Write-Host "  -> Launching Audio Fine-Tuning (CPU Pipeline)..."
-Start-Process "python" -ArgumentList "ml\training\train_audio.py --device cpu --batch-size 64 --workers 8" -NoNewWindow
 
 Write-Host "`n==========================================================="
 Write-Host "PIPELINE INITIATED SUCCESSFULLY"

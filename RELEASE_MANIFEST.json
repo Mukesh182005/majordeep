@@ -29,7 +29,15 @@
       "architecture": "Light CNN (LCNN)",
       "file_path": "checkpoints/audio_detector.pt",
       "size_bytes": 598513,
-      "sha256": "43a96a0a1b422685576b80db11ce6d5a885052dd5ea53d7b9e983de060774b03"
+      "sha256": "43a96a0a1b422685576b80db11ce6d5a885052dd5ea53d7b9e983de060774b03",
+      "status": "retired 2026-10-22: trained on synthetic tones, not speech; no longer loaded (KNOWN_ISSUES.md)"
+    },
+    {
+      "name": "audio_lcnn_asvspoof",
+      "architecture": "LCNN on LFCC, ASVspoof 2019 LA",
+      "file_path": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+      "sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3",
+      "status": "not in git (weights are never committed); sha256 also pinned in paper/config/audio_calibration.json"
     }
   ],
   "critical_dependencies": {

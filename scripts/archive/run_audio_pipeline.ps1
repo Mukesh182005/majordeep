@@ -1,3 +1,8 @@
+# ARCHIVED, do not run. This trained checkpoints/audio_detector.pt on NumPy tones
+# (generate_massive_audio_dataset.py), not speech; that checkpoint is retired.
+# Use ml/training/train_asvspoof.py (ASVspoof 2019 LA, official protocols).
+throw "Archived: this trains the retired synthetic-tone audio model. See KNOWN_ISSUES.md."
+
 # Wait for audio generation to complete if not already done, then preprocess and train
 $ErrorActionPreference = "Stop"
 

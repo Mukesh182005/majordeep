@@ -11,7 +11,7 @@
 ### 2. JWT tokens stored in localStorage
 - **Description:** Frontend stores JWT tokens in `localStorage`, which is accessible to JavaScript and vulnerable to XSS token theft.
 - **Impact:** Low risk for the current use case; documented in the API client code.
-- **Recommendation:** For deployments handling sensitive case material, migrate to httpOnly cookies.
+- **Status:** Backend side done on `fix/p5-security`: login sets an httpOnly, SameSite=Lax session cookie, and `?token=` URLs are replaced by signed 5-minute links (`docs/API_CHANGES.md`). Open until the frontend (`frontend/src/lib/api.js`) stops storing the token and uses the cookie and the signed links; until then, report download and live status for signed-in users' jobs fail, because the backend no longer reads `?token=`.
 
 ### 3. SQLite concurrent write limitations
 - **Description:** Development mode uses SQLite, which does not handle concurrent writes well.
@@ -54,7 +54,21 @@
 - **Description:** Stored results are not recomputed; a few contain `NaN` face scores from the old half-precision bug.
 - **Impact:** Re-upload media to get the corrected analysis.
 
+### 13. In-the-Wild not yet evaluated
+- **Description:** The audio model has been evaluated on ASVspoof 2019 LA only (studio-quality English read speech). Its In-the-Wild scripts exist (`ml/preprocessing/build_in_the_wild.py`, `ml/evaluation/eval_in_the_wild.py`), but the dataset's licence is stated two ways (Apache 2.0 on its page, CC BY-SA 4.0 on Hugging Face) and it has not been downloaded.
+- **Impact:** No real-world audio error rate exists; the audio result carries a note saying so.
+
 ## Resolved Issues
+
+### Untrained audio branches and standards claims in outputs (fixed 2026-10-22, branch `fix/p1-honest-outputs`)
+- The audio model stage reported a random-weight "Sinc-RawNet" score and "WavLM layer 18" / "Whisper layer 4" scores that were an FFT smoothness formula (the second 0.92 x the first + 0.04); none of these models ran. All three, and the typology and generator-family breakdowns built on them, were removed. Without the trained LCNN, audio results are now marked experimental.
+- The audio decision claimed a conformal guarantee (alpha = 0.01) and reported likelihood ratios that were constants (25,000 / 450 / 0.0001). Removed.
+- The PDF, the audio vault and the API description claimed ISO/IEC 27037/27042, SWGDE and Daubert compliance, write-blocker access, and suitability for cybercrime complaints. Removed.
+- Video generator attribution matched keywords in the file name ("sora", "veo", ...). Removed; the attribution is labelled unvalidated.
+
+### `checkpoints/audio_detector.pt` was trained on synthetic tones (retired 2026-10-22, branch `ml/audio-asvspoof`)
+- `scripts/run_audio_pipeline.ps1` trained it on NumPy-generated clips from `scripts/generate_massive_audio_dataset.py` (low-frequency modulation as "speech", high-frequency artefacts as "TTS"), which is why it reported AUC 1.0 and EER 0. Both scripts are in `scripts/archive/`, the audio steps were removed from `scripts/run_massive_training_pipeline.ps1`, and the backend no longer loads the checkpoint (the file is kept, unchanged).
+- The audio model is the LCNN trained on ASVspoof 2019 LA with the official protocols (`ml/training/train_asvspoof.py`); its eval results are in `results/audio_eval.json` and `paper_results/audio_asvspoof2019la/`.
 
 ### AI images reported authentic; real photos reported manipulated (fixed 2026-10-05)
 - `umm-maybe/AI-image-detector` (AUC 0.469 on current generators, below chance) replaced by `haywoodsloan/ai-image-detector-deploy`; max-of-experts fusion (flagged 26–36% of real photos) replaced by log-odds fusion with `Organika/sdxl-detector` (AUC 0.984).

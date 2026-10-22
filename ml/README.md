@@ -59,9 +59,13 @@ python ml/training/train_audio.py --data data/processed/audio \
     --epochs 20 --batch-size 64 --lr 1e-4
 ```
 
-Checkpoints are written to `checkpoints/image_detector.pt` and
-`checkpoints/audio_detector.pt` — the exact paths the backend loads. Training
-curves are written as CSV alongside them for your report.
+The image checkpoint is written to `checkpoints/image_detector.pt`, the path
+the backend loads. `train_audio.py` is the old generic audio trainer; the
+`checkpoints/audio_detector.pt` it produced was trained on synthetic tones and
+is retired. The served audio model is trained on ASVspoof 2019 LA with
+`ml/training/train_asvspoof.py` (official protocols; see
+`docs/paper_upgrade/STATUS.md`). Training curves are written as CSV alongside
+the checkpoints.
 
 ## 3. Evaluate
 

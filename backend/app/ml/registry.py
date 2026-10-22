@@ -29,8 +29,11 @@ UNTRAINED = "untrained-backbone"
 
 CHECKPOINT_FILENAMES = {
     "image": "image_detector.pt",
-    "audio": "audio_detector.pt",
 }
+# checkpoints/audio_detector.pt is retired and never loaded: it was trained on
+# NumPy-generated tones (scripts/archive/generate_massive_audio_dataset.py), not
+# speech, and its "AUC 1.0 / EER 0" were measured on those tones. The audio
+# model is the ASVspoof 2019 LA LCNN named in AUDIO_LCNN_CALIBRATION_FILE.
 
 
 @dataclass
@@ -96,11 +99,6 @@ def get_image_model() -> LoadedModel:
     return _get_or_load("image", _build_image_model)
 
 
-def get_audio_model() -> LoadedModel:
-    """Audio anti-spoofing detector (LCNN over log-Mel spectrograms)."""
-    return _get_or_load("audio", _build_audio_model)
-
-
 def get_audio_lcnn_asvspoof() -> LoadedModel:
     """The ASVspoof 2019 LA LCNN served when ``audio_model_source="lcnn_asvspoof"``."""
     return _get_or_load("audio_lcnn_asvspoof", _build_audio_lcnn_asvspoof)
@@ -146,24 +144,6 @@ def _build_image_model() -> LoadedModel:
         weights_status=status,
         version=str(metadata.get("version", settings.image_model_version)),
         name=f"{backbone}-binary-head",
-        metadata=metadata,
-    )
-
-
-def _build_audio_model() -> LoadedModel:
-    _require_torch()
-    from app.ml.models_arch import build_audio_model
-
-    device = resolve_device()
-    module = build_audio_model()
-    status, metadata = _load_checkpoint(module, checkpoint_path("audio"))
-    module.eval().to(device)
-    return LoadedModel(
-        module=module,
-        device=device,
-        weights_status=status,
-        version=str(metadata.get("version", settings.audio_model_version)),
-        name="lcnn-logmel",
         metadata=metadata,
     )
 
@@ -214,7 +194,10 @@ def _build_audio_lcnn_asvspoof() -> LoadedModel:
 def warm_up() -> dict[str, str]:
     """Preload every model — called at Celery worker startup."""
     statuses: dict[str, str] = {}
-    for kind, loader in (("image", get_image_model), ("audio", get_audio_model)):
+    loaders = [("image", get_image_model)]
+    if settings.audio_model_source == "lcnn_asvspoof":
+        loaders.append(("audio", get_audio_lcnn_asvspoof))
+    for kind, loader in loaders:
         try:
             statuses[kind] = loader().weights_status
         except DetectorUnavailableError as exc:
@@ -236,12 +219,24 @@ def describe() -> dict[str, str]:
         "image": f"{settings.image_model_backbone}, checkpoint "
         f"{TRAINED if checkpoint_path('image').exists() else UNTRAINED}, "
         f"configured {settings.image_model_version}",
-        "audio": f"lcnn, checkpoint "
-        f"{TRAINED if checkpoint_path('audio').exists() else UNTRAINED}, "
-        f"configured {settings.audio_model_version}",
+        "audio": _describe_audio(),
         "video": f"frame-aggregation over the image model, configured "
         f"{settings.video_model_version}",
     }
+
+
+def _describe_audio() -> str:
+    if settings.audio_model_source != "lcnn_asvspoof":
+        return "hand-set rules only (AUDIO_MODEL_SOURCE=legacy): no trained model, results marked experimental"
+    import json
+
+    try:
+        calibration = json.loads(Path(settings.audio_lcnn_calibration_file).read_text(encoding="utf-8"))
+        name = Path(calibration["checkpoint"]).name
+    except (OSError, ValueError, KeyError):
+        return "ASVspoof 2019 LA LCNN: calibration file missing or unreadable"
+    present = (Path(settings.checkpoint_dir) / name).is_file()
+    return f"ASVspoof 2019 LA LCNN {name}, checkpoint {'present' if present else 'MISSING'}"
 
 
 def reset_cache() -> None:

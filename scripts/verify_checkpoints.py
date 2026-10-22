@@ -95,7 +95,9 @@ def main() -> int:
 
     print(f"{BOLD}Checkpoint directory:{RESET} {settings.checkpoint_dir}\n")
 
-    loaders = {"image": registry.get_image_model, "audio": registry.get_audio_model}
+    # audio_detector.pt is retired (trained on synthetic tones) and no longer
+    # loaded; the audio model is checked separately below.
+    loaders = {"image": registry.get_image_model}
     trained = 0
 
     for kind, loader in loaders.items():
@@ -167,7 +169,23 @@ def main() -> int:
         print()
         trained += int(ok)
 
-    total = len(loaders)
+    print(f"{BOLD}AUDIO detector{RESET} (ASVspoof 2019 LA LCNN, {settings.audio_lcnn_calibration_file.name})")
+    if settings.audio_model_source != "lcnn_asvspoof":
+        print(f"  status        : {YELLOW}NOT IN USE{RESET} — AUDIO_MODEL_SOURCE=legacy, audio results are experimental
+")
+    else:
+        try:
+            registry.reset_cache()
+            audio = registry.get_audio_lcnn_asvspoof()
+            print(f"  status        : {GREEN}TRAINED{RESET} {audio.metadata['checkpoint']} (sha256 matches the calibration)")
+            print(f"  serving as    : {audio.name} {audio.version} on {audio.device}
+")
+            trained += 1
+        except Exception as exc:
+            print(f"  status        : {RED}UNAVAILABLE{RESET} — {exc}
+")
+
+    total = len(loaders) + 1
     print(f"{BOLD}Summary:{RESET} {trained}/{total} detectors have trained weights.")
     if trained == total:
         print(f"{GREEN}This deployment will produce evidential results.{RESET}")

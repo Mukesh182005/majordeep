@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Multi-threaded high-throughput synthesizer for audio datasets.
+"""ARCHIVED, do not use. Kept only to document how checkpoints/audio_detector.pt was made.
+
+These clips are NumPy tones, not speech: "bona fide" is low-frequency
+modulation and "spoofed" is high-frequency artefacts with jitter. The LCNN
+trained on them (checkpoints/audio_detector.pt, by run_audio_pipeline.ps1)
+scored AUC 1.0 / EER 0 on held-out tones, which says nothing about real or
+synthetic speech. It is retired: the backend no longer loads it.
+
+Original description: multi-threaded high-throughput synthesizer for audio datasets.
 
 Generates 20GB of synthetic audio data (16kHz, 16-bit mono PCM).
 - 10GB Bonafide (human speech simulation: low-freq modulation)
@@ -14,7 +22,7 @@ from pathlib import Path
 import numpy as np
 import scipy.io.wavfile as wavfile
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]  # scripts/archive/ -> repository root
 OUT_BASE = REPO_ROOT / "data" / "raw" / "massive_audio"
 OUT_BONAFIDE = OUT_BASE / "bonafide"
 OUT_SPOOFED = OUT_BASE / "spoofed"

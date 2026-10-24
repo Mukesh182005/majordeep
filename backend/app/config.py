@@ -111,7 +111,7 @@ class Settings(BaseSettings):
     audio_model_source: str = "lcnn_asvspoof"
     audio_lcnn_calibration_file: Path = ROOT_DIR / "paper" / "config" / "audio_calibration.json"
     audio_verdict_config_file: Path = ROOT_DIR / "paper" / "config" / "frozen_audio_config.json"
-    # Codec families (mp3, aac, opus) on which the served audio model flagged
+    # Codec families (mp3, aac, opus; resample = audio not at 16 kHz) on which the served audio model flagged
     # more than 5% of bona fide dev speech (paper/config/audio_codec_plan.json,
     # guard_rule). Audio in these codecs gets an INCONCLUSIVE audio verdict, and
     # a video's audio track in them is left out of the video score. Empty: no guard.
@@ -139,9 +139,9 @@ class Settings(BaseSettings):
     @classmethod
     def _known_codec_families(cls, value: list[str]) -> list[str]:
         families = [item.lower() for item in value]
-        unknown = sorted(set(families) - {"mp3", "aac", "opus"})
+        unknown = sorted(set(families) - {"mp3", "aac", "opus", "resample"})
         if unknown:
-            raise ValueError(f"AUDIO_CODEC_GUARD: unknown codec families {unknown}; use mp3, aac or opus")
+            raise ValueError(f"AUDIO_CODEC_GUARD: unknown codec families {unknown}; use mp3, aac, opus or resample")
         return families
 
     @field_validator("enabled_media_types", mode="after")

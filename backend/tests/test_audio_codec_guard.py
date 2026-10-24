@@ -119,3 +119,14 @@ def test_guarded_audio_track_is_left_out_of_the_video_score(tmp_path, monkeypatc
     else:
         assert seen["audio_forensics"] is not None
         assert result.evidence["audio_codec_guard"] is None
+
+
+def test_resample_family_covers_audio_not_at_16k(tmp_path, monkeypatch):
+    wav16 = _tone(tmp_path / "a16.wav")
+    wav48 = _encode(wav16, tmp_path / "a48.wav", "-ar", "48000")
+    assert codec_guard.audio_stream(wav48) == ("pcm_s16le", 48000)
+    monkeypatch.setattr(settings, "audio_codec_guard", ["resample"])
+    assert codec_guard.guarded_family(wav48) == "resample"
+    assert codec_guard.guarded_family(wav16) is None
+    assert "sample rate other than 16 kHz" in codec_guard.guard_note("resample")
+    assert Settings(audio_codec_guard="mp3,resample").audio_codec_guard == ["mp3", "resample"]

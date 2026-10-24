@@ -1,0 +1,69 @@
+{
+  "purpose": "Dev diagnostic for audio_codec_plan.json amendment v2: resampling and decoding paths",
+  "utterances": {
+    "file": "paper_results/audio_heuristics_dev/subsample.csv",
+    "selection": "first 150 bona fide rows",
+    "n": 150
+  },
+  "checkpoint": "checkpoints/audio_lcnn_asvspoof_lfcc_seed2.pt",
+  "checkpoint_sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3",
+  "rule": {
+    "flagged_at_or_above": 0.5769953311686985
+  },
+  "paths": {
+    "original": {
+      "bonafide_flagged_rate": 0.0,
+      "median_probability": 1.4654110576256646e-10
+    },
+    "up48_soxr_down": {
+      "bonafide_flagged_rate": 0.9733333333333334,
+      "median_probability": 0.9989949045389841
+    },
+    "up48_ffmpeg_down": {
+      "bonafide_flagged_rate": 0.7866666666666666,
+      "median_probability": 0.9854236559482517
+    },
+    "opus_libsndfile_soxr": {
+      "bonafide_flagged_rate": 0.0,
+      "median_probability": 1.0902335786068575e-09
+    },
+    "opus_ffmpeg": {
+      "bonafide_flagged_rate": 0.37333333333333335,
+      "median_probability": 0.11928447987291611
+    }
+  },
+  "provenance": {
+    "git_commit": "228135f795d083de38925d6305458399d6ad657f",
+    "git_branch": "HEAD",
+    "git_dirty": false,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-24T06:40:41+00:00",
+    "command_line": [
+      "ml\\evaluation\\audio_resampling_diagnostic.py"
+    ],
+    "manifest": "paper_results/audio_heuristics_dev/subsample.csv",
+    "manifest_sha256": "41999cf21b8b54267de0007a0e986bbf0e4da7b7bab1ee0505f5e3eae3e31557",
+    "seeds": null
+  }
+}

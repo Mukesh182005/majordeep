@@ -90,12 +90,16 @@ def build_config(calibration_file: Path = CALIBRATION_FILE, heuristics_file: Pat
     with open(dev_file, newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
     labels = np.array([int(r["label"]) for r in rows])
-    mean_logit = -np.array([float(r["score"]) for r in rows])
+    # Phase 2 score files hold the CM score (-mean logit); the codec selection writes the mean logit itself.
+    mean_logit = np.array([float(r["mean_spoof_logit"]) if "mean_spoof_logit" in r else -float(r["score"])
+                           for r in rows])
     a, b = float(calibration["a"]), float(calibration["b"])
     probabilities = 1.0 / (1.0 + np.exp(-(a * mean_logit + b)))
 
     return {
-        "purpose": "Phase 3 task 6: the audio verdict rule in AUDIO_MODEL_SOURCE=lcnn_asvspoof mode, fixed on dev only",
+        "purpose": ("Phase 3 task 6: the audio verdict rule in AUDIO_MODEL_SOURCE=lcnn_asvspoof mode, fixed on dev only"
+                    if calibration_file == CALIBRATION_FILE else
+                    f"The audio verdict rule for the model in {_rel(calibration_file)}, fixed on dev only"),
         "audio_model_source": "lcnn_asvspoof",
         "checkpoint": calibration["checkpoint"],
         "checkpoint_sha256": calibration["checkpoint_sha256"],
@@ -104,7 +108,7 @@ def build_config(calibration_file: Path = CALIBRATION_FILE, heuristics_file: Pat
         "heuristics_rule": f"weight > 0 only if the bootstrap 95% AUC lower bound on the balanced dev subsample exceeds {AUC_LOWER_BOUND_RULE}",
         "heuristics_excluded": excluded,
         "threshold": threshold,
-        "threshold_rule": "calibrated spoof probability at the dev EER operating point (audio_calibration.json dev_diagnostics)",
+        "threshold_rule": f"calibrated spoof probability at the dev EER operating point ({calibration_file.name} dev_diagnostics)",
         "inconclusive_band": UNCERTAIN_BAND,
         "band_rule": "the platform default UNCERTAIN_BAND, fixed in advance for every modality; not tuned on audio",
         "authentic_below": low,
@@ -113,6 +117,7 @@ def build_config(calibration_file: Path = CALIBRATION_FILE, heuristics_file: Pat
                           f"p >= {high:.4f}, inconclusive otherwise; heuristic signals carry no weight"),
         "dev_verdict_rates_information_only": {
             "source": _rel(dev_file),
+            "splits": calibration["fit_data"].get("splits", ["dev"]),
             "note": "dev holds only the training attacks A01-A06 and was used for selection and calibration, so these rates are optimistic",
             **verdict_rates(probabilities, labels, low, high),
         },
@@ -128,11 +133,12 @@ def build_config(calibration_file: Path = CALIBRATION_FILE, heuristics_file: Pat
 def main(argv: list[str] | None = None) -> dict:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--calibration-file", type=Path, default=CALIBRATION_FILE)
     parser.add_argument("--replace-reason", default="")
     args = parser.parse_args(argv)
     if args.output.is_file() and not args.replace_reason:
         raise SystemExit(f"{args.output.name} is already frozen; pass --replace-reason to replace it.")
-    config = build_config()
+    config = build_config(args.calibration_file)
     if args.replace_reason:
         config["replaces_previous_because"] = args.replace_reason
     args.output.parent.mkdir(parents=True, exist_ok=True)

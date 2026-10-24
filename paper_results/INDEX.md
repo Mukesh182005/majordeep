@@ -67,3 +67,26 @@ value that no file contains.
 | Re-run lfcc_seed2 vs recorded audio_lcnn_asvspoof_lfcc_seed2: per-utterance dev scores byte-identical | yes | ``paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2/comparison.json`` | ``dev_scores.byte_identical`` | 3 |
 | Re-run lfcc_seed2 vs recorded audio_lcnn_asvspoof_lfcc_seed2: checkpoint weights bit-identical | yes | ``paper_results/audio_asvspoof2019la/repro_runs/lfcc_seed2/comparison.json`` | ``weights.bit_identical`` | 3 |
 <!-- end:audio_lcnn_repro -->
+<!-- begin:audio_end_to_end_eval -->
+| Audio LA eval end to end, bona fide: authentic (n=2,002) | 99.8% [99.5, 99.9] (1,998/2,002) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `classes.bonafide.authentic.rate` | 3 |
+| Audio LA eval end to end, bona fide: inconclusive (n=2,002) | 0.0% [0.0, 0.2] (0/2,002) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `classes.bonafide.inconclusive.rate` | 3 |
+| Audio LA eval end to end, bona fide: flagged (n=2,002) | 0.2% [0.1, 0.5] (4/2,002) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `classes.bonafide.flagged.rate` | 3 |
+| Audio LA eval end to end, spoofed: authentic (n=2,002) | 13.1% [11.7, 14.6] (262/2,002) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `classes.spoof.authentic.rate` | 3 |
+| Audio LA eval end to end, spoofed: inconclusive (n=2,002) | 1.3% [0.9, 2.0] (27/2,002) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `classes.spoof.inconclusive.rate` | 3 |
+| Audio LA eval end to end, spoofed: flagged (n=2,002) | 85.6% [84.0, 87.0] (1,713/2,002) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `classes.spoof.flagged.rate` | 3 |
+| Audio LA eval end to end, A07: flagged | 99.4% [96.4, 99.9] (153/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A07.flagged.rate` | 3 |
+| Audio LA eval end to end, A08: flagged | 95.5% [90.9, 97.8] (147/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A08.flagged.rate` | 3 |
+| Audio LA eval end to end, A09: flagged | 100.0% [97.6, 100.0] (154/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A09.flagged.rate` | 3 |
+| Audio LA eval end to end, A10: flagged | 99.4% [96.4, 99.9] (153/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A10.flagged.rate` | 3 |
+| Audio LA eval end to end, A11: flagged | 99.4% [96.4, 99.9] (153/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A11.flagged.rate` | 3 |
+| Audio LA eval end to end, A12: flagged | 100.0% [97.6, 100.0] (154/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A12.flagged.rate` | 3 |
+| Audio LA eval end to end, A13: flagged | 100.0% [97.6, 100.0] (154/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A13.flagged.rate` | 3 |
+| Audio LA eval end to end, A14: flagged | 86.4% [80.1, 90.9] (133/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A14.flagged.rate` | 3 |
+| Audio LA eval end to end, A15: flagged | 83.8% [77.1, 88.8] (129/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A15.flagged.rate` | 3 |
+| Audio LA eval end to end, A16: flagged | 97.4% [93.5, 99.0] (150/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A16.flagged.rate` | 3 |
+| Audio LA eval end to end, A17: flagged | 5.2% [2.7, 9.9] (8/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A17.flagged.rate` | 3 |
+| Audio LA eval end to end, A18: flagged | 74.0% [66.6, 80.3] (114/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A18.flagged.rate` | 3 |
+| Audio LA eval end to end, A19: flagged | 72.1% [64.5, 78.6] (111/154) | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `per_attack.A19.flagged.rate` | 3 |
+| Audio LA eval end to end: AUC of the API probability (rounded to 4 decimals) | 0.9734 [0.9686, 0.9782] | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `auc_fake_probability.auc, .ci95` | 3 |
+| Audio LA eval end to end: AUC of the unrounded LCNN probability | 0.9859 [0.9823, 0.9892] | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `auc_lcnn_probability_unrounded.auc, .ci95` | 3 |
+<!-- end:audio_end_to_end_eval -->

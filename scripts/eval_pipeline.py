@@ -286,14 +286,22 @@ def verdict_rates(rows: list[dict], n_resamples: int = 2000, seed: int = 0) -> d
     spoof = [r for r in rows if int(r["label"]) == 1]
     scored = [r for r in rows if not r.get("error")]
     labels = np.array([int(r["label"]) for r in scored])
-    summary = {
+    summary: dict = {
         "classes": {"bonafide": group_rates(bona), "spoof": group_rates(spoof)},
         "per_attack": {a: group_rates(r for r in spoof if r["attack_id"] == a)
                        for a in sorted({r["attack_id"] for r in spoof})},
     }
     if labels.size and 0 < labels.sum() < labels.size:
+        # fake_probability is what the API returns, rounded to 4 decimals, so many
+        # utterances tie at 0 or 1; the unrounded LCNN probability ranks them all.
         probs = np.array([float(r["fake_probability"]) for r in scored])
         summary["auc_fake_probability"] = bootstrap_auc_ci(labels, probs, n_resamples=n_resamples, seed=seed)
+        summary["fake_probability_ties"] = {"at_0": int((probs == 0).sum()), "at_1": int((probs == 1).sum()),
+                                            "distinct_values": int(np.unique(probs).size)}
+        if all(r.get("lcnn_probability") not in (None, "") for r in scored):
+            lcnn = np.array([float(r["lcnn_probability"]) for r in scored])
+            summary["auc_lcnn_probability_unrounded"] = bootstrap_auc_ci(labels, lcnn, n_resamples=n_resamples,
+                                                                         seed=seed)
     return summary
 
 
@@ -312,11 +320,13 @@ def index_rows(summary: dict, file: str) -> list[tuple[str, str, str, str, str]]
     for attack, entry in summary["per_attack"].items():
         rows.append((f"Audio LA eval end to end, {attack}: flagged", _pct(entry["flagged"]), file,
                      f"per_attack.{attack}.flagged.rate", "3"))
-    auc = summary.get("auc_fake_probability")
-    if auc:
-        rows.append(("Audio LA eval end to end: AUC of the final probability",
-                     f"{auc['auc']:.4f} [{auc['ci95'][0]:.4f}, {auc['ci95'][1]:.4f}]", file,
-                     "auc_fake_probability.auc, .ci95", "3"))
+    for key, item in (("auc_fake_probability", "AUC of the API probability (rounded to 4 decimals)"),
+                      ("auc_lcnn_probability_unrounded", "AUC of the unrounded LCNN probability")):
+        auc = summary.get(key)
+        if auc:
+            rows.append((f"Audio LA eval end to end: {item}",
+                         f"{auc['auc']:.4f} [{auc['ci95'][0]:.4f}, {auc['ci95'][1]:.4f}]", file,
+                         f"{key}.auc, .ci95", "3"))
     return rows
 
 
@@ -398,7 +408,9 @@ def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure
         update_index_section(INDEX_SECTION, index_rows(summary, _rel(rates_path)), index or INDEX)
         audio["asvspoof2019_la_eval"] = {"status": "done", "source": _rel(rates_path), "figure": _rel(figure),
                                          **{k: summary[k] for k in ("sample", "rule", "inference", "classes",
-                                                                    "per_attack", "auc_fake_probability")
+                                                                    "per_attack", "auc_fake_probability",
+                                                                    "fake_probability_ties",
+                                                                    "auc_lcnn_probability_unrounded")
                                             if k in summary}}
     else:
         audio["asvspoof2019_la_eval"] = {"status": "not_run",

@@ -1,0 +1,585 @@
+{
+  "audio": {
+    "in_the_wild": {
+      "status": "not_run",
+      "reason": "Not run: the In-the-Wild licence is unresolved (Apache 2.0 on one page, CC BY-SA 4.0 on another); ml/preprocessing/build_in_the_wild.py refuses to run without --licence-confirmed."
+    },
+    "asvspoof2019_la_eval": {
+      "status": "done",
+      "source": "paper_results/audio_end_to_end_eval/verdict_rates.json",
+      "figure": "results/figures/audio_pipeline_verdicts.png",
+      "sample": {
+        "split": "eval",
+        "seed": 0,
+        "size": 4004,
+        "bonafide": 2002,
+        "per_attack": 154,
+        "attacks": [
+          "A07",
+          "A08",
+          "A09",
+          "A10",
+          "A11",
+          "A12",
+          "A13",
+          "A14",
+          "A15",
+          "A16",
+          "A17",
+          "A18",
+          "A19"
+        ],
+        "sample_sha256": "e055c250d1eecd2deaa859395a5cd2705110087e5715cf5011dc9924de6eee20"
+      },
+      "rule": {
+        "file": "paper/config/frozen_audio_config.json",
+        "sha256": "6e3ed73e62d99d84459b41dc92c7ff300c9cd142c327a3b732af1f2a05f7b173",
+        "authentic_below": 0.4169953311686985,
+        "flagged_at_or_above": 0.5769953311686985,
+        "decision_rule": "LCNN spoof probability p: authentic if p < 0.4170, flagged (AI-generated) if p >= 0.5770, inconclusive otherwise; heuristic signals carry no weight"
+      },
+      "inference": "LCNN in strict float32 (TF32 off, deterministic cuDNN); the Phase 2 eval_scores.csv were computed with cuDNN TF32 on, so LCNN probabilities may differ slightly from them",
+      "classes": {
+        "bonafide": {
+          "n": 2002,
+          "errors": 0,
+          "authentic": {
+            "k": 1998,
+            "n": 2002,
+            "rate": 0.998001998001998,
+            "ci95": [
+              0.9948737628684935,
+              0.9992227502090373
+            ]
+          },
+          "inconclusive": {
+            "k": 0,
+            "n": 2002,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.001915135816842003
+            ]
+          },
+          "flagged": {
+            "k": 4,
+            "n": 2002,
+            "rate": 0.001998001998001998,
+            "ci95": [
+              0.0007772497909626099,
+              0.005126237131506398
+            ]
+          }
+        },
+        "spoof": {
+          "n": 2002,
+          "errors": 0,
+          "authentic": {
+            "k": 262,
+            "n": 2002,
+            "rate": 0.13086913086913088,
+            "ci95": [
+              0.1168000081083427,
+              0.1463521251270681
+            ]
+          },
+          "inconclusive": {
+            "k": 27,
+            "n": 2002,
+            "rate": 0.013486513486513486,
+            "ci95": [
+              0.009285192705492905,
+              0.01955131307433138
+            ]
+          },
+          "flagged": {
+            "k": 1713,
+            "n": 2002,
+            "rate": 0.8556443556443556,
+            "ci95": [
+              0.8395679272112376,
+              0.8703585695903692
+            ]
+          }
+        }
+      },
+      "per_attack": {
+        "A07": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 1,
+            "n": 154,
+            "rate": 0.006493506493506494,
+            "ci95": [
+              0.0011471844874949774,
+              0.035861209025453665
+            ]
+          },
+          "inconclusive": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "flagged": {
+            "k": 153,
+            "n": 154,
+            "rate": 0.9935064935064936,
+            "ci95": [
+              0.9641387909745465,
+              0.9988528155125052
+            ]
+          }
+        },
+        "A08": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 5,
+            "n": 154,
+            "rate": 0.032467532467532464,
+            "ci95": [
+              0.01394636101001754,
+              0.07374580126540747
+            ]
+          },
+          "inconclusive": {
+            "k": 2,
+            "n": 154,
+            "rate": 0.012987012987012988,
+            "ci95": [
+              0.003568762647733807,
+              0.04611057305583393
+            ]
+          },
+          "flagged": {
+            "k": 147,
+            "n": 154,
+            "rate": 0.9545454545454546,
+            "ci95": [
+              0.909155987089836,
+              0.9778099662535009
+            ]
+          }
+        },
+        "A09": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "inconclusive": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "flagged": {
+            "k": 154,
+            "n": 154,
+            "rate": 1.0,
+            "ci95": [
+              0.9756625486776705,
+              1.0
+            ]
+          }
+        },
+        "A10": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 1,
+            "n": 154,
+            "rate": 0.006493506493506494,
+            "ci95": [
+              0.0011471844874949774,
+              0.035861209025453665
+            ]
+          },
+          "inconclusive": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "flagged": {
+            "k": 153,
+            "n": 154,
+            "rate": 0.9935064935064936,
+            "ci95": [
+              0.9641387909745465,
+              0.9988528155125052
+            ]
+          }
+        },
+        "A11": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 1,
+            "n": 154,
+            "rate": 0.006493506493506494,
+            "ci95": [
+              0.0011471844874949774,
+              0.035861209025453665
+            ]
+          },
+          "inconclusive": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "flagged": {
+            "k": 153,
+            "n": 154,
+            "rate": 0.9935064935064936,
+            "ci95": [
+              0.9641387909745465,
+              0.9988528155125052
+            ]
+          }
+        },
+        "A12": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "inconclusive": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "flagged": {
+            "k": 154,
+            "n": 154,
+            "rate": 1.0,
+            "ci95": [
+              0.9756625486776705,
+              1.0
+            ]
+          }
+        },
+        "A13": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "inconclusive": {
+            "k": 0,
+            "n": 154,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.024337451322329538
+            ]
+          },
+          "flagged": {
+            "k": 154,
+            "n": 154,
+            "rate": 1.0,
+            "ci95": [
+              0.9756625486776705,
+              1.0
+            ]
+          }
+        },
+        "A14": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 15,
+            "n": 154,
+            "rate": 0.09740259740259741,
+            "ci95": [
+              0.05991824014917512,
+              0.15448334403244088
+            ]
+          },
+          "inconclusive": {
+            "k": 6,
+            "n": 154,
+            "rate": 0.03896103896103896,
+            "ci95": [
+              0.017976444448228483,
+              0.08238666001781564
+            ]
+          },
+          "flagged": {
+            "k": 133,
+            "n": 154,
+            "rate": 0.8636363636363636,
+            "ci95": [
+              0.8005230453192604,
+              0.9090497173554091
+            ]
+          }
+        },
+        "A15": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 21,
+            "n": 154,
+            "rate": 0.13636363636363635,
+            "ci95": [
+              0.09095028264459093,
+              0.19947695468073967
+            ]
+          },
+          "inconclusive": {
+            "k": 4,
+            "n": 154,
+            "rate": 0.025974025974025976,
+            "ci95": [
+              0.010146123885996193,
+              0.06487509619880974
+            ]
+          },
+          "flagged": {
+            "k": 129,
+            "n": 154,
+            "rate": 0.8376623376623377,
+            "ci95": [
+              0.7713321881648479,
+              0.8875568057473452
+            ]
+          }
+        },
+        "A16": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 2,
+            "n": 154,
+            "rate": 0.012987012987012988,
+            "ci95": [
+              0.003568762647733807,
+              0.04611057305583393
+            ]
+          },
+          "inconclusive": {
+            "k": 2,
+            "n": 154,
+            "rate": 0.012987012987012988,
+            "ci95": [
+              0.003568762647733807,
+              0.04611057305583393
+            ]
+          },
+          "flagged": {
+            "k": 150,
+            "n": 154,
+            "rate": 0.974025974025974,
+            "ci95": [
+              0.9351249038011903,
+              0.9898538761140038
+            ]
+          }
+        },
+        "A17": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 144,
+            "n": 154,
+            "rate": 0.935064935064935,
+            "ci95": [
+              0.8846036752492296,
+              0.96434945152225
+            ]
+          },
+          "inconclusive": {
+            "k": 2,
+            "n": 154,
+            "rate": 0.012987012987012988,
+            "ci95": [
+              0.003568762647733807,
+              0.04611057305583393
+            ]
+          },
+          "flagged": {
+            "k": 8,
+            "n": 154,
+            "rate": 0.05194805194805195,
+            "ci95": [
+              0.026554932485162885,
+              0.09915005636211943
+            ]
+          }
+        },
+        "A18": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 32,
+            "n": 154,
+            "rate": 0.2077922077922078,
+            "ci95": [
+              0.1512102004161851,
+              0.27859740100595565
+            ]
+          },
+          "inconclusive": {
+            "k": 8,
+            "n": 154,
+            "rate": 0.05194805194805195,
+            "ci95": [
+              0.026554932485162885,
+              0.09915005636211943
+            ]
+          },
+          "flagged": {
+            "k": 114,
+            "n": 154,
+            "rate": 0.7402597402597403,
+            "ci95": [
+              0.6657561799445755,
+              0.8030686811083312
+            ]
+          }
+        },
+        "A19": {
+          "n": 154,
+          "errors": 0,
+          "authentic": {
+            "k": 40,
+            "n": 154,
+            "rate": 0.2597402597402597,
+            "ci95": [
+              0.1969313188916689,
+              0.3342438200554245
+            ]
+          },
+          "inconclusive": {
+            "k": 3,
+            "n": 154,
+            "rate": 0.01948051948051948,
+            "ci95": [
+              0.0066469004432945025,
+              0.05570337745089233
+            ]
+          },
+          "flagged": {
+            "k": 111,
+            "n": 154,
+            "rate": 0.7207792207792207,
+            "ci95": [
+              0.6452138349372998,
+              0.7855981995437495
+            ]
+          }
+        }
+      },
+      "auc_fake_probability": {
+        "auc": 0.9734487540431596,
+        "ci95": [
+          0.9685895554245953,
+          0.9782004053638669
+        ],
+        "n_resamples": 2000,
+        "seed": 0,
+        "n_pos": 2002,
+        "n_neg": 2002
+      },
+      "fake_probability_ties": {
+        "at_0": 2024,
+        "at_1": 442,
+        "distinct_values": 502
+      },
+      "auc_lcnn_probability_unrounded": {
+        "auc": 0.9858939761537164,
+        "ci95": [
+          0.982307278136449,
+          0.9891904424247082
+        ],
+        "n_resamples": 2000,
+        "seed": 0,
+        "n_pos": 2002,
+        "n_neg": 2002
+      }
+    }
+  },
+  "video": {
+    "faceforensics_c23_test": {
+      "status": "not_run",
+      "reason": "Not run: FaceForensics++ (c23) is not on this machine (access not yet granted)."
+    },
+    "celeb_df_v2_test": {
+      "status": "not_run",
+      "reason": "Not run: Celeb-DF v2 is not on this machine (access not yet granted)."
+    }
+  },
+  "provenance": {
+    "git_commit": "51ed0e9e63d4f2028542e73d247a5a6f6d38b7a1",
+    "git_branch": "eval/reproducible",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-24T06:03:44+00:00",
+    "command_line": [
+      "scripts/eval_pipeline.py",
+      "summarise"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": null
+  }
+}

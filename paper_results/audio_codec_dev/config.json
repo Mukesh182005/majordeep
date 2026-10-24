@@ -1,0 +1,81 @@
+{
+  "runs": [
+    {
+      "checkpoints": [
+        {
+          "name": "audio_lcnn_asvspoof_lfcc_seed2.pt",
+          "sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3"
+        }
+      ],
+      "n_utterances": 2000,
+      "provenance": {
+        "git_commit": "228135f795d083de38925d6305458399d6ad657f",
+        "git_branch": "HEAD",
+        "git_dirty": false,
+        "python": "3.11.9",
+        "platform": "Windows-10-10.0.26200-SP0",
+        "torch": "2.12.0.dev20260408+cu128",
+        "cuda_build": "12.8",
+        "cuda_available": true,
+        "gpu_name": "NVIDIA GeForce RTX 5070",
+        "cudnn_allow_tf32": true,
+        "matmul_allow_tf32": false,
+        "libraries": {
+          "numpy": "1.26.4",
+          "scipy": "1.17.1",
+          "scikit-learn": "1.9.1",
+          "torch": "2.12.0.dev20260408+cu128",
+          "torchvision": "0.27.0.dev20260407+cu128",
+          "torchaudio": null,
+          "transformers": "5.16.1",
+          "timm": null,
+          "librosa": "0.11.0",
+          "soundfile": "0.14.0",
+          "Pillow": "12.3.0",
+          "opencv-python-headless": "4.10.0.84"
+        },
+        "utc_time": "2026-10-24T06:43:55+00:00",
+        "command_line": [
+          "ml\\evaluation\\audio_codec_dev.py",
+          "score",
+          "--checkpoint",
+          "checkpoints\\audio_lcnn_asvspoof_lfcc_seed2.pt",
+          "--output-dir",
+          "C:\\Users\\STUDENT\\AppData\\Local\\Temp\\claude\\c--Users-STUDENT-Desktop-deepfake-deepfake\\ba3589bd-6751-43b7-b33a-3506f2135bce\\scratchpad\\codec-dev2",
+          "--workers",
+          "16",
+          "--threads",
+          "1"
+        ],
+        "manifest": "manifest.csv",
+        "manifest_sha256": "70d113db4362c52c68be2448d7b3c76ed42d3d064ac9eb0807a27155b104bc31",
+        "seeds": null
+      }
+    }
+  ],
+  "purpose": "Codec robustness on ASVspoof 2019 LA dev (paper/config/audio_codec_plan.json)",
+  "subsample": {
+    "file": "paper_results/audio_heuristics_dev/subsample.csv",
+    "sha256": "41999cf21b8b54267de0007a0e986bbf0e4da7b7bab1ee0505f5e3eae3e31557",
+    "size": 2000
+  },
+  "conditions": [
+    "original",
+    "mp3_32k",
+    "mp3_64k",
+    "mp3_96k",
+    "mp3_128k",
+    "aac_32k",
+    "aac_64k",
+    "aac_96k",
+    "opus_16k",
+    "opus_24k",
+    "opus_32k",
+    "opus_48k",
+    "resample_22k",
+    "resample_44k",
+    "resample_48k",
+    "resample_48k_ffmpeg"
+  ],
+  "scoring": "utterance_lfcc (as served), CPU strict float32, mean window spoof logit"
+}

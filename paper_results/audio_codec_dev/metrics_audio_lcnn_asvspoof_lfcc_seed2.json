@@ -1,0 +1,160 @@
+{
+  "checkpoint": "audio_lcnn_asvspoof_lfcc_seed2.pt",
+  "conditions": {
+    "original": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.003,
+      "auc": 0.9999600000000001,
+      "bonafide_flagged_rate": 0.002,
+      "bonafide_authentic_rate": 0.997,
+      "spoof_flagged_rate": 0.997
+    },
+    "mp3_32k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.222,
+      "auc": 0.859785,
+      "bonafide_flagged_rate": 1.0,
+      "bonafide_authentic_rate": 0.0,
+      "spoof_flagged_rate": 1.0
+    },
+    "mp3_64k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.223,
+      "auc": 0.8578040000000001,
+      "bonafide_flagged_rate": 1.0,
+      "bonafide_authentic_rate": 0.0,
+      "spoof_flagged_rate": 1.0
+    },
+    "mp3_96k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.216,
+      "auc": 0.8661169999999998,
+      "bonafide_flagged_rate": 1.0,
+      "bonafide_authentic_rate": 0.0,
+      "spoof_flagged_rate": 1.0
+    },
+    "mp3_128k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.219,
+      "auc": 0.8679530000000001,
+      "bonafide_flagged_rate": 1.0,
+      "bonafide_authentic_rate": 0.0,
+      "spoof_flagged_rate": 1.0
+    },
+    "aac_32k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.006,
+      "auc": 0.999854,
+      "bonafide_flagged_rate": 0.001,
+      "bonafide_authentic_rate": 0.999,
+      "spoof_flagged_rate": 0.983
+    },
+    "aac_64k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.004,
+      "auc": 0.99993,
+      "bonafide_flagged_rate": 0.002,
+      "bonafide_authentic_rate": 0.996,
+      "spoof_flagged_rate": 0.995
+    },
+    "aac_96k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.004,
+      "auc": 0.99992,
+      "bonafide_flagged_rate": 0.001,
+      "bonafide_authentic_rate": 0.997,
+      "spoof_flagged_rate": 0.995
+    },
+    "opus_16k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.077,
+      "auc": 0.9781970000000001,
+      "bonafide_flagged_rate": 0.755,
+      "bonafide_authentic_rate": 0.206,
+      "spoof_flagged_rate": 1.0
+    },
+    "opus_24k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.049,
+      "auc": 0.99009,
+      "bonafide_flagged_rate": 0.64,
+      "bonafide_authentic_rate": 0.325,
+      "spoof_flagged_rate": 1.0
+    },
+    "opus_32k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.041,
+      "auc": 0.9905240000000001,
+      "bonafide_flagged_rate": 0.631,
+      "bonafide_authentic_rate": 0.335,
+      "spoof_flagged_rate": 1.0
+    },
+    "opus_48k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.042,
+      "auc": 0.9911710000000002,
+      "bonafide_flagged_rate": 0.644,
+      "bonafide_authentic_rate": 0.328,
+      "spoof_flagged_rate": 1.0
+    },
+    "resample_22k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.159,
+      "auc": 0.921853,
+      "bonafide_flagged_rate": 0.98,
+      "bonafide_authentic_rate": 0.018,
+      "spoof_flagged_rate": 1.0
+    },
+    "resample_44k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.158,
+      "auc": 0.921907,
+      "bonafide_flagged_rate": 0.98,
+      "bonafide_authentic_rate": 0.018,
+      "spoof_flagged_rate": 1.0
+    },
+    "resample_48k": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.162,
+      "auc": 0.919969,
+      "bonafide_flagged_rate": 0.98,
+      "bonafide_authentic_rate": 0.018,
+      "spoof_flagged_rate": 1.0
+    },
+    "resample_48k_ffmpeg": {
+      "n": 2000,
+      "errors": 0,
+      "eer": 0.06,
+      "auc": 0.980129,
+      "bonafide_flagged_rate": 0.669,
+      "bonafide_authentic_rate": 0.307,
+      "spoof_flagged_rate": 1.0
+    }
+  },
+  "guard": {
+    "rule": "a codec family is guarded if any of its conditions flags more than 5% of bona fide dev utterances under the frozen rule",
+    "families": {
+      "aac": false,
+      "mp3": true,
+      "opus": true,
+      "resample": true
+    }
+  },
+  "calibration_file": "paper/config/audio_calibration.json",
+  "frozen_file": "paper/config/frozen_audio_config.json"
+}

@@ -118,9 +118,15 @@ def utterance_features(waveform: np.ndarray, frontends: list[str]) -> dict[str, 
     return out
 
 
-def _worker(task: tuple[str, list[str]]) -> dict[str, np.ndarray]:
-    path, frontends = task
-    return utterance_features(load_waveform(Path(path)), frontends)
+def _worker(task: tuple) -> dict[str, np.ndarray]:
+    """(path, frontends) for the file as distributed; (path, frontends, condition, num_samples) re-encoded."""
+    if len(task) == 2:
+        path, frontends = task
+        return utterance_features(load_waveform(Path(path)), frontends)
+    from ml.preprocessing.audio_codecs import encode_decode
+
+    path, frontends, condition, num_samples = task
+    return utterance_features(encode_decode(Path(path), condition, num_samples), frontends)
 
 
 # --------------------------------------------------------------------------- cache
@@ -150,14 +156,27 @@ def build_cache(
     workers: int = 8,
     manifest_sha256: str | None = None,
     flush_every: int = 2000,
+    codec_seed: int | None = None,
 ) -> None:
-    """Extract (or resume extracting) one split's features for each front end."""
+    """Extract (or resume extracting) one split's features for each front end.
+
+    With ``codec_seed`` every utterance is re-encoded with one condition of
+    ``ml/preprocessing/audio_codecs.py`` (seeded per utterance id) and cached as
+    ``<split>_codec``, next to the original cache, with ``<split>_codec_conditions.csv``.
+    """
     from multiprocessing import Pool
 
     rows = [r for r in rows if r["split"] == split]
     if not rows:
         print(f"[{split}] no rows; skipped")
         return
+    conditions: list[str] | None = None
+    if codec_seed is not None:
+        from ml.preprocessing.audio_codecs import CODEC_CONDITIONS, assign_condition
+
+        names = list(CODEC_CONDITIONS)
+        conditions = [assign_condition(r["utt_id"], codec_seed, names) for r in rows]
+        split = f"{split}_codec"
 
     arrays: dict[str, np.memmap] = {}
     start = len(rows)
@@ -169,11 +188,17 @@ def build_cache(
         array_path = frontend_dir / f"{split}.npy"
         progress_path = _progress_path(frontend_dir, split)
         progress = json.loads(progress_path.read_text()) if progress_path.exists() else None
+        if conditions is not None:
+            with open(frontend_dir / f"{split}_conditions.csv", "w", newline="", encoding="utf-8") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(["utt_id", "condition", "codec_seed"])
+                writer.writerows([r["utt_id"], c, codec_seed] for r, c in zip(rows, conditions))
         if (
             progress
             and array_path.exists()
             and progress.get("manifest_sha256") == manifest_sha256
             and progress.get("utterances") == len(rows)
+            and progress.get("codec_seed") == codec_seed
         ):
             arrays[name] = np.lib.format.open_memmap(array_path, mode="r+")
             if arrays[name].shape != shape:
@@ -183,31 +208,37 @@ def build_cache(
             arrays[name] = np.lib.format.open_memmap(array_path, mode="w+", dtype=CACHE_DTYPE, shape=shape)
             done = 0
         start = min(start, done)
-        (frontend_dir / "frontend.json").write_text(
-            json.dumps(
-                {
-                    "frontend": name,
-                    **FRONTENDS[name],
-                    "sample_rate": SAMPLE_RATE,
-                    "window_samples": WINDOW_SAMPLES,
-                    "frames_per_window": FRAMES_PER_WINDOW,
-                    "window_rule": "<=4 s: repeat to 4 s; >4 s: consecutive 4 s windows + last 4 s if remainder",
-                    "training_input": "window 0 (first 4 s, repeated if short)",
-                    "evaluation": "mean of per-window logits",
-                    "cache_dtype": str(np.dtype(CACHE_DTYPE)),
-                    "manifest_sha256": manifest_sha256,
-                },
-                indent=2,
-            ),
-            encoding="utf-8",
-        )
+        # frontend.json describes the front end; the re-encoded cache shares it.
+        if conditions is None:
+            (frontend_dir / "frontend.json").write_text(
+                json.dumps(
+                    {
+                        "frontend": name,
+                        **FRONTENDS[name],
+                        "sample_rate": SAMPLE_RATE,
+                        "window_samples": WINDOW_SAMPLES,
+                        "frames_per_window": FRAMES_PER_WINDOW,
+                        "window_rule": "<=4 s: repeat to 4 s; >4 s: consecutive 4 s windows + last 4 s if remainder",
+                        "training_input": "window 0 (first 4 s, repeated if short)",
+                        "evaluation": "mean of per-window logits",
+                        "cache_dtype": str(np.dtype(CACHE_DTYPE)),
+                        "manifest_sha256": manifest_sha256,
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
 
     if start >= len(rows):
         print(f"[{split}] {', '.join(frontends)}: already complete ({len(rows):,} utterances)")
         return
 
     starts = np.cumsum([0] + [window_count(int(r["num_samples"])) for r in rows])
-    tasks = [(str(la_root / r["relative_path"]), frontends) for r in rows[start:]]
+    if conditions is None:
+        tasks = [(str(la_root / r["relative_path"]), frontends) for r in rows[start:]]
+    else:
+        tasks = [(str(la_root / r["relative_path"]), frontends, c, int(r["num_samples"]))
+                 for r, c in zip(rows[start:], conditions[start:])]
     print(f"[{split}] {', '.join(frontends)}: {len(rows) - start:,} of {len(rows):,} utterances to do "
           f"(resuming at {start:,}) with {workers} workers", flush=True)
 
@@ -221,6 +252,7 @@ def build_cache(
                         "utterances": len(rows),
                         "complete": done == len(rows),
                         "manifest_sha256": manifest_sha256,
+                        "codec_seed": codec_seed,
                     }
                 ),
                 encoding="utf-8",
@@ -261,6 +293,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--features", nargs="+", choices=sorted(FRONTENDS), default=["logmel", "lfcc"])
     parser.add_argument("--splits", nargs="+", choices=["train", "dev", "eval"], default=["train", "dev", "eval"])
     parser.add_argument("--workers", type=int, default=min(16, os.cpu_count() or 4))
+    parser.add_argument("--codec-seed", type=int, default=None,
+                        help="re-encode each utterance with one seeded codec condition; cached as <split>_codec")
     return parser.parse_args()
 
 
@@ -276,7 +310,8 @@ def main() -> None:
     rows = read_manifest(args.manifest)
     manifest_sha = sha256_file(args.manifest)
     for split in args.splits:
-        build_cache(rows, args.asvspoof_root, features_dir, split, args.features, args.workers, manifest_sha)
+        build_cache(rows, args.asvspoof_root, features_dir, split, args.features, args.workers, manifest_sha,
+                    codec_seed=args.codec_seed)
     print(f"Features in {features_dir}")
 
 

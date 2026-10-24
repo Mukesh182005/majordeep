@@ -81,6 +81,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train-limit", type=int, default=None, help="random subset of train (smoke tests only)")
     parser.add_argument("--device", default=None)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--extra-train-splits", nargs="*", default=[],
+                        help="further cached splits of the same utterances to train on, e.g. train_codec")
+    parser.add_argument("--dev-splits", nargs="+", default=["dev"],
+                        help="cached dev splits; the selection EER is pooled over all of them")
+    parser.add_argument("--tag", default="", help="inserted into the run name, e.g. _codec")
     return parser.parse_args()
 
 
@@ -125,7 +130,7 @@ def main() -> None:
     from ml.training.engine import _format_duration, _run_epoch
 
     args = parse_args()
-    name = f"audio_lcnn_asvspoof_{args.features}_seed{args.seed}"
+    name = f"audio_lcnn_asvspoof_{args.features}{args.tag}_seed{args.seed}"
     output = (args.output or REPO_ROOT / "checkpoints" / f"{name}.pt").resolve()
     run_dir = (args.run_dir or REPO_ROOT / "paper_results/audio_asvspoof2019la/dev_runs" / output.stem).resolve()
     last_path = run_dir / "last.pt"
@@ -145,19 +150,28 @@ def main() -> None:
     if device.type == "cuda":
         print(f"GPU: {torch.cuda.get_device_name(device)}")
 
+    from torch.utils.data import ConcatDataset
+
     train_cache = CachedSplit(args.cache, args.features, "train")
-    dev_cache = CachedSplit(args.cache, args.features, "dev")
-    if train_cache.manifest_sha256 != dev_cache.manifest_sha256:
-        raise SystemExit("train and dev caches come from different manifests")
+    extra_caches = [CachedSplit(args.cache, args.features, s) for s in args.extra_train_splits]
+    dev_caches = [CachedSplit(args.cache, args.features, s) for s in args.dev_splits]
+    dev_cache = dev_caches[0]
+    if len({c.manifest_sha256 for c in [train_cache, *extra_caches, *dev_caches]}) != 1:
+        raise SystemExit("the train and dev caches come from different manifests")
+    for extra in extra_caches:
+        if extra.utt_ids != train_cache.utt_ids:
+            raise SystemExit(f"{extra.split} does not hold the train utterances in the same order")
 
     indices = np.arange(len(train_cache))
     if args.train_limit:
         indices = np.sort(np.random.default_rng(args.seed).choice(indices, size=args.train_limit, replace=False))
-    train_set = ASVspoofTrainDataset(train_cache, indices)
-    labels = train_set.labels
+    parts = [ASVspoofTrainDataset(c, indices) for c in [train_cache, *extra_caches]]
+    train_set = parts[0] if len(parts) == 1 else ConcatDataset(parts)
+    labels = np.concatenate([part.labels for part in parts])
     n_spoof, n_bona = int(labels.sum()), int((labels == 0).sum())
-    print(f"train: {len(train_set):,} utterances ({n_bona:,} bona fide, {n_spoof:,} spoof) | "
-          f"dev: {len(dev_cache):,} utterances, {int(dev_cache.n_windows.sum()):,} windows")
+    print(f"train: {len(train_set):,} examples ({n_bona:,} bona fide, {n_spoof:,} spoof) from "
+          f"{', '.join(c.split for c in [train_cache, *extra_caches])} | dev: "
+          + ", ".join(f"{c.split} {len(c):,} utterances" for c in dev_caches))
 
     generator = torch.Generator()
     generator.manual_seed(args.seed)
@@ -174,7 +188,11 @@ def main() -> None:
         pos_weight = n_bona / n_spoof
         criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([pos_weight], device=device))
         balance_note = f"weighted BCE, pos_weight = n_bonafide / n_spoof = {pos_weight:.6f}"
-    dev_set = ASVspoofWindowDataset(dev_cache)
+    dev_sets = [ASVspoofWindowDataset(c) for c in dev_caches]
+    dev_labels = np.concatenate([c.labels for c in dev_caches])
+
+    def pooled_dev_scores() -> list[np.ndarray]:
+        return [cm_scores(c, score_split(model, s, device)) for c, s in zip(dev_caches, dev_sets)]
 
     model = build_audio_model().to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -203,11 +221,14 @@ def main() -> None:
         "amp_training": use_amp,
         "inference_dtype": "float32",
         "class_balance": balance_note,
-        "selection": "epoch with the lowest dev EER (pooled, window-averaged logits); eval split unused",
+        "selection": "epoch with the lowest dev EER (pooled over the dev splits, window-averaged logits); "
+                     "eval split unused",
+        "train_splits": [c.split for c in [train_cache, *extra_caches]],
+        "dev_splits": [c.split for c in dev_caches],
         "train_input": "window 0 of each utterance (first 4 s, repeated if shorter)",
         "train_limit": args.train_limit,
         "n_train": len(train_set),
-        "n_dev": len(dev_cache),
+        "n_dev": int(sum(len(c) for c in dev_caches)),
     }
 
     # Recorded in every checkpoint so it states what it was trained on (P2).
@@ -249,8 +270,8 @@ def main() -> None:
         train_loss = _run_epoch(model, _InputsTargets(train_loader), criterion, optimizer, scaler, device,
                                 use_amp, 5.0)
         scheduler.step()
-        dev_scores = cm_scores(dev_cache, score_split(model, dev_set, device))
-        dev_eer = eer(dev_scores[dev_cache.labels == 0], dev_scores[dev_cache.labels == 1])[0]
+        dev_scores = np.concatenate(pooled_dev_scores())
+        dev_eer = eer(dev_scores[dev_labels == 0], dev_scores[dev_labels == 1])[0]
         epoch_s = time.perf_counter() - t0
         with open(log_path, "a", newline="", encoding="utf-8") as handle:
             csv.writer(handle).writerow([epoch, f"{train_loss:.6f}", f"{dev_eer:.6f}", f"{lr:.3e}", f"{epoch_s:.1f}"])
@@ -274,7 +295,8 @@ def main() -> None:
                     "manifest_sha256": train_cache.manifest_sha256,
                     **dataset_record,
                     "score_convention": "model outputs a spoof logit; CM score = -mean window logit",
-                    "model_version": f"audio-lcnn-asvspoof2019la-{args.features}-seed{args.seed}",
+                    "model_version": f"audio-lcnn-asvspoof2019la-{args.features}{args.tag.replace('_', '-')}"
+                                     f"-seed{args.seed}",
                 },
                 output,
             )
@@ -298,11 +320,20 @@ def main() -> None:
     # Re-score dev with the selected epoch and record everything about the run.
     best = torch.load(output, map_location="cpu", weights_only=True)
     model.load_state_dict(best["state_dict"])
-    dev_scores = cm_scores(dev_cache, score_split(model, dev_set, device))
-    write_scores(run_dir / "dev_scores.csv", dev_cache, dev_scores)
+    per_split = pooled_dev_scores()
     asv, asv_note = load_asv(args.asvspoof_root, "dev")
+    for cache, scores in zip(dev_caches, per_split):
+        suffix = "" if cache.split == "dev" else "_" + cache.split.removeprefix("dev_")
+        write_scores(run_dir / f"dev{suffix}_scores.csv", cache, scores)
+    dev_scores = per_split[0]
     dev_metrics = evaluate_scores(dev_scores, dev_cache.labels, np.array(dev_cache.attack_ids), asv)
     dev_metrics["asv_scores"] = asv_note
+    if len(dev_caches) > 1:
+        pooled = np.concatenate(per_split)
+        dev_metrics["pooled"] = {"splits": [c.split for c in dev_caches],
+                                 "eer": float(eer(pooled[dev_labels == 0], pooled[dev_labels == 1])[0]),
+                                 "per_split_eer": {c.split: float(eer(s[c.labels == 0], s[c.labels == 1])[0])
+                                                   for c, s in zip(dev_caches, per_split)}}
     (run_dir / "dev_metrics.json").write_text(json.dumps(dev_metrics, indent=2, default=str), encoding="utf-8")
     run_config = {
         "run": output.stem,
@@ -310,6 +341,7 @@ def main() -> None:
         "checkpoint_sha256": sha256_file(output),
         "best_epoch": best_epoch,
         "dev_eer": dev_metrics["eer"],
+        "pooled_dev_eer": dev_metrics.get("pooled", {}).get("eer", dev_metrics["eer"]),
         "dev_min_tdcf": dev_metrics["min_tdcf"],
         "train_config": train_config,
         "feature_config": feature_config,

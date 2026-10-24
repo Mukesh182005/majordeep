@@ -117,3 +117,34 @@ def test_protected_checkpoint_names_are_refused(tmp_path):
         capture_output=True, text=True, cwd=REPO, timeout=600,
     )
     assert result.returncode != 0 and "never overwritten" in (result.stdout + result.stderr)
+
+
+def test_codec_splits_train_and_pool_dev(tmp_path):
+    pytest.importorskip("imageio_ffmpeg")
+    manifest = _fake_corpus(tmp_path)
+    cache = manifest.parent / "features"
+    rows = read_manifest(manifest)
+    for split, seed in (("train", 1), ("dev", 2)):
+        build_cache(rows, tmp_path / "LA", cache, split, ["lfcc"], workers=1,
+                    manifest_sha256=sha256_file(manifest), codec_seed=seed)
+    with open(cache / "lfcc/train_codec_conditions.csv", newline="", encoding="utf-8") as handle:
+        assigned = list(csv.DictReader(handle))
+    assert len(assigned) == 8 and {r["codec_seed"] for r in assigned} == {"1"}
+    checkpoint = tmp_path / "ckpt/audio_lcnn_asvspoof_lfcc_codec_seed0.pt"
+    run_dir = tmp_path / "run_codec"
+    env = {**os.environ, "DEEPSENTINEL_DATA": str(tmp_path / "no_data_here")}
+    result = subprocess.run(
+        [sys.executable, str(REPO / "ml/training/train_asvspoof.py"), "--features", "lfcc", "--seed", "0",
+         "--epochs", "1", "--batch-size", "4", "--device", "cpu", "--output", str(checkpoint),
+         "--run-dir", str(run_dir), "--manifest", str(manifest), "--cache", str(cache), "--tag", "_codec",
+         "--extra-train-splits", "train_codec", "--dev-splits", "dev", "dev_codec"],
+        capture_output=True, text=True, env=env, timeout=600,
+    )
+    assert result.returncode == 0, result.stderr[-2000:]
+    assert "16 examples" in result.stdout
+    metrics = json.loads((run_dir / "dev_metrics.json").read_text(encoding="utf-8"))
+    assert metrics["pooled"]["splits"] == ["dev", "dev_codec"]
+    assert (run_dir / "dev_scores.csv").is_file() and (run_dir / "dev_codec_scores.csv").is_file()
+    config = json.loads((run_dir / "run_config.json").read_text(encoding="utf-8"))
+    assert config["train_config"]["train_splits"] == ["train", "train_codec"]
+    assert config["pooled_dev_eer"] == metrics["pooled"]["eer"]

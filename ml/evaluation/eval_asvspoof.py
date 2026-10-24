@@ -105,13 +105,29 @@ def load_model(checkpoint_path: Path, device):
     return model, checkpoint
 
 
+def _git_tracked(path: Path) -> bool | None:
+    """Whether git tracks ``path`` unchanged (None when git is unavailable)."""
+    import subprocess
+
+    try:
+        listed = subprocess.run(["git", "ls-files", "--error-unmatch", str(path)], cwd=REPO_ROOT,
+                                capture_output=True, check=False)
+        changed = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", str(path)], cwd=REPO_ROOT, check=False)
+    except OSError:
+        return None
+    return listed.returncode == 0 and changed.returncode == 0
+
+
 def _eval_guard(checkpoint_sha: str, args: argparse.Namespace, log_path: Path) -> None:
     if not args.confirm_final_eval:
         raise SystemExit("Scoring the eval split is the final test: pass --confirm-final-eval.")
-    if not SELECTION_FILE.is_file():
-        raise SystemExit(f"{SELECTION_FILE.relative_to(REPO_ROOT)} not found: choose the configuration on dev "
+    selection_file = args.selection_file
+    if not selection_file.is_file():
+        raise SystemExit(f"{selection_file.name} not found: choose the configuration on dev "
                          "(ml/evaluation/select_asvspoof_frontend.py) and commit it before scoring eval.")
-    selection = json.loads(SELECTION_FILE.read_text(encoding="utf-8"))
+    if _git_tracked(selection_file) is False:
+        raise SystemExit(f"{selection_file.name} is not committed: commit the dev-based selection before eval.")
+    selection = json.loads(selection_file.read_text(encoding="utf-8"))
     selected = {c["sha256"] for c in selection.get("selected_checkpoints", [])}
     if checkpoint_sha not in selected:
         raise SystemExit("This checkpoint is not in the dev-based selection; eval scoring refused.")
@@ -128,6 +144,8 @@ def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--checkpoint", type=Path, required=True)
+    parser.add_argument("--selection-file", type=Path, default=SELECTION_FILE,
+                        help="the committed dev-based selection that must list the checkpoint")
     parser.add_argument("--split", choices=["dev", "eval"], required=True)
     parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
     parser.add_argument("--asvspoof-root", type=Path, default=default_la_root())

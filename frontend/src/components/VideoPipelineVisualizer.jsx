@@ -44,7 +44,7 @@ export const VIDEO_PHASES = [
     name: 'Audio & Attribution',
     stages: [10, 11],
     color: '#F59E0B',
-    desc: 'LCNN acoustic voice sync & zero-watermark generator diffusion matching'
+    desc: 'LCNN acoustic voice sync & zero-watermark generator diffusion matching (unvalidated heuristic)'
   }
 ]
 
@@ -96,57 +96,57 @@ export const DEFAULT_11_STAGES = [
   {
     stage: 5,
     id: 5,
-    name: 'Temporal Jitter & Facial Dynamics',
+    name: 'Temporal Jitter & Facial Dynamics (unvalidated)',
     category: 'Biometric Kinematics',
     engine: 'Kalman Landmark Trajectory + Ocular Blink Synchrony',
     status: 'PASSED',
     duration_ms: 42,
     targetSubTab: 'facial',
-    desc: 'Facial bounding-box acceleration, landmark jitter variance, and biological blink rhythm plausibility.'
+    desc: 'Facial bounding-box acceleration, landmark jitter variance, and biological blink rhythm plausibility (unvalidated heuristic).'
   },
   {
     stage: 6,
     id: 6,
-    name: 'Remote Photoplethysmography (rPPG)',
+    name: 'Remote Photoplethysmography (rPPG) (unvalidated)',
     category: 'Cardiovascular Biometrics',
     engine: 'CHROM/POS Capillary Reflectance Bandpass (0.75-2.5 Hz) + Welch PSD',
     status: 'INCONCLUSIVE',
     duration_ms: 36,
     targetSubTab: 'biometrics',
-    desc: 'Cardiovascular Blood Volume Pulse (BVP) extraction measuring autonomous biological blood volume pulses.'
+    desc: 'Cardiovascular Blood Volume Pulse (BVP) extraction measuring autonomous biological blood volume pulses (unvalidated heuristic).'
   },
   {
     stage: 7,
     id: 7,
-    name: 'Spatio-Temporal 4D Tensor Dynamics',
+    name: 'Spatio-Temporal 4D Tensor Dynamics (unvalidated)',
     category: 'Deep Spatiotemporal',
     engine: 'TimeSformer Space-Time Patch Variance + SlowFast Seam Vibration',
     status: 'PASSED',
     duration_ms: 95,
     targetSubTab: 'biometrics',
-    desc: 'TimeSformer space-time patch variance, latent denoise jump rates, and SlowFast boundary vibration.'
+    desc: 'TimeSformer space-time patch variance, latent denoise jump rates, and SlowFast boundary vibration (unvalidated heuristic).'
   },
   {
     stage: 8,
     id: 8,
-    name: 'LipForensics Articulatory Kinematics',
+    name: 'LipForensics Articulatory Kinematics (unvalidated)',
     category: 'Oral Dynamics',
     engine: 'Lip Aperture Kinematics + 2nd-Derivative Articulatory Jerk',
     status: 'INSUFFICIENT_FACE_FRAMES',
     duration_ms: 22,
     targetSubTab: 'facial',
-    desc: 'Oral kinematic velocity, articulatory jerk anomalies, and phonetic coarticulation texture smoothness.'
+    desc: 'Oral kinematic velocity, articulatory jerk anomalies, and phonetic coarticulation texture smoothness (unvalidated heuristic).'
   },
   {
     stage: 9,
     id: 9,
-    name: 'Optical Flow Motion Decomposition',
+    name: 'Optical Flow Motion Decomposition (unvalidated)',
     category: 'Vector Motion Field',
     engine: 'Farneback Dense Motion Vectors + Boundary Seam Divergence',
     status: 'PASSED',
     duration_ms: 145,
     targetSubTab: 'facial',
-    desc: 'Dense optical flow divergence between synthesized face boundary pixels and background scene physics.'
+    desc: 'Dense optical flow divergence between synthesized face boundary pixels and background scene physics (unvalidated heuristic).'
   },
   {
     stage: 10,
@@ -162,13 +162,13 @@ export const DEFAULT_11_STAGES = [
   {
     stage: 11,
     id: 11,
-    name: 'AI Generator Attribution Engine',
+    name: 'AI Generator Attribution (unvalidated)',
     category: 'Attribution Engine',
     engine: 'Physical Diffusion Latent Matching (Sora, Gemini/Veo, Kling, Runway, Luma)',
     status: 'AI_FLAGGED',
     duration_ms: 55,
     targetSubTab: 'origin',
-    desc: 'Intrinsic physical & latent diffusion matching attributing synthesis engines without requiring watermarks.'
+    desc: 'Intrinsic physical & latent diffusion matching attributing synthesis engines without requiring watermarks (unvalidated heuristic).'
   }
 ]
 

@@ -3,6 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import Result from '../Result'
 import realAudioResult from '../../components/__tests__/fixtures/real_audio_result.json'
+import realVideoFaceswapResult from '../../components/__tests__/fixtures/real_video_faceswap_result.json'
+import realVideoNofaceResult from '../../components/__tests__/fixtures/real_video_noface_result.json'
 
 const mockVideoResult = {
   id: 'job-vid-999',
@@ -35,6 +37,12 @@ vi.mock('../../lib/api', () => ({
   connectJobWs: vi.fn((jobId) => {
     if (jobId === 'job-audio-real-1') {
       return Promise.resolve(realAudioResult)
+    }
+    if (jobId === 'job-video-faceswap-real') {
+      return Promise.resolve(realVideoFaceswapResult)
+    }
+    if (jobId === 'job-video-noface-real') {
+      return Promise.resolve(realVideoNofaceResult)
     }
     return Promise.resolve(mockVideoResult)
   }),
@@ -101,5 +109,50 @@ describe('Result page video pipeline rendering', () => {
     // Verify absence of typology and generator-family panels
     expect(screen.queryByText(/typology/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/generator family/i)).not.toBeInTheDocument()
+  })
+
+  it('renders video result page for real ml/faceswap-wire response with per-track scores and timeline', async () => {
+    render(
+      <MemoryRouter initialEntries={['/jobs/job-video-faceswap-real']}>
+        <Routes>
+          <Route path="/jobs/:jobId" element={<Result />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Forensics')).toBeInTheDocument()
+    })
+
+    const forensicsTab = screen.getByText('Forensics')
+    fireEvent.click(forensicsTab)
+
+    await waitFor(() => {
+      expect(screen.getByText('Trained Face-Swap Model Forensics')).toBeInTheDocument()
+      expect(screen.getByText('Per-Track Scores (1 Track)')).toBeInTheDocument()
+      expect(screen.getByText('Face Track #0')).toBeInTheDocument()
+      expect(screen.getByText('Temporal Segment Timeline (from model response)')).toBeInTheDocument()
+    })
+  })
+
+  it('renders "No face found: face-swap check not applicable." on video without face tracks', async () => {
+    render(
+      <MemoryRouter initialEntries={['/jobs/job-video-noface-real']}>
+        <Routes>
+          <Route path="/jobs/:jobId" element={<Result />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Forensics')).toBeInTheDocument()
+    })
+
+    const forensicsTab = screen.getByText('Forensics')
+    fireEvent.click(forensicsTab)
+
+    await waitFor(() => {
+      expect(screen.getByText('No face found: face-swap check not applicable.')).toBeInTheDocument()
+    })
   })
 })

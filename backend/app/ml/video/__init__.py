@@ -29,6 +29,7 @@ from app.ml.faces import extract_faces
 from app.ml.forensics import run_comprehensive_forensics
 from app.ml.gradcam import compute_gradcam, overlay_heatmap
 from app.ml.image_pipeline import score_scene
+from app.ml.audio.codec_guard import guard_note, guarded_family
 from app.ml.preprocessing import MediaRefusedError, normalize_waveform, preprocess_image, sample_video_frames
 from app.ml.registry import UNTRAINED, get_image_model
 from app.ml.video.audio_crossmodal import analyze_crossmodal_lipsync
@@ -290,9 +291,13 @@ def analyze_video(
     except Exception as exc:
         logger.debug("Audio demuxing and acoustic forensics skipped: %s", exc)
 
+    # An audio track in a codec the audio model failed on (dev) is left out of the video score.
+    audio_codec_guard = None
+    if audio_forensics is not None:
+        audio_codec_guard = guarded_family(file_path)
     st10_ms = int((time.perf_counter() - st10_start) * 1000)
     st10_bad = lipsync_info.get("lip_sync_anomaly_detected", False) or (
-        audio_forensics and audio_forensics.get("fusion_decision", {}).get("calibrated_fake_probability", 0.0) >= 0.65
+        audio_forensics and not audio_codec_guard and audio_forensics.get("fusion_decision", {}).get("calibrated_fake_probability", 0.0) >= 0.65
     )
     pipeline_modules.append({
         "stage": 10,
@@ -337,7 +342,7 @@ def analyze_video(
         duration_s=duration_s,
         vit_genai_prob=vit_genai_prob,
         image_forensics=image_forensics,
-        audio_forensics=audio_forensics,
+        audio_forensics=None if audio_codec_guard else audio_forensics,
         attribution_info=attribution_info,
         rppg_info=rppg_info,
         spatiotemporal_info=spatiotemporal_info,
@@ -399,6 +404,8 @@ def analyze_video(
             "crossmodal_lipsync": lipsync_info,
             "image_forensics": image_forensics,
             "audio_forensics": audio_forensics,
+            "audio_codec_guard": {"codec_family": audio_codec_guard, "setting": "AUDIO_CODEC_GUARD",
+                                  "effect": "audio track left out of the video score"} if audio_codec_guard else None,
             "generator_attribution": attribution_info,
             "rppg_biometrics": rppg_info,
             "spatiotemporal_forensics": spatiotemporal_info,
@@ -409,7 +416,8 @@ def analyze_video(
             "optical_flow_file": motion_metrics.get("flow_heatmap_file"),
             "backbone": f"{settings.image_model_backbone} + FrameAggregator + ImageForensics + AudioSentinel",
             "input_size": loaded.input_size,
-            "notes": fusion["notes"],
+            "notes": fusion["notes"] + ([guard_note(audio_codec_guard) + " It is left out of the video score."]
+                                        if audio_codec_guard else []),
             "processing_ms": total_processing_ms,
         },
     )

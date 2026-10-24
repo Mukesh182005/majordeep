@@ -10,8 +10,8 @@ served), strict float32 on the CPU, mean window spoof logit. Dev data only.
 ``score`` appends one row per utterance, condition and checkpoint to
 ``scores.csv`` (resumable). ``summarise`` turns the rows of one checkpoint into
 per-condition EER and AUC and, given its calibration and frozen rule, the
-verdict rates; the per-codec-family guard of the plan (more than 5 % of bona
-fide flagged in any condition) is computed from them.
+verdict rates; the per-family guard of the plan (more than 5 % of bona fide
+flagged in any condition of mp3, aac, opus or resample) is computed from them.
 
 Usage (PowerShell)::
 
@@ -53,12 +53,13 @@ def _rel(path: Path) -> str:
 
 
 def conditions() -> list[str]:
-    from ml.preprocessing.audio_codecs import CODEC_CONDITIONS
+    from ml.preprocessing.audio_codecs import ALL_CONDITIONS
 
-    return ["original", *CODEC_CONDITIONS]
+    return ["original", *ALL_CONDITIONS]
 
 
 def family(condition: str) -> str:
+    """mp3, aac, opus, or resample (any change of sample rate)."""
     return condition.split("_", 1)[0]
 
 

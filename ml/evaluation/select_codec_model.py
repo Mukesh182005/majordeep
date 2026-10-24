@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Choose, compare and calibrate the codec-trained LCNN on dev only (paper/config/audio_codec_plan.json).
 
-1. Score ``dev`` and ``dev_codec`` (cached LFCC) with every codec-trained seed
+1. Score ``dev`` and ``dev_codec2`` (cached LFCC; plan amendment v2) with every codec-trained seed
    and with the currently served checkpoint, in strict float32 (TF32 off,
    deterministic cuDNN), mean window spoof logit per utterance.
 2. Pooled dev EER of each (every re-encoded utterance is its own trial).
@@ -44,7 +44,8 @@ SELECTION_OUT = REPO_ROOT / "paper/config/audio_codec_model_selection.json"
 CALIBRATION_OUT = REPO_ROOT / "paper/config/audio_calibration_codec.json"
 SCORES_DIR = REPO_ROOT / "paper_results/audio_codec_model"
 SEEDS = (0, 1, 2)
-DEV_SPLITS = ("dev", "dev_codec")
+DEV_SPLITS = ("dev", "dev_codec2")  # plan amendment v2
+TAG = "_codec2"
 
 
 def _rel(path: Path) -> str:
@@ -121,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
 
     results: dict[str, dict] = {}
     for name, path in [("current", current_path)] + [
-            (f"seed{s}", args.checkpoint_dir / f"audio_lcnn_asvspoof_lfcc_codec_seed{s}.pt") for s in SEEDS]:
+            (f"seed{s}", args.checkpoint_dir / f"audio_lcnn_asvspoof_lfcc{TAG}_seed{s}.pt") for s in SEEDS]:
         if not path.is_file():
             raise SystemExit(f"{path.name} not found: train all seeds of the plan first.")
         logits = strict_scores(path, caches, device)

@@ -23,6 +23,8 @@ PLAN = Path(__file__).resolve().parents[2] / "paper/config/audio_codec_plan.json
 def test_plan_lists_exactly_the_defined_conditions():
     plan = json.loads(PLAN.read_text(encoding="utf-8"))
     assert plan["conditions"]["names"] == list(ac.CODEC_CONDITIONS)
+    assert ac.ALL_CONDITIONS == [*plan["conditions"]["names"], "resample_22k", "resample_44k", "resample_48k",
+                                 "resample_48k_ffmpeg"]
 
 
 def test_assignment_is_stable_seeded_and_spread():
@@ -41,7 +43,7 @@ def test_fit_length():
     assert ac.fit_length(x, 7).tolist() == [0, 1, 2, 3, 4, 0, 0]
 
 
-@pytest.mark.parametrize("condition", ["mp3_64k", "aac_64k", "opus_24k"])
+@pytest.mark.parametrize("condition", ["mp3_64k", "aac_64k", "opus_24k", "resample_44k", "resample_48k_ffmpeg"])
 def test_round_trip_keeps_rate_and_length(tmp_path, condition):
     pytest.importorskip("imageio_ffmpeg")
     source = tmp_path / "tone.wav"

@@ -3,14 +3,30 @@
   "trigger": "results/robustness.json (eval sample): after MP3 at 64 kbit/s the served model flags 100% of bona fide utterances. That eval measurement only motivated the work; every choice below is fixed here in advance or made on train and dev data.",
   "conditions": {
     "source": "ml/preprocessing/audio_codecs.py CODEC_CONDITIONS (ffmpeg bundled with imageio-ffmpeg; encode, then decode to 16 kHz mono PCM; cut or zero-pad to the original length)",
-    "names": ["mp3_32k", "mp3_64k", "mp3_96k", "mp3_128k", "aac_32k", "aac_64k", "aac_96k", "opus_16k", "opus_24k", "opus_32k", "opus_48k"]
+    "names": [
+      "mp3_32k",
+      "mp3_64k",
+      "mp3_96k",
+      "mp3_128k",
+      "aac_32k",
+      "aac_64k",
+      "aac_96k",
+      "opus_16k",
+      "opus_24k",
+      "opus_32k",
+      "opus_48k"
+    ]
   },
   "training_data": "official LA train: every utterance once as distributed and once re-encoded with one condition, assign_condition(utt_id, seed=1, all 11 conditions); cache split train_codec",
   "selection_data": "official LA dev: every utterance as distributed plus once re-encoded, assign_condition(utt_id, seed=2, all 11 conditions); cache split dev_codec. Dev EER is pooled over both (each re-encoded utterance is its own trial).",
   "training": {
     "script": "ml/training/train_asvspoof.py",
     "features": "lfcc",
-    "seeds": [0, 1, 2],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
     "hyperparameters": "the script defaults used in Phase 2 (AdamW lr 3e-4, weight decay 1e-4, batch 64, 30 epochs at most, patience 10, weighted BCE)",
     "epoch_selection": "lowest pooled dev EER"
   },
@@ -21,5 +37,16 @@
   "dev_codec_measurement": "the balanced dev subsample of Phase 3 (paper_results/audio_heuristics_dev/subsample.csv, 1,000 bona fide + 1,000 spoofed) in every condition, scored by the current and by the new model",
   "guard_rule": "after the freeze: if any condition of a codec family (mp3, aac, opus) has its bona fide utterances on the dev measurement flagged more than 5% of the time under the served model's frozen rule, uploads encoded with that codec get an INCONCLUSIVE verdict with a note saying why (codec read from the file), behind a setting",
   "evaluation": "once, after the selection, calibration and freeze are committed: (1) the full LA eval partition as distributed, eval_asvspoof.py --confirm-final-eval; (2) the 4,004-utterance eval sample of paper_results/audio_end_to_end_eval/sample.csv in every condition; (3) end-to-end verdicts on that sample. The earlier model's results stay as they are.",
-  "decided_utc": "2026-10-24"
+  "decided_utc": "2026-10-24",
+  "amendment_v2": {
+    "decided_utc": "2026-10-24",
+    "reason": "Dev diagnostic before any codec model was finished: with the served model, 150 bona fide dev utterances resampled 16 kHz -> 48 kHz -> 16 kHz were flagged 97.3% of the time with soxr (the load_audio path for uploads at other rates) and 78.7% with ffmpeg's resampler (the video audio path); Opus decoded by ffmpeg flagged 37.3%, by libsndfile + soxr 0%. Resampling, not only codecs, breaks the model, and nearly every real upload is resampled.",
+    "v1_runs": "the three plan-v1 runs (codec conditions only) were stopped at epoch 5 when this was found; they are not used or reported as results",
+    "conditions": "the 11 codec conditions plus resample_22k, resample_44k, resample_48k (soxr up and down) and resample_48k_ffmpeg (ffmpeg up and down): ml/preprocessing/audio_codecs.py ALL_CONDITIONS",
+    "training_data": "official LA train as distributed plus once with one of the 15 conditions, assign_condition(utt_id, seed=3); cache split train_codec2",
+    "selection_data": "official LA dev as distributed plus once with one of the 15 conditions, assign_condition(utt_id, seed=4); cache split dev_codec2; dev EER pooled over both",
+    "checkpoints": "audio_lcnn_asvspoof_lfcc_codec2_seed{0,1,2}.pt; training, seed choice, calibration, verdict rule and replacement rule as in v1 with dev_codec2 in place of dev_codec",
+    "dev_codec_measurement": "as in v1, over all 15 conditions plus the original",
+    "guard_rule": "as in v1, over the families mp3, aac, opus and resample; the resample family applies to uploads whose first audio stream is not at 16 kHz"
+  }
 }

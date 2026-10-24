@@ -111,6 +111,11 @@ class Settings(BaseSettings):
     audio_model_source: str = "lcnn_asvspoof"
     audio_lcnn_calibration_file: Path = ROOT_DIR / "paper" / "config" / "audio_calibration.json"
     audio_verdict_config_file: Path = ROOT_DIR / "paper" / "config" / "frozen_audio_config.json"
+    # Codec families (mp3, aac, opus) on which the served audio model flagged
+    # more than 5% of bona fide dev speech (paper/config/audio_codec_plan.json,
+    # guard_rule). Audio in these codecs gets an INCONCLUSIVE audio verdict, and
+    # a video's audio track in them is left out of the video score. Empty: no guard.
+    audio_codec_guard: CsvList = Field(default_factory=list)
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5
@@ -119,7 +124,7 @@ class Settings(BaseSettings):
     # --- Frontend ---
     cors_origins: CsvList = Field(default_factory=lambda: ["http://localhost:5173"])
 
-    @field_validator("cors_origins", "trusted_proxies", "enabled_media_types", mode="before")
+    @field_validator("cors_origins", "trusted_proxies", "enabled_media_types", "audio_codec_guard", mode="before")
     @classmethod
     def _split_list(cls, value: object) -> object:
         """Accept a JSON list or a comma-separated string from the environment."""
@@ -129,6 +134,15 @@ class Settings(BaseSettings):
                 return [str(item).strip() for item in json.loads(text) if str(item).strip()]
             return [item.strip() for item in text.split(",") if item.strip()]
         return value
+
+    @field_validator("audio_codec_guard", mode="after")
+    @classmethod
+    def _known_codec_families(cls, value: list[str]) -> list[str]:
+        families = [item.lower() for item in value]
+        unknown = sorted(set(families) - {"mp3", "aac", "opus"})
+        if unknown:
+            raise ValueError(f"AUDIO_CODEC_GUARD: unknown codec families {unknown}; use mp3, aac or opus")
+        return families
 
     @field_validator("enabled_media_types", mode="after")
     @classmethod

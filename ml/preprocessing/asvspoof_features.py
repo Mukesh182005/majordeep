@@ -157,12 +157,15 @@ def build_cache(
     manifest_sha256: str | None = None,
     flush_every: int = 2000,
     codec_seed: int | None = None,
+    codec_conditions: str = "codec",
+    codec_suffix: str = "_codec",
 ) -> None:
     """Extract (or resume extracting) one split's features for each front end.
 
     With ``codec_seed`` every utterance is re-encoded with one condition of
     ``ml/preprocessing/audio_codecs.py`` (seeded per utterance id) and cached as
-    ``<split>_codec``, next to the original cache, with ``<split>_codec_conditions.csv``.
+    ``<split><codec_suffix>``, next to the original cache, with its ``_conditions.csv``.
+    ``codec_conditions``: "codec" (the 11 codec conditions, plan v1) or "all" (plus resampling, plan v2).
     """
     from multiprocessing import Pool
 
@@ -172,11 +175,11 @@ def build_cache(
         return
     conditions: list[str] | None = None
     if codec_seed is not None:
-        from ml.preprocessing.audio_codecs import CODEC_CONDITIONS, assign_condition
+        from ml.preprocessing.audio_codecs import ALL_CONDITIONS, CODEC_CONDITIONS, assign_condition
 
-        names = list(CODEC_CONDITIONS)
+        names = list(CODEC_CONDITIONS) if codec_conditions == "codec" else ALL_CONDITIONS
         conditions = [assign_condition(r["utt_id"], codec_seed, names) for r in rows]
-        split = f"{split}_codec"
+        split = f"{split}{codec_suffix}"
 
     arrays: dict[str, np.memmap] = {}
     start = len(rows)
@@ -294,7 +297,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--splits", nargs="+", choices=["train", "dev", "eval"], default=["train", "dev", "eval"])
     parser.add_argument("--workers", type=int, default=min(16, os.cpu_count() or 4))
     parser.add_argument("--codec-seed", type=int, default=None,
-                        help="re-encode each utterance with one seeded codec condition; cached as <split>_codec")
+                        help="re-encode each utterance with one seeded condition; cached as <split><codec-suffix>")
+    parser.add_argument("--codec-conditions", choices=["codec", "all"], default="codec")
+    parser.add_argument("--codec-suffix", default="_codec")
     return parser.parse_args()
 
 
@@ -311,7 +316,8 @@ def main() -> None:
     manifest_sha = sha256_file(args.manifest)
     for split in args.splits:
         build_cache(rows, args.asvspoof_root, features_dir, split, args.features, args.workers, manifest_sha,
-                    codec_seed=args.codec_seed)
+                    codec_seed=args.codec_seed, codec_conditions=args.codec_conditions,
+                    codec_suffix=args.codec_suffix)
     print(f"Features in {features_dir}")
 
 

@@ -20,6 +20,7 @@ from app.models import Verdict
 from app.ml.preprocessing import load_audio, normalize_waveform
 from app.ml.registry import TRAINED, UNTRAINED
 from app.ml.audio import run_comprehensive_audio_forensics
+from app.ml.audio.codec_guard import guard_note, guarded_family
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +79,10 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     lcnn = forensic_results["models_output"].get("lcnn_asvspoof")
     experimental = lcnn is None
     notes: list[str] = [EXPERIMENTAL_REASON if experimental else LCNN_SCOPE_NOTE]
+    # A codec on which the model failed on dev speech: no audio verdict (AUDIO_CODEC_GUARD).
+    guarded = None if experimental else guarded_family(path)
+    if guarded:
+        notes.insert(0, guard_note(guarded))
     if not experimental:
         notes.append(
             "The verdict is the trained model's alone. Glottal, mains-hum, splice, container and watermark "
@@ -175,6 +180,7 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "decision_rule": fusion.get("decision_rule"),
         "is_inconclusive": fusion.get("is_inconclusive"),
     }
+    evidence_payload["codec_guard"] = {"codec_family": guarded, "setting": "AUDIO_CODEC_GUARD"} if guarded else None
     if fusion.get("verdict_source") == "lcnn_asvspoof":
         evidence_payload["decision_threshold"] = fusion["decision_threshold"]
         evidence_payload["uncertain_band"] = fusion["uncertain_band"]
@@ -188,7 +194,7 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
             evidence=evidence_payload,
             # The audio thresholds were frozen on ASVspoof dev and differ from the
             # platform-wide FAKE_THRESHOLD, so the verdict is set from them here.
-            verdict_override=_AUDIO_VERDICT.get(fusion.get("final_verdict")),
+            verdict_override=Verdict.INCONCLUSIVE if guarded else _AUDIO_VERDICT.get(fusion.get("final_verdict")),
         )
     return AnalysisResult(
         fake_probability=round(final_fake_prob, 4),

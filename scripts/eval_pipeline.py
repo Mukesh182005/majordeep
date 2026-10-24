@@ -371,6 +371,33 @@ def plot_verdicts(summary: dict, path: Path) -> None:
     plt.close(fig)
 
 
+PHASE2_EVAL_SCORES = REPO_ROOT / "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_scores.csv"
+
+
+def tf32_comparison(scores: list[dict], phase2: Path = PHASE2_EVAL_SCORES) -> dict | None:
+    """The strict-float32 mean logits here against the Phase 2 eval scores (cuDNN TF32 on), same utterances.
+
+    Reported side by side so the two are never mixed silently; nothing is re-scored.
+    """
+    from ml.evaluation.metrics import roc_auc
+
+    if not phase2.is_file():
+        return None
+    stored = {r["utt_id"]: float(r["score"]) for r in read_csv(phase2)}
+    rows = [r for r in scores if not r.get("error") and r["utt_id"] in stored and r.get("mean_spoof_logit")]
+    if not rows:
+        return None
+    labels = np.array([int(r["label"]) for r in rows])
+    float32 = np.array([float(r["mean_spoof_logit"]) for r in rows])
+    tf32 = np.array([-stored[r["utt_id"]] for r in rows])  # stored score = -mean spoof logit
+    return {
+        "phase2_scores_file": _rel(phase2), "n": len(rows),
+        "max_abs_mean_logit_difference": float(np.max(np.abs(float32 - tf32))),
+        "auc_float32_mean_logit": float(roc_auc(labels, float32)),
+        "auc_tf32_mean_logit": float(roc_auc(labels, tf32)),
+    }
+
+
 def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure: Path = FIGURE,
               index: Path | None = None) -> dict:
     """Write verdict_rates.json, results/pipeline_eval.json, the figure and INDEX rows from saved files only."""
@@ -402,6 +429,9 @@ def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure
             "scores_sha256": _sha256(scores_path),
             **verdict_rates(scores),
         }
+        comparison = tf32_comparison(scores)
+        if comparison:
+            summary["tf32_comparison"] = comparison
         rates_path = out_dir / "verdict_rates.json"
         rates_path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
         plot_verdicts(summary, figure)
@@ -410,7 +440,8 @@ def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure
                                          **{k: summary[k] for k in ("sample", "rule", "inference", "classes",
                                                                     "per_attack", "auc_fake_probability",
                                                                     "fake_probability_ties",
-                                                                    "auc_lcnn_probability_unrounded")
+                                                                    "auc_lcnn_probability_unrounded",
+                                                                    "tf32_comparison")
                                             if k in summary}}
     else:
         audio["asvspoof2019_la_eval"] = {"status": "not_run",

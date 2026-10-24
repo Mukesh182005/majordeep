@@ -1,0 +1,41 @@
+{
+  "status": "not_run",
+  "reason": "Not run: the 560-image held-out set (H560) is not on this machine (searched on C:, D: and Google Drive, docs/paper_upgrade/STATUS.md), so paper/manifests/h560.csv cannot be built and no image has been scored. No number is reported until the images are found.",
+  "manifest_expected": "paper/manifests/h560.csv",
+  "scores_expected": "paper_results/image_h560/scores.jsonl",
+  "provenance": {
+    "git_commit": "f9f297481f7d80185a6a847ef17afed9ae7f53d3",
+    "git_branch": "eval/reproducible",
+    "git_dirty": true,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-24T06:10:37+00:00",
+    "command_line": [
+      "scripts/eval_image.py",
+      "summarise"
+    ],
+    "manifest": null,
+    "manifest_sha256": null,
+    "seeds": null
+  }
+}

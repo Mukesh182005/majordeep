@@ -3,7 +3,7 @@
 Branch `paper-upgrade`, started from `main` at `1de4b2e`. Rules: `CLAUDE.md`.
 Plan: `PLAN.md`. Phase prompts: `GOAL.md`. External resources: `RESOURCES.md`.
 
-Last updated: 2026-10-22 (completion plan, days 1-5).
+Last updated: 2026-10-24 (eval/reproducible; Phase 3 task 7).
 
 ## Completion plan, days 1-5 (2026-10-22)
 
@@ -15,7 +15,10 @@ The project completion plan (Phases 0-7) is run as one branch per task, each sta
 | `fix/p1-honest-outputs` | `6fd6fad` | Untrained SincRawNet and the "WavLM/Whisper" formula removed (tabular rule kept, labelled unvalidated); conformal and likelihood-ratio claims removed; SWGDE / ISO 27037 / 27042 / Daubert / write-blocker / cybercrime-complaint claims removed from backend, PDF and API; filename rules removed from video attribution, which is labelled unvalidated; audio results without the trained model marked experimental; plain disclaimer on page 1 of the PDF. |
 | `fix/p5-security` | `ba2e8a4` | Trusted-proxy X-Real-IP only; compose passes the limits; hourly retention purge of guest jobs (beat service); full Delete scan; 5-minute HMAC-signed links replace `?token=`; httpOnly SameSite=Lax login cookie; MAX_AUDIO/VIDEO_SECONDS and ENABLED_MEDIA_TYPES at upload; weights_only checkpoint loading. Also fixed: list settings in the comma form crashed startup. |
 | `ml/audio-asvspoof` | `ff3e675` | `audio_detector.pt` retired (not loaded; file kept); its scripts archived; In-the-Wild builder and scorer (not run: licence conflict); `results/audio_eval.json` from the saved LA eval scores. |
-| `ml/audio-wire` | (this commit) | The LCNN decides the audio verdict by default (`AUDIO_MODEL_SOURCE=lcnn_asvspoof`); verdict rule frozen on dev in `paper/config/frozen_audio_config.json` (Phase 3 task 6); heuristics are context with no weight; per-window LCNN scores are the timeline; deterministic float32 scoring; regression and two-process tests. |
+| `ml/audio-wire` | `9b2f17b` | The LCNN decides the audio verdict by default (`AUDIO_MODEL_SOURCE=lcnn_asvspoof`); verdict rule frozen on dev in `paper/config/frozen_audio_config.json` (Phase 3 task 6); heuristics are context with no weight; per-window LCNN scores are the timeline; deterministic float32 scoring; regression and two-process tests. |
+| `fix/p5-bounded-decode` | `980041f` | Decoding stops at MAX_AUDIO/VIDEO_SECONDS + 1 s and longer media is refused, whatever the headers claim; an ffmpeg timeout refuses the video. |
+| `ml/audio-repro` | `7808cc4` | The seed-2 retrain reproduces the served LCNN bit for bit (`paper_results/audio_asvspoof2019la/repro_runs/`). |
+| `eval/reproducible` | (this commit) | Phase 3 task 7 scored; codec robustness, latency, image-eval and regenerate scripts; `docs/research/EVALUATION.md` and `DATASETS.md` rewritten from results files. |
 
 **Phase 3 task 5/6 decision:** the completion plan says to keep glottal, ENF and signal checks "as notes with no weight until each is validated", which is the outcome of the dev AUC rule (no signal's lower bound exceeded 0.60). Frozen with `ml/evaluation/freeze_audio_config.py` (dev data only): threshold = calibrated probability at the dev EER point (0.497); inconclusive band = the platform default 0.08, fixed in advance; authentic below 0.417, flagged at or above 0.577. Dev verdict rates under the rule (information only, optimistic: dev holds only the training attacks): bona fide 99.80 % authentic, 0.08 % inconclusive, 0.12 % flagged; spoofed 99.80 % flagged, 0.04 % inconclusive, 0.16 % authentic (`frozen_audio_config.json`, `dev_verdict_rates_information_only`).
 
@@ -31,9 +34,21 @@ The project completion plan (Phases 0-7) is run as one branch per task, each sta
 - **In-the-Wild licence** (Apache 2.0 vs CC BY-SA 4.0): decide before downloading.
 - **Two agents share one working tree:** Antigravity's uncommitted edits (frontend, `backend/app/main.py`, `docker-compose.yml`) sit in the same checkout as these branches; each commit here staged only its own files.
 - **Frontend:** until the frontend uses the cookie and signed links, report download and live status of signed-in users' jobs fail (`?token=` is no longer read); the audio page still shows the removed fields with invented defaults (list in `docs/API_CHANGES.md`).
-- Still open from before: TF32 and the eval numbers; Phase 7 video option; H560; RAISE-1k.
+- Still open from before: whether to re-score LA eval in strict float32 (TF32 effect measured above); Phase 7 video option; H560; RAISE-1k.
 
-**Next:** Phase 3 task 7 (end-to-end LA eval verdict rates with the frozen config, at least 4,000 stratified utterances; script to write); video verdict still uses the unvalidated generator-profile match (it can raise the video probability to 0.88); image and video methodology text in the PDF still describes a face-crop CNN that is not in the image verdict.
+**Measured in eval/reproducible (2026-10-24)**
+- Phase 3 task 7, scored once at `51ed0e9` (clean tree; `paper_results/audio_end_to_end_eval/eval_log.csv`): 4,004 LA eval utterances (2,002 bona fide, 154 per attack A07-A19, seed 0) through the worker's pipeline with the frozen dev rule; no errors. Bona fide 99.8 % authentic, 0.2 % flagged; spoofed 85.6 % flagged, 13.1 % authentic; A17 flagged 5.2 % (`verdict_rates.json`, `INDEX.md` section `audio_end_to_end_eval`).
+- The API rounds the audio probability to 4 decimals: 2,024 utterances tie at 0 and 442 at 1, so its AUC on the sample is 0.973 against 0.986 for the unrounded probability (verdicts unaffected; `KNOWN_ISSUES.md` #15).
+- TF32 vs strict float32 on the same 4,004 utterances: max mean-logit difference 0.094; AUC 0.98592 vs 0.98589 (`verdict_rates.json`, `tf32_comparison`).
+- Codec robustness, scored once at `f9f2974`: **MP3 64 kbit/s flags 100 % of bona fide as AI-generated** (EER 17.2 %, AUC 0.911); Opus 32 kbit/s EER 6.4 %, bona fide 99.6 % authentic (`results/robustness.json`; `KNOWN_ISSUES.md` #14).
+- Latency per modality on GPU and CPU: `results/latency.json`.
+
+**Needs you (new)**
+- MP3 uploads: retrain the LCNN with codec augmentation (dev-selected), or refuse / mark MP3 audio inconclusive until then. Either changes behaviour or claims.
+- Whether the API should stop rounding the audio probability.
+- Local `.env` sets `UNCERTAIN_BAND=0.15`; the platform default and the audio freeze use 0.08. Decide before freezing the image configuration.
+
+**Next:** image evaluation waits for H560 (or the T2 freeze); video waits for FaceForensics++ / Celeb-DF; video verdict still uses the unvalidated generator-profile match (it can raise the video probability to 0.88); image and video methodology text in the PDF still describes a face-crop CNN that is not in the image verdict.
 
 
 ## Done

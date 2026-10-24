@@ -58,6 +58,14 @@
 - **Description:** The audio model has been evaluated on ASVspoof 2019 LA only (studio-quality English read speech). Its In-the-Wild scripts exist (`ml/preprocessing/build_in_the_wild.py`, `ml/evaluation/eval_in_the_wild.py`), but the dataset's licence is stated two ways (Apache 2.0 on its page, CC BY-SA 4.0 on Hugging Face) and it has not been downloaded.
 - **Impact:** No real-world audio error rate exists; the audio result carries a note saying so.
 
+### 14. MP3 audio is always flagged as AI-generated
+- **Description:** On the 4,004-utterance LA eval sample re-encoded as MP3 at 64 kbit/s, the frozen audio rule flags 100 % of bona fide utterances as AI-generated, the same as the spoofed ones (`results/robustness.json`, `audio.conditions.mp3_64k.frozen_rule_verdicts`). The model still ranks them partly (AUC 0.911 against 0.986 on the original FLAC), but every calibrated probability moves above the flag threshold. Opus at 32 kbit/s keeps 99.6 % of bona fide authentic. The LCNN was trained on uncompressed LA audio only.
+- **Impact:** A genuine voice recording uploaded as MP3 receives an AI-generated verdict. Until the model is retrained with codec augmentation (or MP3 input is refused or marked inconclusive), audio verdicts on MP3 files must not be trusted.
+
+### 15. The API's audio probability is rounded to four decimals
+- **Description:** `analyze_audio` returns `round(p, 4)`. On the LA eval sample 2,024 of 4,004 utterances report exactly 0 and 442 exactly 1, so the returned value ranks them worse (AUC 0.973) than the model's own probability (AUC 0.986; `results/pipeline_eval.json`). Verdicts use the unrounded value and are unaffected.
+- **Impact:** Anyone ranking or thresholding the API's `fake_probability` loses resolution near 0 and 1.
+
 ## Resolved Issues
 
 ### Untrained audio branches and standards claims in outputs (fixed 2026-10-22, branch `fix/p1-honest-outputs`)

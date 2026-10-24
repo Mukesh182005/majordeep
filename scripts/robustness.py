@@ -278,6 +278,12 @@ def index_rows(metrics: dict, file: str) -> list[tuple[str, str, str, str, str]]
         rows.append((f"Audio LA eval sample, {names[condition]}: AUC",
                      f"{auc['auc']:.4f} [{auc['ci95'][0]:.4f}, {auc['ci95'][1]:.4f}]", file,
                      f"conditions.{condition}.auc.auc, .ci95", "6"))
+        verdicts = entry["frozen_rule_verdicts"]
+        for cls, verdict, name in (("bonafide", "authentic", "bona fide called authentic"),
+                                   ("spoof", "flagged", "spoofed flagged")):
+            rows.append((f"Audio LA eval sample, {names[condition]}: {name} (frozen rule)",
+                         ep._pct(verdicts[cls][verdict]), file,
+                         f"conditions.{condition}.frozen_rule_verdicts.{cls}.{verdict}.rate", "6"))
     for condition, test in metrics.get("delong_vs_original", {}).items():
         rows.append((f"Audio LA eval sample, DeLong {names[condition]} vs original: p", f"{test['p_value']:.3g}",
                      file, f"delong_vs_original.{condition}.p_value", "6"))

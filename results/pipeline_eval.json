@@ -534,6 +534,13 @@
         "seed": 0,
         "n_pos": 2002,
         "n_neg": 2002
+      },
+      "tf32_comparison": {
+        "phase2_scores_file": "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_scores.csv",
+        "n": 4004,
+        "max_abs_mean_logit_difference": 0.09412569299316331,
+        "auc_float32_mean_logit": 0.9858939761537164,
+        "auc_tf32_mean_logit": 0.9859201737323615
       }
     }
   },
@@ -548,7 +555,7 @@
     }
   },
   "provenance": {
-    "git_commit": "51ed0e9e63d4f2028542e73d247a5a6f6d38b7a1",
+    "git_commit": "f9f297481f7d80185a6a847ef17afed9ae7f53d3",
     "git_branch": "eval/reproducible",
     "git_dirty": true,
     "python": "3.11.9",
@@ -573,7 +580,7 @@
       "Pillow": "12.3.0",
       "opencv-python-headless": "4.10.0.84"
     },
-    "utc_time": "2026-10-24T06:03:44+00:00",
+    "utc_time": "2026-10-24T06:10:32+00:00",
     "command_line": [
       "scripts/eval_pipeline.py",
       "summarise"

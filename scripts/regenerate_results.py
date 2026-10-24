@@ -77,7 +77,8 @@ def main(argv: list[str] | None = None) -> int:
     before = {p: (REPO_ROOT / p).stat().st_mtime_ns for p in tracked if (REPO_ROOT / p).is_file()}
     for step in STEPS:
         print(f"> python {' '.join(step)}", flush=True)
-        subprocess.run([sys.executable, str(REPO_ROOT / step[0]), *step[1:]], cwd=REPO_ROOT, check=True)
+        # Relative paths, so provenance records no local absolute path.
+        subprocess.run([sys.executable, step[0], *step[1:]], cwd=REPO_ROOT, check=True)
     if not args.check:
         return 0
 

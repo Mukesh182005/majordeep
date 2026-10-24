@@ -163,3 +163,16 @@ def test_a_completed_run_is_not_scored_again(tmp_path, monkeypatch):
     with pytest.raises(SystemExit, match="already holds a completed run"):
         ep.main(["audio-la", "--split", "dev", "--manifest", str(manifest), "--output-dir", str(tmp_path),
                  "--asvspoof-root", str(tmp_path)])
+
+
+def test_tf32_comparison_reads_the_stored_scores_side_by_side(tmp_path):
+    phase2 = tmp_path / "eval_scores.csv"
+    _write(phase2, [{"utt_id": "a", "attack_id": "-", "label": 0, "score": 3.0},
+                    {"utt_id": "b", "attack_id": "A07", "label": 1, "score": -2.0}],
+           ["utt_id", "attack_id", "label", "score"])
+    rows = [{"utt_id": "a", "label": "0", "mean_spoof_logit": "-2.95", "error": ""},
+            {"utt_id": "b", "label": "1", "mean_spoof_logit": "2.0", "error": ""}]
+    result = ep.tf32_comparison(rows, phase2)
+    assert result["n"] == 2 and abs(result["max_abs_mean_logit_difference"] - 0.05) < 1e-9
+    assert result["auc_float32_mean_logit"] == result["auc_tf32_mean_logit"] == 1.0
+    assert ep.tf32_comparison(rows, tmp_path / "missing.csv") is None

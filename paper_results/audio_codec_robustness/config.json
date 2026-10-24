@@ -1,0 +1,63 @@
+{
+  "purpose": "Served audio model under MP3 and Opus re-encoding",
+  "sample": {
+    "file": "paper_results/audio_end_to_end_eval/sample.csv",
+    "sha256": "e055c250d1eecd2deaa859395a5cd2705110087e5715cf5011dc9924de6eee20",
+    "size": 4004
+  },
+  "codecs": {
+    "ffmpeg": "ffmpeg version 7.1-essentials_build-www.gyan.dev Copyright (c) 2000-2024 the FFmpeg developers",
+    "mp3_64k": "-c:a libmp3lame -b:a 64k",
+    "opus_32k": "-c:a libopus -b:a 32k"
+  },
+  "loading": "app.ml.preprocessing.load_audio at 16 kHz (as an upload), then score_lcnn_asvspoof",
+  "rule": {
+    "file": "paper/config/frozen_audio_config.json",
+    "sha256": "6e3ed73e62d99d84459b41dc92c7ff300c9cd142c327a3b732af1f2a05f7b173",
+    "authentic_below": 0.4169953311686985,
+    "flagged_at_or_above": 0.5769953311686985
+  },
+  "inference": "LCNN in strict float32 (TF32 off, deterministic cuDNN)",
+  "workers": 12,
+  "threads_per_worker": 2,
+  "provenance": {
+    "git_commit": "f9f297481f7d80185a6a847ef17afed9ae7f53d3",
+    "git_branch": "HEAD",
+    "git_dirty": false,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-24T06:04:25+00:00",
+    "command_line": [
+      "scripts\\robustness.py",
+      "audio",
+      "--workers",
+      "12",
+      "--threads",
+      "2",
+      "--confirm-final-eval"
+    ],
+    "manifest": "paper_results/audio_end_to_end_eval/sample.csv",
+    "manifest_sha256": "e055c250d1eecd2deaa859395a5cd2705110087e5715cf5011dc9924de6eee20",
+    "seeds": null
+  }
+}

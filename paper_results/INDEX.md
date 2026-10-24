@@ -90,3 +90,19 @@ value that no file contains.
 | Audio LA eval end to end: AUC of the API probability (rounded to 4 decimals) | 0.9734 [0.9686, 0.9782] | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `auc_fake_probability.auc, .ci95` | 3 |
 | Audio LA eval end to end: AUC of the unrounded LCNN probability | 0.9859 [0.9823, 0.9892] | `paper_results/audio_end_to_end_eval/verdict_rates.json` | `auc_lcnn_probability_unrounded.auc, .ci95` | 3 |
 <!-- end:audio_end_to_end_eval -->
+<!-- begin:audio_codec_robustness -->
+| Audio LA eval sample, original FLAC: EER (%) | 4.45 | `paper_results/audio_codec_robustness/metrics.json` | `conditions.original.eer` | 6 |
+| Audio LA eval sample, original FLAC: AUC | 0.9859 [0.9820, 0.9893] | `paper_results/audio_codec_robustness/metrics.json` | `conditions.original.auc.auc, .ci95` | 6 |
+| Audio LA eval sample, original FLAC: bona fide called authentic (frozen rule) | 99.8% [99.5, 99.9] (1,998/2,002) | `paper_results/audio_codec_robustness/metrics.json` | `conditions.original.frozen_rule_verdicts.bonafide.authentic.rate` | 6 |
+| Audio LA eval sample, original FLAC: spoofed flagged (frozen rule) | 85.6% [84.0, 87.0] (1,713/2,002) | `paper_results/audio_codec_robustness/metrics.json` | `conditions.original.frozen_rule_verdicts.spoof.flagged.rate` | 6 |
+| Audio LA eval sample, MP3 64 kbit/s: EER (%) | 17.18 | `paper_results/audio_codec_robustness/metrics.json` | `conditions.mp3_64k.eer` | 6 |
+| Audio LA eval sample, MP3 64 kbit/s: AUC | 0.9112 [0.9023, 0.9202] | `paper_results/audio_codec_robustness/metrics.json` | `conditions.mp3_64k.auc.auc, .ci95` | 6 |
+| Audio LA eval sample, MP3 64 kbit/s: bona fide called authentic (frozen rule) | 0.0% [0.0, 0.2] (0/2,002) | `paper_results/audio_codec_robustness/metrics.json` | `conditions.mp3_64k.frozen_rule_verdicts.bonafide.authentic.rate` | 6 |
+| Audio LA eval sample, MP3 64 kbit/s: spoofed flagged (frozen rule) | 100.0% [99.8, 100.0] (2,002/2,002) | `paper_results/audio_codec_robustness/metrics.json` | `conditions.mp3_64k.frozen_rule_verdicts.spoof.flagged.rate` | 6 |
+| Audio LA eval sample, Opus 32 kbit/s: EER (%) | 6.44 | `paper_results/audio_codec_robustness/metrics.json` | `conditions.opus_32k.eer` | 6 |
+| Audio LA eval sample, Opus 32 kbit/s: AUC | 0.9796 [0.9752, 0.9835] | `paper_results/audio_codec_robustness/metrics.json` | `conditions.opus_32k.auc.auc, .ci95` | 6 |
+| Audio LA eval sample, Opus 32 kbit/s: bona fide called authentic (frozen rule) | 99.6% [99.1, 99.8] (1,993/2,002) | `paper_results/audio_codec_robustness/metrics.json` | `conditions.opus_32k.frozen_rule_verdicts.bonafide.authentic.rate` | 6 |
+| Audio LA eval sample, Opus 32 kbit/s: spoofed flagged (frozen rule) | 82.4% [80.7, 84.0] (1,650/2,002) | `paper_results/audio_codec_robustness/metrics.json` | `conditions.opus_32k.frozen_rule_verdicts.spoof.flagged.rate` | 6 |
+| Audio LA eval sample, DeLong MP3 64 kbit/s vs original: p | 1.73e-64 | `paper_results/audio_codec_robustness/metrics.json` | `delong_vs_original.mp3_64k.p_value` | 6 |
+| Audio LA eval sample, DeLong Opus 32 kbit/s vs original: p | 2.49e-12 | `paper_results/audio_codec_robustness/metrics.json` | `delong_vs_original.opus_32k.p_value` | 6 |
+<!-- end:audio_codec_robustness -->

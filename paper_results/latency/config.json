@@ -1,0 +1,122 @@
+{
+  "purpose": "End-to-end latency per modality (app.ml.pipeline.analyze), this machine",
+  "hardware": {
+    "cpu": "Intel(R) Core(TM) i9-14900",
+    "logical_cpus": 32,
+    "ram_gb": 63.7,
+    "gpu_driver": "595.95",
+    "os": "Windows-10-10.0.26200-SP0"
+  },
+  "inputs": {
+    "image": {
+      "source": "faces-140k test (half real, half StyleGAN), 256 x 256 px",
+      "files": [
+        "01233.jpg",
+        "03003.jpg",
+        "05241.jpg",
+        "12453.jpg",
+        "18984.jpg",
+        "21690.jpg",
+        "35538.jpg",
+        "44766.jpg",
+        "57104.jpg",
+        "59626.jpg",
+        "02TPLQKRQB.jpg",
+        "1308F9M1GP.jpg",
+        "9T4XSZTLUN.jpg",
+        "E6IFJKHYBP.jpg",
+        "JTEDY5HZ7A.jpg",
+        "O3MJJN6AEC.jpg",
+        "RCOZFTABXU.jpg",
+        "T4I5QYBRIW.jpg",
+        "UQIELFEMBK.jpg",
+        "XKJ3VXFL4Q.jpg"
+      ]
+    },
+    "audio": {
+      "source": "ASVspoof 2019 LA dev",
+      "files": [
+        "LA_D_1049366.flac",
+        "LA_D_1074980.flac",
+        "LA_D_1253043.flac",
+        "LA_D_2128519.flac",
+        "LA_D_3318993.flac",
+        "LA_D_4432873.flac",
+        "LA_D_4464967.flac",
+        "LA_D_4649265.flac",
+        "LA_D_4815856.flac",
+        "LA_D_5165861.flac",
+        "LA_D_5343352.flac",
+        "LA_D_5751531.flac",
+        "LA_D_6558756.flac",
+        "LA_D_6852874.flac",
+        "LA_D_7061416.flac",
+        "LA_D_7189435.flac",
+        "LA_D_7848357.flac",
+        "LA_D_8218322.flac",
+        "LA_D_9830830.flac",
+        "LA_D_9977709.flac"
+      ]
+    },
+    "video": {
+      "source": "synthetic 10 s, 640 x 480, 30 fps StyleGAN-face clip, no audio track",
+      "files": [
+        "synthetic_10s.mp4"
+      ]
+    }
+  },
+  "runs": {
+    "warmup_discarded": 2,
+    "image": 30,
+    "audio": 30,
+    "video": 8,
+    "devices": [
+      "cuda",
+      "cpu"
+    ],
+    "seed": 0
+  },
+  "settings": {
+    "audio_model_source": "lcnn_asvspoof",
+    "video_sample_fps": 1.0,
+    "video_max_frames": 32,
+    "image_model_backbone": "efficientnet_b4"
+  },
+  "provenance": {
+    "git_commit": "f9f297481f7d80185a6a847ef17afed9ae7f53d3",
+    "git_branch": "HEAD",
+    "git_dirty": false,
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.12.0.dev20260408+cu128",
+    "cuda_build": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5070",
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "libraries": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.12.0.dev20260408+cu128",
+      "torchvision": "0.27.0.dev20260407+cu128",
+      "torchaudio": null,
+      "transformers": "5.16.1",
+      "timm": null,
+      "librosa": "0.11.0",
+      "soundfile": "0.14.0",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "4.10.0.84"
+    },
+    "utc_time": "2026-10-24T06:11:00+00:00",
+    "command_line": [
+      "scripts\\benchmark_latency.py",
+      "run"
+    ],
+    "manifest": "manifest.csv",
+    "manifest_sha256": "70d113db4362c52c68be2448d7b3c76ed42d3d064ac9eb0807a27155b104bc31",
+    "seeds": [
+      0
+    ]
+  }
+}

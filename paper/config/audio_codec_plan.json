@@ -1,0 +1,25 @@
+{
+  "purpose": "Codec-robust audio model (KNOWN_ISSUES.md #14). Committed before any codec feature, training run, dev score or eval score that uses it.",
+  "trigger": "results/robustness.json (eval sample): after MP3 at 64 kbit/s the served model flags 100% of bona fide utterances. That eval measurement only motivated the work; every choice below is fixed here in advance or made on train and dev data.",
+  "conditions": {
+    "source": "ml/preprocessing/audio_codecs.py CODEC_CONDITIONS (ffmpeg bundled with imageio-ffmpeg; encode, then decode to 16 kHz mono PCM; cut or zero-pad to the original length)",
+    "names": ["mp3_32k", "mp3_64k", "mp3_96k", "mp3_128k", "aac_32k", "aac_64k", "aac_96k", "opus_16k", "opus_24k", "opus_32k", "opus_48k"]
+  },
+  "training_data": "official LA train: every utterance once as distributed and once re-encoded with one condition, assign_condition(utt_id, seed=1, all 11 conditions); cache split train_codec",
+  "selection_data": "official LA dev: every utterance as distributed plus once re-encoded, assign_condition(utt_id, seed=2, all 11 conditions); cache split dev_codec. Dev EER is pooled over both (each re-encoded utterance is its own trial).",
+  "training": {
+    "script": "ml/training/train_asvspoof.py",
+    "features": "lfcc",
+    "seeds": [0, 1, 2],
+    "hyperparameters": "the script defaults used in Phase 2 (AdamW lr 3e-4, weight decay 1e-4, batch 64, 30 epochs at most, patience 10, weighted BCE)",
+    "epoch_selection": "lowest pooled dev EER"
+  },
+  "served_seed": "of the three, the lowest pooled dev EER (ties: lower seed)",
+  "calibration": "class-balanced Platt scaling of the mean window spoof logit, fitted on the pooled dev scores of the served seed",
+  "verdict_rule": "threshold = calibrated probability at the pooled dev EER point; inconclusive band = 0.08 (platform default, fixed in advance); heuristics keep weight 0",
+  "replacement_rule": "the codec-trained model replaces the current one as the default only if its pooled dev EER is lower than the current model's pooled dev EER on the same dev and dev_codec trials; otherwise it is reported and not served",
+  "dev_codec_measurement": "the balanced dev subsample of Phase 3 (paper_results/audio_heuristics_dev/subsample.csv, 1,000 bona fide + 1,000 spoofed) in every condition, scored by the current and by the new model",
+  "guard_rule": "after the freeze: if any condition of a codec family (mp3, aac, opus) has its bona fide utterances on the dev measurement flagged more than 5% of the time under the served model's frozen rule, uploads encoded with that codec get an INCONCLUSIVE verdict with a note saying why (codec read from the file), behind a setting",
+  "evaluation": "once, after the selection, calibration and freeze are committed: (1) the full LA eval partition as distributed, eval_asvspoof.py --confirm-final-eval; (2) the 4,004-utterance eval sample of paper_results/audio_end_to_end_eval/sample.csv in every condition; (3) end-to-end verdicts on that sample. The earlier model's results stay as they are.",
+  "decided_utc": "2026-10-24"
+}

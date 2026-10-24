@@ -230,16 +230,16 @@ def _git(*args: str) -> str:
 
 
 def gate_problems(split: str, confirm: bool, official: bool, git_status: str, frozen_diff: str,
-                  frozen_tracked: bool) -> list[str]:
+                  frozen_tracked: bool, frozen_path: Path = FROZEN_CONFIG) -> list[str]:
     """Reasons the run must not start (empty = may start)."""
     problems = []
     if split == "eval" and not confirm:
         problems.append("Scoring the eval split is the final test: pass --confirm-final-eval.")
     if split == "eval":
         if not frozen_tracked:
-            problems.append(f"{_rel(FROZEN_CONFIG)} is not committed; the rule must be frozen before eval scoring.")
+            problems.append(f"{_rel(frozen_path)} is not committed; the rule must be frozen before eval scoring.")
         if frozen_diff:
-            problems.append(f"{_rel(FROZEN_CONFIG)} differs from the committed version.")
+            problems.append(f"{_rel(frozen_path)} differs from the committed version.")
     if official and git_status:
         problems.append("The working tree is not clean; commit first so the scored code is recorded exactly.")
     return problems
@@ -310,27 +310,27 @@ def _pct(entry: dict) -> str:
     return f"{entry['rate'] * 100:.1f}% [{low * 100:.1f}, {high * 100:.1f}] ({entry['k']:,}/{entry['n']:,})"
 
 
-def index_rows(summary: dict, file: str) -> list[tuple[str, str, str, str, str]]:
+def index_rows(summary: dict, file: str, prefix: str = "Audio LA eval end to end") -> list[tuple[str, str, str, str, str]]:
     rows = []
     for cls, name in (("bonafide", "bona fide"), ("spoof", "spoofed")):
         entry = summary["classes"][cls]
         for verdict in VERDICTS:
-            rows.append((f"Audio LA eval end to end, {name}: {verdict} (n={entry['n']:,})", _pct(entry[verdict]),
+            rows.append((f"{prefix}, {name}: {verdict} (n={entry['n']:,})", _pct(entry[verdict]),
                          file, f"classes.{cls}.{verdict}.rate", "3"))
     for attack, entry in summary["per_attack"].items():
-        rows.append((f"Audio LA eval end to end, {attack}: flagged", _pct(entry["flagged"]), file,
+        rows.append((f"{prefix}, {attack}: flagged", _pct(entry["flagged"]), file,
                      f"per_attack.{attack}.flagged.rate", "3"))
     for key, item in (("auc_fake_probability", "AUC of the API probability (rounded to 4 decimals)"),
                       ("auc_lcnn_probability_unrounded", "AUC of the unrounded LCNN probability")):
         auc = summary.get(key)
         if auc:
-            rows.append((f"Audio LA eval end to end: {item}",
+            rows.append((f"{prefix}: {item}",
                          f"{auc['auc']:.4f} [{auc['ci95'][0]:.4f}, {auc['ci95'][1]:.4f}]", file,
                          f"{key}.auc, .ci95", "3"))
     return rows
 
 
-def plot_verdicts(summary: dict, path: Path) -> None:
+def plot_verdicts(summary: dict, path: Path, title: str = "") -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -361,7 +361,7 @@ def plot_verdicts(summary: dict, path: Path) -> None:
         ax.spines[side].set_visible(False)
     ax.spines["bottom"].set_color("#d6d5d0")
     ax.tick_params(axis="y", length=0)
-    ax.set_title("End-to-end audio verdicts, ASVspoof 2019 LA eval sample (frozen dev rule)",
+    ax.set_title(title or "End-to-end audio verdicts, ASVspoof 2019 LA eval sample (frozen dev rule)",
                  fontsize=9.5, color=ink, loc="left")
     ax.legend(ncol=3, frameon=False, fontsize=8, loc="upper left", bbox_to_anchor=(0, -0.08 - 1.2 / len(groups)),
               labelcolor=ink)
@@ -374,14 +374,20 @@ def plot_verdicts(summary: dict, path: Path) -> None:
 PHASE2_EVAL_SCORES = REPO_ROOT / "paper_results/audio_asvspoof2019la/eval/audio_lcnn_asvspoof_lfcc_seed2_eval_scores.csv"
 
 
+PHASE2_SERVED_SHA256 = "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3"
+
+
 def tf32_comparison(scores: list[dict], phase2: Path = PHASE2_EVAL_SCORES) -> dict | None:
     """The strict-float32 mean logits here against the Phase 2 eval scores (cuDNN TF32 on), same utterances.
 
-    Reported side by side so the two are never mixed silently; nothing is re-scored.
+    Reported side by side so the two are never mixed silently; nothing is re-scored. Only for rows
+    scored by the Phase 2 served checkpoint, whose eval scores those are.
     """
     from ml.evaluation.metrics import roc_auc
 
     if not phase2.is_file():
+        return None
+    if any(r.get("checkpoint_sha256") and r["checkpoint_sha256"] != PHASE2_SERVED_SHA256 for r in scores):
         return None
     stored = {r["utt_id"]: float(r["score"]) for r in read_csv(phase2)}
     rows = [r for r in scores if not r.get("error") and r["utt_id"] in stored and r.get("mean_spoof_logit")]
@@ -399,7 +405,7 @@ def tf32_comparison(scores: list[dict], phase2: Path = PHASE2_EVAL_SCORES) -> di
 
 
 def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure: Path = FIGURE,
-              index: Path | None = None) -> dict:
+              index: Path | None = None, section: str = INDEX_SECTION) -> dict:
     """Write verdict_rates.json, results/pipeline_eval.json, the figure and INDEX rows from saved files only."""
     from ml.provenance import collect_provenance
     from paper.analysis.index_tools import INDEX, update_index_section
@@ -419,8 +425,9 @@ def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure
         scores.sort(key=lambda r: order[r["utt_id"]])
         checkpoints = {r["checkpoint_sha256"] for r in scores if not r["error"]}
         summary = {
-            "purpose": "Phase 3 task 7: end-to-end verdicts on a stratified ASVspoof 2019 LA eval sample, "
-                       "frozen dev rule",
+            "purpose": config.get("title") or "Phase 3 task 7: end-to-end verdicts on a stratified ASVspoof 2019 LA "
+                                              "eval sample, frozen dev rule",
+            **({"model": config["model"]} if "model" in config else {}),
             "rule": config["rule"],
             "sample": config["sample"],
             "inference": config["inference"],
@@ -434,8 +441,10 @@ def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure
             summary["tf32_comparison"] = comparison
         rates_path = out_dir / "verdict_rates.json"
         rates_path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-        plot_verdicts(summary, figure)
-        update_index_section(INDEX_SECTION, index_rows(summary, _rel(rates_path)), index or INDEX)
+        plot_verdicts(summary, figure, config.get("title", ""))
+        update_index_section(section, index_rows(summary, _rel(rates_path),
+                                                 config.get("index_prefix") or "Audio LA eval end to end"),
+                             index or INDEX)
         audio["asvspoof2019_la_eval"] = {"status": "done", "source": _rel(rates_path), "figure": _rel(figure),
                                          **{k: summary[k] for k in ("sample", "rule", "inference", "classes",
                                                                     "per_attack", "auc_fake_probability",
@@ -468,13 +477,18 @@ def cmd_audio_la(args: argparse.Namespace) -> int:
     root = args.asvspoof_root or default_la_root()
     if root is None:
         raise SystemExit("Set DEEPSENTINEL_DATA or pass --asvspoof-root.")
+    from app.config import settings
+
     out = args.output_dir
-    official = out.resolve() == OUT_DIR.resolve()
+    # A complete eval run is a result; only dev or --limit timing runs may start from an unclean tree.
+    official = args.split == "eval" and args.limit is None
+    frozen_path = Path(settings.audio_verdict_config_file)
     problems = gate_problems(
         args.split, args.confirm_final_eval, official,
         git_status=_git("status", "--porcelain"),
-        frozen_diff=_git("diff", "HEAD", "--", _rel(FROZEN_CONFIG)),
-        frozen_tracked=bool(_git("ls-files", "--", _rel(FROZEN_CONFIG))),
+        frozen_diff=_git("diff", "HEAD", "--", _rel(frozen_path)),
+        frozen_tracked=bool(_git("ls-files", "--", _rel(frozen_path))),
+        frozen_path=frozen_path,
     )
     if problems:
         raise SystemExit("\n".join(problems))
@@ -498,9 +512,8 @@ def cmd_audio_la(args: argparse.Namespace) -> int:
             raise SystemExit(f"{_rel(scores_path)} was started with another sample; move it aside to start again.")
     write_sample(out / "sample.csv", sample)
 
-    from app.config import settings
-
-    frozen = json.loads(FROZEN_CONFIG.read_text(encoding="utf-8"))
+    frozen = json.loads(frozen_path.read_text(encoding="utf-8"))
+    calibration = json.loads(Path(settings.audio_lcnn_calibration_file).read_text(encoding="utf-8"))
     done = done_ids(scores_path)
     todo = [r for r in sample if r["utt_id"] not in done][: args.limit]
     if not scores_path.is_file():
@@ -510,7 +523,8 @@ def cmd_audio_la(args: argparse.Namespace) -> int:
             "sample": {"split": args.split, "seed": args.seed, "size": len(sample), "bonafide": args.bonafide,
                        "per_attack": args.per_attack, "attacks": attacks,
                        "sample_sha256": _sha256(out / "sample.csv")},
-            "rule": {"file": _rel(FROZEN_CONFIG), "sha256": _sha256(FROZEN_CONFIG),
+            "model": {"checkpoint": calibration["checkpoint"], "checkpoint_sha256": calibration["checkpoint_sha256"]},
+            "rule": {"file": _rel(frozen_path), "sha256": _sha256(frozen_path),
                      "authentic_below": frozen["authentic_below"],
                      "flagged_at_or_above": frozen["flagged_at_or_above"],
                      "decision_rule": frozen["decision_rule"]},
@@ -524,6 +538,8 @@ def cmd_audio_la(args: argparse.Namespace) -> int:
             "workers": args.workers, "threads_per_worker": args.threads,
             "provenance": provenance,
         }
+        if args.title:
+            config.update({"title": args.title, "index_prefix": args.index_prefix})
         (out / "config.json").write_text(json.dumps(config, indent=2, default=str) + "\n", encoding="utf-8")
     print(f"{len(sample):,} sampled ({args.split}), {len(done):,} already scored, {len(todo):,} to do", flush=True)
     append_log(log_path, "resume" if done else "start", args.split, commit, len(done), args.rescore_reason or "")
@@ -542,7 +558,7 @@ def cmd_audio_la(args: argparse.Namespace) -> int:
         return 0
     append_log(log_path, "complete", args.split, commit, len(sample), args.rescore_reason or "")
     if official:
-        summarise(out)
+        summarise(out, results_file=args.results_file, figure=args.figure, section=args.index_section)
     return 0
 
 
@@ -562,7 +578,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     audio.add_argument("--output-dir", type=Path, default=OUT_DIR)
     audio.add_argument("--confirm-final-eval", action="store_true")
     audio.add_argument("--rescore-reason", default="")
-    sub.add_parser("summarise", help="rebuild the summaries from the saved rows only")
+    audio.add_argument("--title", default="", help="figure title and summary purpose of a non-default run")
+    audio.add_argument("--index-prefix", default="Audio LA eval end to end")
+    summary = sub.add_parser("summarise", help="rebuild the summaries from the saved rows only")
+    summary.add_argument("--output-dir", type=Path, default=OUT_DIR)
+    for target in (audio, summary):
+        target.add_argument("--results-file", type=Path, default=RESULTS_FILE)
+        target.add_argument("--figure", type=Path, default=FIGURE)
+        target.add_argument("--index-section", default=INDEX_SECTION)
     return parser.parse_args(argv)
 
 
@@ -570,7 +593,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     if args.command == "audio-la":
         return cmd_audio_la(args)
-    summarise()
+    summarise(args.output_dir, results_file=args.results_file, figure=args.figure, section=args.index_section)
     return 0
 
 

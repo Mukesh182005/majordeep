@@ -108,11 +108,45 @@ def score_audio_file(path: Path) -> dict:
     return {"probability": scored["probability"], "cm_score": scored["cm_score"], "n_windows": scored["n_windows"]}
 
 
-def score_conditions(task: tuple[str, str]) -> list[dict]:
-    """Every condition of one utterance; errors are recorded, never raised."""
-    utt_id, source = task
-    exe = ffmpeg_exe()
+def plan_conditions() -> list[str]:
+    from ml.preprocessing.audio_codecs import ALL_CONDITIONS
+
+    return ["original", *ALL_CONDITIONS]
+
+
+def conditions_for(config: dict) -> list[str]:
+    """The conditions a run scored (runs before condition sets existed scored CONDITIONS)."""
+    return list(config.get("conditions") or CONDITIONS)
+
+
+def score_conditions(task: tuple) -> list[dict]:
+    """Every condition of one utterance; errors are recorded, never raised.
+
+    ``(utt_id, path)`` or ``(utt_id, path, "v1")``: CONDITIONS, each encoded file loaded as an upload.
+    ``(utt_id, path, "plan")``: the original plus every condition of ml/preprocessing/audio_codecs.py,
+    decoded as in the dev measurement (ml/evaluation/audio_codec_dev.py).
+    """
+    utt_id, source = task[0], task[1]
+    condition_set = task[2] if len(task) > 2 else "v1"
     rows = []
+    if condition_set == "plan":
+        from app.ml.audio.lcnn_asvspoof import score_lcnn_asvspoof
+
+        from ml.preprocessing.audio_codecs import encode_decode
+
+        for condition in plan_conditions():
+            try:
+                if condition == "original":
+                    scored = score_audio_file(Path(source))
+                else:
+                    full = score_lcnn_asvspoof(encode_decode(Path(source), condition), 16000)
+                    scored = {"probability": full["probability"], "cm_score": full["cm_score"],
+                              "n_windows": full["n_windows"]}
+                rows.append({"utt_id": utt_id, "condition": condition, **scored, "error": ""})
+            except Exception as exc:
+                rows.append({"utt_id": utt_id, "condition": condition, "error": f"{type(exc).__name__}: {exc}"[:500]})
+        return rows
+    exe = ffmpeg_exe()
     with tempfile.TemporaryDirectory(prefix="ds-codec-") as tmp:
         for condition in CONDITIONS:
             try:
@@ -123,9 +157,10 @@ def score_conditions(task: tuple[str, str]) -> list[dict]:
     return rows
 
 
-def run_audio(todo: list[dict], root: Path, scores_path: Path, workers: int, threads: int, scorer=score_conditions) -> int:
+def run_audio(todo: list[dict], root: Path, scores_path: Path, workers: int, threads: int, scorer=score_conditions,
+              condition_set: str = "v1") -> int:
     by_id = {r["utt_id"]: r for r in todo}
-    tasks = [(r["utt_id"], str(root / r["relative_path"])) for r in todo]
+    tasks = [(r["utt_id"], str(root / r["relative_path"]), condition_set) for r in todo]
     new_file = not scores_path.is_file()
     t0, written = time.perf_counter(), 0
     with open(scores_path, "a", newline="", encoding="utf-8") as handle:
@@ -192,15 +227,16 @@ def condition_metrics(rows: list[dict], rule: dict, n_resamples: int = 2000, see
     }
 
 
-def audio_metrics(rows: list[dict], rule: dict, n_resamples: int = 2000, seed: int = 0) -> dict:
+def audio_metrics(rows: list[dict], rule: dict, n_resamples: int = 2000, seed: int = 0,
+                  conditions: list[str] | tuple[str, ...] = CONDITIONS) -> dict:
     from ml.evaluation.stats import delong_test
 
-    by_condition = {c: [r for r in rows if r["condition"] == c] for c in CONDITIONS}
+    by_condition = {c: [r for r in rows if r["condition"] == c] for c in conditions}
     result: dict = {"conditions": {c: condition_metrics(by_condition[c], rule, n_resamples, seed)
-                                   for c in CONDITIONS if by_condition[c]}}
+                                   for c in conditions if by_condition[c]}}
     reference = {r["utt_id"]: r for r in by_condition["original"] if not r.get("error")}
     result["delong_vs_original"] = {}
-    for condition in AUDIO_CODECS:
+    for condition in [c for c in conditions if c != "original"]:
         pairs = [(reference[r["utt_id"]], r) for r in by_condition[condition]
                  if not r.get("error") and r["utt_id"] in reference]
         if not pairs:
@@ -232,8 +268,9 @@ def plot_audio(metrics: dict, path: Path) -> None:
 
     surface, ink, muted, mark = "#fcfcfb", "#0b0b0b", "#52514e", "#2a78d6"
     names = {"original": "Original (FLAC)", "mp3_64k": "MP3 64 kbit/s", "opus_32k": "Opus 32 kbit/s"}
-    conditions = [c for c in CONDITIONS if c in metrics["conditions"]]
-    fig, axes = plt.subplots(1, 2, figsize=(8.2, 0.55 * len(conditions) + 1.3), facecolor=surface)
+    conditions = list(metrics["conditions"])
+    fig, axes = plt.subplots(1, 2, figsize=(8.2, (0.55 if len(conditions) <= 3 else 0.42) * len(conditions) + 1.3),
+                             facecolor=surface)
     for ax in axes:
         ax.set_facecolor(surface)
         for side in ("top", "right", "left"):
@@ -246,7 +283,7 @@ def plot_audio(metrics: dict, path: Path) -> None:
     axes[0].barh(list(ys), eers, height=0.55, color=mark, edgecolor=surface, linewidth=2)
     for y, value in zip(ys, eers):
         axes[0].text(value, y, f" {value:.2f}", va="center", fontsize=8, color=ink)
-    axes[0].set_yticks(list(ys), [names[c] for c in conditions])
+    axes[0].set_yticks(list(ys), [names.get(c, c) for c in conditions])
     axes[0].invert_yaxis()
     axes[0].set_xlabel("EER (%)", fontsize=8.5, color=muted)
     axes[0].set_xlim(0, max(eers) * 1.25 + 0.5)
@@ -260,7 +297,8 @@ def plot_audio(metrics: dict, path: Path) -> None:
     axes[1].set_xlabel("AUC (95% bootstrap interval)", fontsize=8.5, color=muted)
     low = min(metrics["conditions"][c]["auc"]["ci95"][0] for c in conditions)
     axes[1].set_xlim(max(0.0, low - 0.02), 1.004)
-    fig.suptitle("Served audio model under re-encoding, ASVspoof 2019 LA eval sample", fontsize=9.5, color=ink,
+    fig.suptitle(metrics.get("title", "Served audio model under re-encoding, ASVspoof 2019 LA eval sample"),
+                 fontsize=9.5, color=ink,
                  x=0.02, ha="left")
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -268,24 +306,25 @@ def plot_audio(metrics: dict, path: Path) -> None:
     plt.close(fig)
 
 
-def index_rows(metrics: dict, file: str) -> list[tuple[str, str, str, str, str]]:
+def index_rows(metrics: dict, file: str, prefix: str = "Audio LA eval sample") -> list[tuple[str, str, str, str, str]]:
     names = {"original": "original FLAC", "mp3_64k": "MP3 64 kbit/s", "opus_32k": "Opus 32 kbit/s"}
     rows = []
     for condition, entry in metrics["conditions"].items():
         auc = entry["auc"]
-        rows.append((f"Audio LA eval sample, {names[condition]}: EER (%)", f"{entry['eer'] * 100:.2f}", file,
+        label = names.get(condition, condition)
+        rows.append((f"{prefix}, {label}: EER (%)", f"{entry['eer'] * 100:.2f}", file,
                      f"conditions.{condition}.eer", "6"))
-        rows.append((f"Audio LA eval sample, {names[condition]}: AUC",
+        rows.append((f"{prefix}, {label}: AUC",
                      f"{auc['auc']:.4f} [{auc['ci95'][0]:.4f}, {auc['ci95'][1]:.4f}]", file,
                      f"conditions.{condition}.auc.auc, .ci95", "6"))
         verdicts = entry["frozen_rule_verdicts"]
         for cls, verdict, name in (("bonafide", "authentic", "bona fide called authentic"),
                                    ("spoof", "flagged", "spoofed flagged")):
-            rows.append((f"Audio LA eval sample, {names[condition]}: {name} (frozen rule)",
+            rows.append((f"{prefix}, {label}: {name} (frozen rule)",
                          ep._pct(verdicts[cls][verdict]), file,
                          f"conditions.{condition}.frozen_rule_verdicts.{cls}.{verdict}.rate", "6"))
     for condition, test in metrics.get("delong_vs_original", {}).items():
-        rows.append((f"Audio LA eval sample, DeLong {names[condition]} vs original: p", f"{test['p_value']:.3g}",
+        rows.append((f"{prefix}, DeLong {names.get(condition, condition)} vs original: p", f"{test['p_value']:.3g}",
                      file, f"delong_vs_original.{condition}.p_value", "6"))
     return rows
 
@@ -355,7 +394,7 @@ def image_summary() -> dict:
 
 
 def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure: Path = FIGURE,
-              index: Path | None = None) -> dict:
+              index: Path | None = None, section: str = INDEX_SECTION) -> dict:
     from ml.provenance import collect_provenance
     from paper.analysis.index_tools import INDEX, update_index_section
 
@@ -368,17 +407,22 @@ def summarise(out_dir: Path = OUT_DIR, results_file: Path = RESULTS_FILE, figure
         seen = {(r["utt_id"], r["condition"]) for r in rows}
         if len(seen) != len(rows):
             raise SystemExit(f"{ep._rel(scores_path)} holds a condition of an utterance twice.")
-        if {(u, c) for u in sample_ids for c in CONDITIONS} - seen:
+        conditions = conditions_for(config)
+        if {(u, c) for u in sample_ids for c in conditions} - seen:
             raise SystemExit("Some utterances are not scored in every condition yet; finish the run first.")
-        metrics = {"purpose": "Served audio model under MP3 and Opus re-encoding, ASVspoof 2019 LA eval sample",
+        metrics = {"purpose": config.get("title") or
+                   "Served audio model under MP3 and Opus re-encoding, ASVspoof 2019 LA eval sample",
+                   **({"model": config["model"], "title": config["title"]} if config.get("title") else {}),
                    "sample": config["sample"], "codecs": config["codecs"], "rule": config["rule"],
                    "inference": config["inference"], "scores_file": ep._rel(scores_path),
-                   "scores_sha256": ep._sha256(scores_path), **audio_metrics(rows, config["rule"]),
+                   "scores_sha256": ep._sha256(scores_path),
+                   **audio_metrics(rows, config["rule"], conditions=conditions),
                    "original_vs_end_to_end_run": end_to_end_agreement(rows)}
         metrics_path = out_dir / "metrics.json"
         metrics_path.write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
         plot_audio(metrics, figure)
-        update_index_section(INDEX_SECTION, index_rows(metrics, ep._rel(metrics_path)), index or INDEX)
+        update_index_section(section, index_rows(metrics, ep._rel(metrics_path),
+                                                 config.get("index_prefix") or "Audio LA eval sample"), index or INDEX)
         audio = {"status": "done", "source": ep._rel(metrics_path), "figure": ep._rel(figure),
                  **{k: metrics[k] for k in ("sample", "codecs", "conditions", "delong_vs_original")}}
     else:
@@ -401,12 +445,16 @@ def cmd_audio(args: argparse.Namespace) -> int:
         raise SystemExit("Set DEEPSENTINEL_DATA or pass --asvspoof-root.")
     if not args.sample.is_file():
         raise SystemExit(f"{ep._rel(args.sample)} not found: run scripts/eval_pipeline.py audio-la first.")
+    from app.config import settings
+
     out = args.output_dir
-    official = out.resolve() == OUT_DIR.resolve()
+    # Every complete run is a result: only a timing run (--limit-sample) may start from an unclean tree.
+    official = args.limit_sample is None
+    frozen_path = Path(settings.audio_verdict_config_file)
     problems = ep.gate_problems("eval", args.confirm_final_eval, official,
                                 git_status=ep._git("status", "--porcelain"),
-                                frozen_diff=ep._git("diff", "HEAD", "--", ep._rel(ep.FROZEN_CONFIG)),
-                                frozen_tracked=bool(ep._git("ls-files", "--", ep._rel(ep.FROZEN_CONFIG))))
+                                frozen_diff=ep._git("diff", "HEAD", "--", ep._rel(frozen_path)),
+                                frozen_tracked=bool(ep._git("ls-files", "--", ep._rel(frozen_path))))
     if problems:
         raise SystemExit("\n".join(problems))
     provenance = collect_provenance(args.sample, seeds=None)
@@ -424,33 +472,46 @@ def cmd_audio(args: argparse.Namespace) -> int:
             raise SystemExit(f"{ep._rel(scores_path)} was started at another commit; move it aside to start again.")
     ep.write_sample(out / "sample.csv", sample)
     if not scores_path.is_file():
-        frozen = json.loads(ep.FROZEN_CONFIG.read_text(encoding="utf-8"))
+        frozen = json.loads(frozen_path.read_text(encoding="utf-8"))
+        calibration_path = Path(settings.audio_lcnn_calibration_file)
+        calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
         version = subprocess.run([ffmpeg_exe(), "-version"], capture_output=True, text=True).stdout.splitlines()[0]
+        plan = args.condition_set == "plan"
         config = {
             "purpose": "Served audio model under MP3 and Opus re-encoding",
+            "condition_set": args.condition_set,
+            "conditions": plan_conditions() if plan else list(CONDITIONS),
+            "model": {"checkpoint": calibration["checkpoint"], "checkpoint_sha256": calibration["checkpoint_sha256"],
+                      "calibration_file": ep._rel(calibration_path)},
             "sample": {"file": ep._rel(args.sample), "sha256": ep._sha256(args.sample), "size": len(sample)},
-            "codecs": {"ffmpeg": version, **{c: " ".join(v["args"]) for c, v in AUDIO_CODECS.items()}},
-            "loading": "app.ml.preprocessing.load_audio at 16 kHz (as an upload), then score_lcnn_asvspoof",
-            "rule": {"file": ep._rel(ep.FROZEN_CONFIG), "sha256": ep._sha256(ep.FROZEN_CONFIG),
+            "codecs": ({"ffmpeg": version, "definitions": "ml/preprocessing/audio_codecs.py"} if plan else
+                       {"ffmpeg": version, **{c: " ".join(v["args"]) for c, v in AUDIO_CODECS.items()}}),
+            "loading": ("original: load_audio; other conditions: audio_codecs.encode_decode (as the dev measurement), "
+                        "then score_lcnn_asvspoof" if plan else
+                        "app.ml.preprocessing.load_audio at 16 kHz (as an upload), then score_lcnn_asvspoof"),
+            "rule": {"file": ep._rel(frozen_path), "sha256": ep._sha256(frozen_path),
                      "authentic_below": frozen["authentic_below"],
                      "flagged_at_or_above": frozen["flagged_at_or_above"]},
             "inference": "LCNN in strict float32 (TF32 off, deterministic cuDNN)",
             "workers": args.workers, "threads_per_worker": args.threads,
             "provenance": provenance,
         }
+        if args.title:
+            config.update({"title": args.title, "index_prefix": args.index_prefix})
         (out / "config.json").write_text(json.dumps(config, indent=2, default=str) + "\n", encoding="utf-8")
     done = {r["utt_id"] for r in ep.read_csv(scores_path)} if scores_path.is_file() else set()
     todo = [r for r in sample if r["utt_id"] not in done]
-    print(f"{len(sample):,} utterances x {len(CONDITIONS)} conditions; {len(done):,} done, {len(todo):,} to do",
+    n_conditions = len(conditions_for(json.loads((out / "config.json").read_text(encoding="utf-8"))))
+    print(f"{len(sample):,} utterances x {n_conditions} conditions; {len(done):,} done, {len(todo):,} to do",
           flush=True)
     ep.append_log(log_path, "resume" if done else "start", "eval", commit, len(done), args.rescore_reason)
     for name in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"):
         os.environ.setdefault(name, str(args.threads))
-    run_audio(todo, root, scores_path, args.workers, args.threads)
+    run_audio(todo, root, scores_path, args.workers, args.threads, condition_set=args.condition_set)
     if {r["utt_id"] for r in ep.read_csv(scores_path)} >= {r["utt_id"] for r in sample}:
         ep.append_log(log_path, "complete", "eval", commit, len(sample), args.rescore_reason)
         if official:
-            summarise(out)
+            summarise(out, results_file=args.results_file, figure=args.figure, section=args.index_section)
     return 0
 
 
@@ -480,12 +541,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     audio.add_argument("--output-dir", type=Path, default=OUT_DIR)
     audio.add_argument("--confirm-final-eval", action="store_true")
     audio.add_argument("--rescore-reason", default="")
+    audio.add_argument("--condition-set", choices=["v1", "plan"], default="v1",
+                       help="v1: original, MP3 64k, Opus 32k loaded as uploads; plan: audio_codec_plan.json conditions")
+    audio.add_argument("--title", default="", help="figure title of a non-default run")
+    audio.add_argument("--index-prefix", default="Audio LA eval sample")
     image = sub.add_parser("image-transforms", help="write transformed copies of an image manifest")
     image.add_argument("--manifest", type=Path, required=True)
     image.add_argument("--image-root", type=Path, required=True)
     image.add_argument("--out-root", type=Path, required=True)
     image.add_argument("--manifest-out", type=Path, required=True)
-    sub.add_parser("summarise", help="rebuild the summaries from the saved rows only")
+    summary = sub.add_parser("summarise", help="rebuild the summaries from the saved rows only")
+    summary.add_argument("--output-dir", type=Path, default=OUT_DIR)
+    for target in (audio, summary):
+        target.add_argument("--results-file", type=Path, default=RESULTS_FILE)
+        target.add_argument("--figure", type=Path, default=FIGURE)
+        target.add_argument("--index-section", default=INDEX_SECTION)
     return parser.parse_args(argv)
 
 
@@ -495,7 +565,7 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_audio(args)
     if args.command == "image-transforms":
         return cmd_image_transforms(args)
-    summarise()
+    summarise(args.output_dir, results_file=args.results_file, figure=args.figure, section=args.index_section)
     return 0
 
 

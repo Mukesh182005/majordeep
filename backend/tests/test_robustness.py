@@ -154,3 +154,15 @@ def test_summarise_refuses_a_missing_condition(tmp_path):
     (out / "config.json").write_text(json.dumps({"rule": RULE}), encoding="utf-8")
     with pytest.raises(SystemExit, match="every condition"):
         rb.summarise(out, results_file=tmp_path / "r.json", figure=tmp_path / "f.png", index=tmp_path / "I.md")
+
+
+def test_plan_condition_set_scores_every_plan_condition(tmp_path):
+    pytest.importorskip("imageio_ffmpeg")
+    source = tmp_path / "tone.wav"
+    _tone_wav(source, seconds=3.0)
+    rows = rb.score_conditions(("u1", str(source), "plan"))
+    assert [r["condition"] for r in rows] == rb.plan_conditions()
+    assert len(rows) == 16 and all(not r["error"] for r in rows), [r["error"] for r in rows if r["error"]]
+    assert all(0.0 <= r["probability"] <= 1.0 for r in rows)
+    assert rb.conditions_for({}) == list(rb.CONDITIONS)
+    assert rb.conditions_for({"conditions": ["original", "mp3_32k"]}) == ["original", "mp3_32k"]

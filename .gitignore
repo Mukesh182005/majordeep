@@ -70,3 +70,4 @@ yarn-error.log*
 checkpoints/audio_lcnn_asvspoof_*.pt
 paper_results/**/last.pt
 paper_results/**/*.pt
+checkpoints/commfor_ft_*/

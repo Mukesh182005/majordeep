@@ -446,8 +446,12 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         risk_engine["risk_tier"] = "CRITICAL_RISK" if overall_risk >= 85 else "HIGH_RISK"
 
     # Update pipeline modules for Stage 6 and Stage 8 to match calibrated values
+    # A detector at weight 0 is shown but adds nothing to the fusion; say so,
+    # so its score cannot be read as part of the verdict.
+    unweighted = {spec.model_id for spec in SCENE_DETECTORS if spec.weight == 0}
     model_summary = " | ".join(
-        f"{model_id.split('/')[-1]}: {round(p * 100, 1)}%" for model_id, p in scene["model_scores"].items()
+        f"{model_id.split('/')[-1]}{' (unvalidated, not in verdict)' if model_id in unweighted else ''}: {round(p * 100, 1)}%"
+        for model_id, p in scene["model_scores"].items()
     ) or "unavailable"
     for mod in forensics.get("pipeline_modules", []):
         if mod.get("stage") == 6:

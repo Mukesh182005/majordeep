@@ -13,12 +13,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY requirements.lock ./
+COPY requirements.lock requirements-gpu.txt ./
 # Every package pinned to the tested version (scripts/compile_requirements_lock.ps1).
 # The lock takes torch from the PyTorch CPU index: the GPU wheels are several
-# GB and pointless without a GPU. For a GPU host, install requirements-gpu.txt
-# on top, in a CUDA base image.
-RUN pip install -r requirements.lock
+# GB and pointless without a GPU. TORCH_VARIANT=gpu (docker-compose.gpu.yml)
+# swaps in the CUDA build from requirements-gpu.txt; the wheels bundle the CUDA
+# runtime, so only the host's NVIDIA driver is needed. The CPU build is removed
+# first: pip counts 2.12.0+cpu as satisfying torch==2.12.0 and would keep it.
+ARG TORCH_VARIANT=cpu
+RUN pip install -r requirements.lock \
+    && if [ "$TORCH_VARIANT" = "gpu" ]; then \
+        pip uninstall -y torch torchvision && pip install -r requirements-gpu.txt; \
+    fi
 
 COPY . .
 

@@ -53,7 +53,11 @@ def get_model_audit_info() -> dict[str, Any]:
     try:
         from app.ml.image_pipeline import SCENE_DETECTORS
 
-        scene_architecture = "; ".join(f"{s.model_id} ({s.role}, weight {s.weight})" for s in SCENE_DETECTORS)
+        scene_architecture = "; ".join(
+            f"{s.model_id} ({s.role}, weight {s.weight}{', unvalidated, not in verdict' if s.weight == 0 else ''})"
+            for s in SCENE_DETECTORS
+            if s.loader != "commfor" or settings.commfor_enabled
+        )
     except Exception:  # pragma: no cover - inference stack unavailable
         scene_architecture = "unavailable"
 

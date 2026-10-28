@@ -211,6 +211,47 @@ class TestImageVerdicts:
         assert result.evidence["face_scores"] == []
         json.dumps(json_safe(result.evidence), allow_nan=False)
 
+    def test_zero_weight_detector_is_labelled_not_in_verdict(self, tmp_path, monkeypatch):
+        import app.ml.image_pipeline as ip
+
+        monkeypatch.setattr(
+            ip,
+            "SCENE_DETECTORS",
+            (ip.SceneDetectorSpec("test/counted", 1.0, "test"), ip.SceneDetectorSpec("test/extra", 0.0, "test")),
+        )
+        monkeypatch.setattr(
+            ip,
+            "score_scene",
+            lambda image: {"scene_ai_prob": 0.1, "model_scores": {"test/counted": 0.1, "test/extra": 0.99}},
+        )
+        source = tmp_path / "scene.png"
+        Image.new("RGB", (256, 256), (40, 90, 140)).save(source)
+
+        result = ip.analyze_image(source, tmp_path / "evidence", "zero-weight-job")
+        stage6 = next(m for m in result.evidence["pipeline_modules"] if m.get("stage") == 6)
+        assert "counted: 10.0%" in stage6["summary"]
+        assert "extra (unvalidated, not in verdict): 99.0%" in stage6["summary"]
+
+
+def test_custody_record_marks_zero_weight_detectors_and_omits_disabled_ones(monkeypatch):
+    import app.ml.image_pipeline as ip
+    from app.ml.forensics import custody
+
+    monkeypatch.setattr(
+        ip,
+        "SCENE_DETECTORS",
+        (
+            ip.SceneDetectorSpec("test/counted", 1.0, "main"),
+            ip.SceneDetectorSpec("test/commfor", 0.0, "extra", loader="commfor"),
+        ),
+    )
+    architecture = custody.get_model_audit_info()["full_scene_model"]["architecture"]
+    assert "test/counted (main, weight 1.0)" in architecture
+    assert "test/commfor (extra, weight 0.0, unvalidated, not in verdict)" in architecture
+
+    monkeypatch.setattr(settings, "commfor_enabled", False)
+    assert "test/commfor" not in custody.get_model_audit_info()["full_scene_model"]["architecture"]
+
 
 def test_video_scene_score_reaches_the_pipeline(tmp_path, monkeypatch):
     """The video path used to call ensemble records as functions; every call

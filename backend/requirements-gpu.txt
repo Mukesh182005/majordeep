@@ -1,6 +1,7 @@
 # CUDA torch wheels, installed on top of requirements.lock for a GPU host:
 #
 #   pip install -r requirements.lock
+#   pip uninstall -y torch torchvision   # 2.12.0+cpu satisfies torch==2.12.0, so pip would keep it
 #   pip install -r requirements-gpu.txt
 #
 # Kept out of the CPU image: the CUDA wheels are several GB and useless

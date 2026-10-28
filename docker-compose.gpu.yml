@@ -1,0 +1,24 @@
+# GPU override: the inference worker gets the NVIDIA GPU and the CUDA torch build.
+# Only the worker runs models; the API, beat, database, Redis and frontend stay on CPU.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up --build
+#
+# Needs an NVIDIA driver 580 or newer (CUDA 13.0 wheels, backend/requirements-gpu.txt)
+# and Docker with GPU support (Docker Desktop on WSL2, or the NVIDIA Container
+# Toolkit on Linux). Without the override the stack runs on CPU anywhere.
+
+services:
+  worker:
+    build:
+      context: ./backend
+      args:
+        TORCH_VARIANT: gpu
+    environment:
+      DEVICE: cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

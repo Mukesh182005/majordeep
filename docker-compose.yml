@@ -71,6 +71,12 @@ services:
       AUDIO_MODEL_SOURCE: ${AUDIO_MODEL_SOURCE:-lcnn_asvspoof}
       AUDIO_LCNN_CALIBRATION_FILE: /app/paper_config/audio_calibration.json
       AUDIO_VERDICT_CONFIG_FILE: /app/paper_config/frozen_audio_config.json
+      # cuda falls back to CPU when no GPU is visible; docker-compose.gpu.yml
+      # gives the worker the GPU and the CUDA torch build.
+      DEVICE: ${DEVICE:-cpu}
+      # Community Forensics scene detector: weight 0 = scored and shown, not in the verdict.
+      COMMFOR_ENABLED: ${COMMFOR_ENABLED:-true}
+      COMMFOR_WEIGHT: ${COMMFOR_WEIGHT:-0}
     volumes:
       # Shared with the worker: the API writes uploads, the worker reads them
       # and writes evidence back.

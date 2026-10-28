@@ -20,16 +20,9 @@ services:
     depends_on:
       - frontend
 
-  # Worker GPU Acceleration (when deployed on the lab RTX 5070 machine)
-  # Uncomment the deploy section below on NVIDIA GPU machines:
-  # worker:
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
+  # Worker GPU (lab RTX 5070 machine): add -f docker-compose.gpu.yml after this
+  # file. It builds the worker with the CUDA torch build and reserves the GPU;
+  # reserving the GPU alone is not enough, the default image has CPU torch.
 
 volumes:
   caddy_data:

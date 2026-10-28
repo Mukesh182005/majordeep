@@ -5,6 +5,10 @@ Sets (either or both):
                      and ASVspoof2019_LA_{dev,eval}/flac/). Samples --per-class bona fide
                      and spoof clips (spoof spread evenly over the attacks) from eval,
                      and --dev-per-class of each from dev, with a fixed seed.
+  --asvspoof5-root D the ASVspoof 5 folder (ASVspoof5.eval.track_1.tsv and flac_E_eval/).
+                     Every eval clip present under flac_E_eval/ is scored (download only a
+                     sample: the full eval set is 85 GB); results are broken down by attack
+                     (A17-A32) and by codec condition (C01-C11, "-" = none).
   --data D           D/real/<source>/ (label 0) and D/fake/<generator>/ (label 1),
                      any audio format load_audio reads.
 
@@ -101,6 +105,20 @@ def sample_asvspoof(root: Path, split: str, per_class: int, seed: int) -> list[d
         pool = by_attack[attack]
         picked += [pool[i] for i in rng.choice(len(pool), min(n, len(pool)), replace=False)]
     return [{**r, "set": f"asvspoof2019_la_{split}"} for r in picked]
+
+
+def collect_asvspoof5(root: Path) -> list[dict]:
+    """ASVspoof 5 eval clips present on disk, labelled from ASVspoof5.eval.track_1.tsv."""
+    present = {p.stem: p for p in (root / "flac_E_eval").glob("E_*.flac")}
+    items = []
+    for line in (root / "ASVspoof5.eval.track_1.tsv").read_text().splitlines():
+        p = line.split()
+        if len(p) >= 9 and p[1] in present:
+            spoof = p[8] == "spoof"
+            items.append({"path": present[p[1]], "id": p[1], "label": int(spoof),
+                          "group": p[7] if spoof else "bonafide", "codec": p[3], "codec_q": p[4],
+                          "speaker": p[0], "set": "asvspoof5_eval"})
+    return sorted(items, key=lambda r: r["id"])
 
 
 def collect_folders(data: Path) -> tuple[list[dict], list[str]]:
@@ -256,7 +274,33 @@ def evaluate(records: list[dict], key: str, thresholds: dict[str, float], seed: 
                      **{f"{'flagged' if label == 0 else 'caught'}_at_{name}": float((gs >= t).mean())
                         for name, t in thresholds.items()}}
     out["per_group"] = groups
+    codecs = sorted({r["codec"] for r in rows if "codec" in r})
+    if codecs:
+        out["per_codec"] = {}
+        for c in codecs:
+            sub = [r for r in rows if r.get("codec") == c]
+            ys = np.array([r["label"] for r in sub]); ss = np.array([r[key] for r in sub], dtype=float)
+            entry = {"n_real": int((ys == 0).sum()), "n_fake": int((ys == 1).sum()),
+                     **{f"at_{name}": _rates(ys, ss, t) for name, t in thresholds.items()}}
+            if 0 < ys.sum() < ys.size:
+                entry["auc"] = roc_auc(ys, ss)
+                entry["eer"] = equal_error_rate(ys, ss)[0]
+            out["per_codec"][c] = entry
     return out
+
+
+def print_per_codec(name: str, results: dict) -> None:
+    models = {m: r for m, r in results.items() if r and "per_codec" in r and m != "pellav2_max"}
+    if not models:
+        return
+    print(f"  per codec ({name}; at 0.5: real flagged / fakes caught / EER):")
+    for c in next(iter(models.values()))["per_codec"]:
+        cells = []
+        for m, r in models.items():
+            e = r["per_codec"][c]; a = e["at_0.5"]
+            caught = None if a["fakes_missed_rate"] is None else 1 - a["fakes_missed_rate"]
+            cells.append(f"{m:<8} {_fmt(a['real_flagged_rate'])} / {_fmt(caught)} / EER {_fmt(e.get('eer'))}")
+        print(f"    {c:<5} n={e['n_real']}/{e['n_fake']:<4} " + "   |   ".join(cells))
 
 
 def dev_verdict_config(records: list[dict], loaded) -> dict:
@@ -369,6 +413,7 @@ def _provenance(loaded) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--asvspoof-root", type=Path, help="ASVspoof 2019 LA folder")
+    parser.add_argument("--asvspoof5-root", type=Path, help="ASVspoof 5 folder (eval clips under flac_E_eval/)")
     parser.add_argument("--data", type=Path, help="folder with real/<source>/ and fake/<generator>/")
     parser.add_argument("--per-class", type=int, default=300, help="eval clips per class (default 300)")
     parser.add_argument("--dev-per-class", type=int, default=None, help="dev clips per class (default: --per-class)")
@@ -381,8 +426,8 @@ def main() -> int:
                         help=f"fix pellav2 thresholds on the dev sample and write {Path(settings.audio_pellav2_config_file).name}")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
     args = parser.parse_args()
-    if not args.asvspoof_root and not args.data:
-        parser.error("give --asvspoof-root, --data, or both")
+    if not args.asvspoof_root and not args.data and not args.asvspoof5_root:
+        parser.error("give --asvspoof-root, --asvspoof5-root and/or --data")
     if args.write_verdict_config and not args.asvspoof_root:
         parser.error("--write-verdict-config needs --asvspoof-root (thresholds are fixed on its dev split)")
 
@@ -400,6 +445,13 @@ def main() -> int:
             items = sample_asvspoof(args.asvspoof_root, split, n, args.seed)
             print(f"Scoring ASVspoof 2019 LA {split}: {len(items)} clips")
             sets[f"asvspoof2019_la_{split}"] = score_all(items, loaded, lcnn_score, args.max_windows)
+    if args.asvspoof5_root:
+        items = collect_asvspoof5(args.asvspoof5_root)
+        if not items:
+            print(f"WARNING: no ASVspoof 5 eval clips under {args.asvspoof5_root / 'flac_E_eval'}; left out.")
+        else:
+            print(f"Scoring ASVspoof 5 eval: {len(items)} clips")
+            sets["asvspoof5_eval"] = score_all(items, loaded, lcnn_score, args.max_windows)
     codec = None
     if args.codecs and args.asvspoof_root:
         from ml.preprocessing.audio_codecs import ALL_CONDITIONS
@@ -437,6 +489,7 @@ def main() -> int:
             "lcnn": evaluate(records, "lcnn", {"0.5": 0.5}, args.seed) if lcnn_score else None,
         }
         print_table(name, {k: v for k, v in results[name].items() if k != "pellav2_max"})
+        print_per_codec(name, results[name])
 
     if codec:
         print_codecs(codec["summary"])

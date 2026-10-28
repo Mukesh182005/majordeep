@@ -143,7 +143,10 @@ class Settings(BaseSettings):
     # verdict only with TRUFOR_IN_VERDICT=true, which needs a measured threshold first.
     trufor_enabled: bool = True
     trufor_in_verdict: bool = False
-    trufor_flag_at: float = 0.5  # integrity score at which a region is reported as possibly edited
+    # Integrity score at which a region is reported as possibly edited: the lowest threshold
+    # flagging <= 2 % of real COCO photos on the dev half (evaluation/TRUFOR-01/results.json).
+    # Re-compressed social-media photos are flagged more often (10 % of accuracy_test real).
+    trufor_flag_at: float = 0.8
     trufor_max_side: int = 2048  # longer images are downscaled first (GPU memory)
     trufor_weights: str = ""  # local trufor.pth.tar; empty = download once into trufor_cache_dir
     trufor_cache_dir: Path = Path.home() / ".cache" / "deepsentinel" / "trufor"

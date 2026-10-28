@@ -199,3 +199,41 @@ describe('AudioForensicsView Pipeline SubTab', () => {
     expect(handleSubTabChange).toHaveBeenCalledWith('security')
   })
 })
+
+describe('AudioForensicsView with pellav2', () => {
+  const pellav2 = {
+    prob: 0.9731, n_windows: 2, window_probs: [0.9612, 0.985], model: 'pellav2 (w2v-BERT 2.0)',
+    windows: [{ index: 0, start_s: 0, end_s: 4, probability: 0.9612 }, { index: 1, start_s: 4, end_s: 7.2, probability: 0.985 }]
+  }
+
+  it('shows pellav2 as unvalidated context when the LCNN decides', () => {
+    const result = { ...mockAudioResult, evidence: { ...mockAudioResult.evidence, models_output: { pellav2 } } }
+    render(<AudioForensicsView result={result} activeSubTab="summary" setActiveSubTab={() => {}} />)
+
+    const context = screen.getByTestId('pellav2-context')
+    expect(context).toHaveTextContent(/pellav2 \(w2v-BERT 2\.0\): 97\.3%/)
+    expect(context).toHaveTextContent(/not in the verdict/)
+    expect(screen.getAllByText('LCNN (LFCC)').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('names pellav2 as the model when it decides the verdict', () => {
+    const segments = mockAudioResult.evidence.segment_scores.map(s => ({ ...s, source: 'pellav2' }))
+    const result = {
+      ...mockAudioResult,
+      model_name: 'pellav2 (w2v-BERT 2.0)',
+      evidence: {
+        ...mockAudioResult.evidence,
+        segment_scores: segments,
+        segment_scores_source: 'pellav2',
+        models_output: { pellav2 },
+        fusion_decision: { ...(mockAudioResult.evidence.fusion_decision || {}), verdict_source: 'pellav2' }
+      }
+    }
+    render(<AudioForensicsView result={result} activeSubTab="summary" setActiveSubTab={() => {}} />)
+
+    expect(screen.queryByTestId('pellav2-context')).not.toBeInTheDocument()
+    expect(screen.getAllByText('pellav2').length).toBe(2)
+    expect(screen.queryByText('LCNN (LFCC)')).not.toBeInTheDocument()
+    expect(screen.getByText(/pellav2 classification across consecutive 4\.0s windows/)).toBeInTheDocument()
+  })
+})

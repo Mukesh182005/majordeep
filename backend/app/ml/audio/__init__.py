@@ -39,19 +39,73 @@ from app.ml.audio.xai_interpretability import generate_audio_xai_explanations
 logger = logging.getLogger(__name__)
 
 
+TRAINED_MODEL_SOURCES = ("lcnn_asvspoof", "pellav2")
+
+
+def _pellav2_stage(
+    waveform: np.ndarray,
+    sample_rate: int,
+    models_output: dict[str, Any],
+    verdict_config: dict[str, Any] | None,
+    findings: list[str],
+) -> tuple[dict[str, Any], dict[str, Any] | None, list[str]]:
+    """Score with pellav2; it takes over the model stage only when AUDIO_PELLAV2_IN_VERDICT is set.
+
+    If pellav2 is meant to decide but cannot (no weights, no frozen thresholds),
+    the stage is left as it was and a finding says so.
+    """
+    from app.ml.audio.pellav2 import MODEL_LABEL, load_pellav2_verdict_config, score_clip
+
+    try:
+        pellav2 = score_clip(waveform, sample_rate, settings.audio_pellav2_max_windows)
+    except Exception as exc:
+        logger.error("pellav2 scoring failed: %s", exc)
+        pellav2 = None
+    if pellav2 is None:
+        return models_output, verdict_config, findings + [f"{MODEL_LABEL} unavailable for this clip; not used."]
+
+    models_output = {**models_output, "pellav2": pellav2}
+    summary = f"{MODEL_LABEL}: fake probability {pellav2['prob'] * 100:.1f}% (mean of {pellav2['n_windows']} 4 s window(s))"
+    if not settings.audio_pellav2_in_verdict:
+        return models_output, verdict_config, findings + [summary + "; unvalidated here, not in the verdict."]
+    try:
+        pellav2_config = load_pellav2_verdict_config(pellav2["metadata"].get("weights_sha256"))
+    except Exception as exc:
+        logger.error("pellav2 cannot decide the verdict: %s", exc)
+        return models_output, verdict_config, findings + [summary + f"; not in the verdict ({exc})."]
+
+    lcnn = models_output.get("lcnn_asvspoof")
+    models_output.update(
+        fused_ai_probability=pellav2["prob"],
+        model_stage_source="pellav2",
+        model_stage_label=f"{MODEL_LABEL}, pretrained by its authors",
+    )
+    findings = [summary + "; decides the verdict.", *(
+        [f"ASVspoof 2019 LA LCNN {lcnn['probability'] * 100:.1f}% shown as context (no weight)."] if lcnn else []
+    ), *[f for f in findings if f.startswith("Hand-set rule")]]
+    return models_output, pellav2_config, findings
+
+
+def _verdict_model(models_output: dict[str, Any]) -> tuple[str | None, dict[str, Any] | None]:
+    source = models_output.get("model_stage_source")
+    if source not in TRAINED_MODEL_SOURCES:
+        return None, None
+    return source, models_output.get(source)
+
+
 def lcnn_window_segments(models_output: dict[str, Any], verdict_config: dict[str, Any] | None) -> list[dict[str, Any]]:
-    """The LCNN's per-window probabilities as timeline segments (empty in legacy mode).
+    """The verdict model's per-window probabilities as timeline segments (empty in legacy mode).
 
     Same keys as the splice-timeline segments, so the plates, the report and
     the UI draw them unchanged. Status uses the frozen verdict thresholds; the
     verdict itself uses the mean over windows, not any single window.
     """
-    lcnn = models_output.get("lcnn_asvspoof")
-    if not lcnn or verdict_config is None:
+    source, model = _verdict_model(models_output)
+    if not model or verdict_config is None:
         return []
     low, high = float(verdict_config["authentic_below"]), float(verdict_config["flagged_at_or_above"])
     segments = []
-    for window in lcnn.get("windows", []):
+    for window in model.get("windows", []):
         p = float(window["probability"])
         status = "FLAGGED" if p >= high else ("AUTHENTIC" if p < low else "INCONCLUSIVE")
         segments.append({
@@ -60,7 +114,7 @@ def lcnn_window_segments(models_output: dict[str, Any], verdict_config: dict[str
             "end_s": window["end_s"],
             "fake_probability": round(p, 4),
             "status": status,
-            "source": "lcnn_asvspoof",
+            "source": source,
             "reasons": [],
         })
     return segments
@@ -205,16 +259,26 @@ def run_comprehensive_audio_forensics(
             f"Hand-set rule score {models_output['legacy_fused_ai_probability'] * 100:.1f}% shown as context only "
             "(heuristic, unvalidated).",
         ]
+    if settings.audio_pellav2_enabled:
+        models_output, verdict_config, model_findings = _pellav2_stage(
+            model_waveform if model_waveform is not None else waveform, sample_rate,
+            models_output, verdict_config, model_findings,
+        )
     t1 = time.perf_counter()
     ai_prob = models_output.get("fused_ai_probability", 0.1)
     pipeline_modules.append({
         "stage": 6,
         "name": "Model Stage",
-        "category": "Machine Learning" if models_output.get("model_stage_source") == "lcnn_asvspoof" else "Heuristic (unvalidated)",
+        "category": "Machine Learning" if models_output.get("model_stage_source") in TRAINED_MODEL_SOURCES else "Heuristic (unvalidated)",
         "status": "ANOMALY_DETECTED" if ai_prob > 0.65 else "PASSED",
         "duration_ms": max(1, int((t1 - t0) * 1000)),
         "summary": f"Spoof probability: {ai_prob * 100:.1f}% ({models_output.get('model_stage_label')}) | "
-        f"Domain (heuristic): {models_output.get('audio_domain')}",
+        + (
+            f"pellav2 (w2v-BERT 2.0): {models_output['pellav2']['prob'] * 100:.1f}% over "
+            f"{models_output['pellav2']['n_windows']} window(s) (unvalidated, not in verdict) | "
+            if models_output.get("pellav2") and models_output.get("model_stage_source") != "pellav2" else ""
+        )
+        + f"Domain (heuristic): {models_output.get('audio_domain')}",
         "findings": model_findings,
     })
 

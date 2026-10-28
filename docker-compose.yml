@@ -71,6 +71,12 @@ services:
       AUDIO_MODEL_SOURCE: ${AUDIO_MODEL_SOURCE:-lcnn_asvspoof}
       AUDIO_LCNN_CALIBRATION_FILE: /app/paper_config/audio_calibration.json
       AUDIO_VERDICT_CONFIG_FILE: /app/paper_config/frozen_audio_config.json
+      # pellav2 (2.3 GB, downloaded once into the worker's HF cache): scored on every
+      # clip; it decides the verdict only with AUDIO_PELLAV2_IN_VERDICT=true.
+      AUDIO_PELLAV2_ENABLED: ${AUDIO_PELLAV2_ENABLED:-true}
+      AUDIO_PELLAV2_IN_VERDICT: ${AUDIO_PELLAV2_IN_VERDICT:-false}
+      AUDIO_PELLAV2_MAX_WINDOWS: ${AUDIO_PELLAV2_MAX_WINDOWS:-8}
+      AUDIO_PELLAV2_CONFIG_FILE: /app/paper_config/pellav2_verdict_config.json
       # cuda falls back to CPU when no GPU is visible; docker-compose.gpu.yml
       # gives the worker the GPU and the CUDA torch build.
       DEVICE: ${DEVICE:-cpu}
@@ -94,6 +100,7 @@ services:
     build: ./backend
     command: >
       sh -c "python -c 'from app.ml.image_pipeline import get_scene_detector; get_scene_detector()' &&
+             python -c 'from app.config import settings; from app.ml.audio.pellav2 import get_pellav2; settings.audio_pellav2_enabled and get_pellav2()' &&
              celery -A app.worker.celery_app.celery_app worker --loglevel=info --concurrency=1"
     environment:
       <<: *backend_env

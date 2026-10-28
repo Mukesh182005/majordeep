@@ -57,6 +57,13 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
   const uncertainBand = evidence.uncertain_band ?? fusion.uncertain_band ?? 0.08
   const decisionRule = evidence.decision_rule ?? fusion.decision_rule ?? 'LCNN probability against decision threshold'
   const contextSignals = fusion.context_signals || {}
+  // Which trained model decided: the ASVspoof LCNN (default) or pellav2 (AUDIO_PELLAV2_IN_VERDICT).
+  const verdictSource = fusion.verdict_source || evidence.segment_scores_source || 'lcnn_asvspoof'
+  const pellav2Decides = verdictSource === 'pellav2'
+  const pellav2 = (evidence.models_output || forensics.models_output || {}).pellav2 || null
+  const sourceLabel = (source) => (source === 'lcnn_asvspoof' ? 'LCNN (LFCC)' : source === 'pellav2' ? 'pellav2' : source)
+  const modelBackbone = pellav2Decides ? 'pellav2 (w2v-BERT 2.0)' : 'LCNN (LFCC)'
+  const modelLineage = pellav2Decides ? 'Pretrained by its authors' : 'ASVspoof 2019 LA'
 
   const timeDomain = signalIntel.time_domain || {}
   const freqDomain = signalIntel.frequency_domain || {}
@@ -188,8 +195,8 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
               </div>
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
                 <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block font-sans">Model Lineage</span>
-                <span className="text-xs font-bold text-accent mt-1 block truncate">ASVspoof 2019 LA</span>
-                <span className="text-[0.6875rem] text-ink-muted">LFCC 60-dim / LCNN</span>
+                <span className="text-xs font-bold text-accent mt-1 block truncate">{modelLineage}</span>
+                <span className="text-[0.6875rem] text-ink-muted">{pellav2Decides ? 'w2v-BERT 2.0 / pellav2' : 'LFCC 60-dim / LCNN'}</span>
               </div>
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
                 <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block font-sans">Weight Status</span>
@@ -206,13 +213,24 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
                 The verdict is the trained model&apos;s alone. Glottal, mains-hum, splice, container and watermark checks below are shown as context and carry no weight: none separated genuine from synthetic speech on development data.
               </p>
             </div>
+
+            {pellav2 && !pellav2Decides && (
+              <div className="p-3 bg-surface-2 rounded-xl border border-black/5 text-xs text-ink-secondary flex items-start gap-2.5" data-testid="pellav2-context">
+                <Info size={15} className="text-ink-muted flex-shrink-0 mt-0.5" />
+                <p className="leading-relaxed">
+                  <strong className="text-ink-primary">pellav2 (w2v-BERT 2.0): {percent(pellav2.prob)}</strong>
+                  {' '}over {pellav2.n_windows} window(s) ({(pellav2.window_probs || []).map(p => percent(p)).join(', ')}).
+                  {' '}Second detector, unvalidated here: shown as context, not in the verdict.
+                </p>
+              </div>
+            )}
           </div>
         </Card>
 
         {/* 2. MAIN RESULT: Per-Window Timeline */}
         <Card
           title="Per-Window Timeline (Trained Model)"
-          subtitle="Calibrated ASVspoof LCNN classification across sliding 4.0s temporal windows"
+          subtitle={pellav2Decides ? 'pellav2 classification across consecutive 4.0s windows' : 'Calibrated ASVspoof LCNN classification across sliding 4.0s temporal windows'}
         >
           <div className="mt-4 space-y-4">
             {segments && segments.length > 0 ? (
@@ -277,7 +295,7 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
                               </span>
                             </td>
                             <td className="py-2.5 text-ink-muted font-mono text-[0.6875rem]">
-                              {seg.source === 'lcnn_asvspoof' ? 'LCNN (LFCC)' : seg.source}
+                              {sourceLabel(seg.source)}
                             </td>
                           </tr>
                         )
@@ -1343,7 +1361,7 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
                 <span className="font-mono text-lg font-black text-ink-primary mt-1 block">
                   {percent(fakeProb)}
                 </span>
-                <span className="text-[0.6875rem] text-ink-muted">Trained LCNN probability</span>
+                <span className="text-[0.6875rem] text-ink-muted">{pellav2Decides ? 'pellav2 probability' : 'Trained LCNN probability'}</span>
               </div>
 
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
@@ -1369,23 +1387,25 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
                 <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Model Backbone</span>
                 <span className="font-mono text-sm font-bold text-accent mt-1 block truncate">
-                  LCNN (LFCC)
+                  {modelBackbone}
                 </span>
-                <span className="text-[0.6875rem] text-ink-muted">ASVspoof 2019 LA</span>
+                <span className="text-[0.6875rem] text-ink-muted">{modelLineage}</span>
               </div>
             </div>
           </div>
         </Card>
 
         {/* Trained Model Architecture & Decision Rule */}
-        <Card title="Trained Model Architecture & Decision Rule" subtitle="LCNN acoustic classification on ASVspoof 2019 LA">
+        <Card title="Trained Model Architecture & Decision Rule" subtitle={pellav2Decides ? 'pellav2 classification (pretrained by its authors)' : 'LCNN acoustic classification on ASVspoof 2019 LA'}>
           <div className="mt-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
                 <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Neural Classifier</span>
                 <h4 className="text-sm font-bold text-ink-primary">{modelName}</h4>
                 <p className="text-xs text-ink-secondary leading-relaxed">
-                  Light-CNN (LCNN) architecture operating on 60-dimensional Linear Frequency Cepstral Coefficients (LFCC). 
+                  {pellav2Decides
+                    ? 'w2v-BERT 2.0 speech encoder with a learned weighting of all layers and a linear head, released by its authors (MIT licence; training data not published). Scores loudness-normalised 4.0s windows of 80-bin filterbank features. '
+                    : 'Light-CNN (LCNN) architecture operating on 60-dimensional Linear Frequency Cepstral Coefficients (LFCC). '}
                   Inference is strict float32 and deterministic (TF32 disabled, deterministic cuDNN).
                 </p>
                 <div className="text-xs font-mono text-ink-muted pt-1">
@@ -1395,9 +1415,11 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
 
               <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
                 <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Calibration & Threshold</span>
-                <h4 className="text-sm font-bold text-ink-primary">Class-Balanced Platt Scaling</h4>
+                <h4 className="text-sm font-bold text-ink-primary">{pellav2Decides ? 'Mean of Window Probabilities' : 'Class-Balanced Platt Scaling'}</h4>
                 <p className="text-xs text-ink-secondary leading-relaxed">
-                  Mean spoof logits across sliding 4.0s windows are mapped to calibrated probabilities via Platt scaling fitted on the ASVspoof 2019 LA development split.
+                  {pellav2Decides
+                    ? "The clip probability is the mean of the window probabilities. The threshold is the authors' 0.5, checked on the ASVspoof 2019 LA development split."
+                    : 'Mean spoof logits across sliding 4.0s windows are mapped to calibrated probabilities via Platt scaling fitted on the ASVspoof 2019 LA development split.'}
                 </p>
                 <div className="text-xs font-mono text-ink-muted pt-1">
                   Rule: {decisionRule}

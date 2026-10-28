@@ -116,6 +116,14 @@ class Settings(BaseSettings):
     # guard_rule). Audio in these codecs gets an INCONCLUSIVE audio verdict, and
     # a video's audio track in them is left out of the video score. Empty: no guard.
     audio_codec_guard: CsvList = Field(default_factory=list)
+    # pellav2 (app/ml/audio/pellav2.py): pretrained by its authors, scored on every clip.
+    audio_pellav2_enabled: bool = True
+    # True: pellav2 decides the audio verdict, with the thresholds in audio_pellav2_config_file
+    # (written by scripts/eval_audio_detector.py). False: shown as context, the LCNN decides.
+    audio_pellav2_in_verdict: bool = False
+    audio_pellav2_max_windows: int = 8  # 8 x 4 s = the first 32 s of audio
+    audio_pellav2_model_id: str = "Sadanie/pellav2-audio-deepfake-detector"  # or a local .pt / folder
+    audio_pellav2_config_file: Path = ROOT_DIR / "paper" / "config" / "pellav2_verdict_config.json"
     # Community Forensics ViT (app/ml/commfor.py), pretrained by its authors and
     # not yet evaluated on our image set, so it carries no verdict weight.
     commfor_enabled: bool = True
@@ -176,7 +184,7 @@ class Settings(BaseSettings):
 
     @field_validator(
         "storage_dir", "evidence_dir", "report_dir", "checkpoint_dir", "audio_lcnn_calibration_file",
-        "audio_verdict_config_file", mode="after",
+        "audio_verdict_config_file", "audio_pellav2_config_file", mode="after",
     )
     @classmethod
     def _anchor_path(cls, value: Path) -> Path:

@@ -111,6 +111,16 @@ METHODOLOGY: dict[str, str] = {
     ),
 }
 
+METHODOLOGY_AUDIO_PELLAV2 = (
+    "The submitted audio was converted to a 16 kHz mono signal and divided into consecutive "
+    "4-second windows (up to the first 32 seconds). Each window was loudness-normalised and "
+    "scored by pellav2, a pretrained detector built on the w2v-BERT 2.0 speech model and "
+    "released by its authors under the MIT licence; its training data is not published. The "
+    "reported probability is the mean of the window scores, and the decision thresholds were "
+    "fixed on the ASVspoof 2019 development set. The glottal, mains-hum, splice and container "
+    "checks listed in section 4 are heuristics whose discrimination has not been shown."
+)
+
 METHODOLOGY_AUDIO_RULES = (
     "No trained audio model was used for this analysis. The score comes from hand-set rules "
     "over signal descriptors (glottal-flow, voice-quality and cepstral measures, container "
@@ -682,6 +692,8 @@ def _section_methodology(job, styles, has_forensics: bool = True) -> list[Any]:
         Paragraph(
             METHODOLOGY_AUDIO_RULES
             if job.media_type.value == "audio" and (job.evidence or {}).get("experimental")
+            else METHODOLOGY_AUDIO_PELLAV2
+            if job.media_type.value == "audio" and (job.evidence or {}).get("segment_scores_source") == "pellav2"
             else METHODOLOGY.get(job.media_type.value, ""),
             styles["body"],
         ),
@@ -1003,7 +1015,7 @@ def _section_forensics(job, charts, styles) -> list[Any]:
             Paragraph("4. Audio Stage Outputs", styles["h2"]),
             Paragraph(
                 "Outputs of the eight audio stages. Only the model stage is a trained model, and "
-                "only when it is the ASVspoof 2019 LA LCNN; the glottal, mains-hum (ENF), splice, "
+                "only when it is the ASVspoof 2019 LA LCNN or pellav2; the glottal, mains-hum (ENF), splice, "
                 "watermark and container checks are heuristics whose discrimination has not been "
                 "shown, and are marked unvalidated.",
                 styles["body"],

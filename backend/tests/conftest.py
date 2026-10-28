@@ -40,6 +40,10 @@ os.environ.update(
         "AUDIO_MODEL_SOURCE": "lcnn_asvspoof",
         "AUDIO_LCNN_CALIBRATION_FILE": str(TEST_ROOT / "config" / "audio_calibration.json"),
         "AUDIO_VERDICT_CONFIG_FILE": str(TEST_ROOT / "config" / "frozen_audio_config.json"),
+        # pellav2 weights are 2.3 GB; tests that need it enable it with a tiny model
+        # (tests/test_audio_pellav2.py).
+        "AUDIO_PELLAV2_ENABLED": "false",
+        "AUDIO_PELLAV2_CONFIG_FILE": str(TEST_ROOT / "config" / "pellav2_verdict_config.json"),
     }
 )
 

@@ -32,6 +32,11 @@ LCNN_SCOPE_NOTE = (
     "Model stage: LCNN trained and evaluated on ASVspoof 2019 LA (studio-quality English read speech). "
     "It has not been evaluated on real-world recordings, phone calls or other languages."
 )
+PELLAV2_SCOPE_NOTE = (
+    "Model stage: pellav2 (w2v-BERT 2.0), a pretrained detector from its authors whose training data is not "
+    "published. Its thresholds were fixed on ASVspoof 2019 LA dev; see evaluation/AUDIO-PELLAV2-01 for what "
+    "it was measured on."
+)
 
 
 _AUDIO_VERDICT = {
@@ -76,11 +81,16 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     provenance = forensic_results["security_provenance"]
 
     # ------------------------------------------------------------------ 3. Investigative Notes
-    lcnn = forensic_results["models_output"].get("lcnn_asvspoof")
-    experimental = lcnn is None
-    notes: list[str] = [EXPERIMENTAL_REASON if experimental else LCNN_SCOPE_NOTE]
-    # A codec on which the model failed on dev speech: no audio verdict (AUDIO_CODEC_GUARD).
-    guarded = None if experimental else guarded_family(path)
+    models_output = forensic_results["models_output"]
+    verdict_source = models_output.get("model_stage_source")
+    verdict_model = models_output.get(verdict_source) if verdict_source in ("lcnn_asvspoof", "pellav2") else None
+    experimental = verdict_model is None
+    notes: list[str] = [
+        EXPERIMENTAL_REASON if experimental else (PELLAV2_SCOPE_NOTE if verdict_source == "pellav2" else LCNN_SCOPE_NOTE)
+    ]
+    # A codec on which the LCNN failed on dev speech: no audio verdict (AUDIO_CODEC_GUARD).
+    # The guard was measured on the LCNN, so it applies only when the LCNN decides.
+    guarded = guarded_family(path) if verdict_source == "lcnn_asvspoof" else None
     if guarded:
         notes.insert(0, guard_note(guarded))
     if not experimental:
@@ -152,7 +162,7 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "segments_analysed": len(model_windows) if model_windows else splicing.get("total_segments_analyzed", 0),
         "flagged_segments": sum(1 for w in model_windows if w["status"] == "FLAGGED") if model_windows else None,
         "segment_scores": model_windows or splicing.get("segments", []),
-        "segment_scores_source": "lcnn_asvspoof" if model_windows else "splice_timeline_heuristic",
+        "segment_scores_source": verdict_source if model_windows else "splice_timeline_heuristic",
         "splice_segment_scores": splicing.get("segments", []),
         "suspicious_intervals": splicing.get("suspicious_intervals", []),
 
@@ -165,7 +175,8 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "signal_intel": signal_intel,
         "glottal_physics": glottal,
         "speech_semantics": forensic_results["speech_semantics"],
-        "models_output": forensic_results["models_output"],
+        "models_output": models_output,
+        "pellav2_window_probs": (models_output.get("pellav2") or {}).get("window_probs"),
         "splicing_timeline": splicing,
         "enf_environment": enf,
         "security_provenance": provenance,
@@ -181,15 +192,19 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "is_inconclusive": fusion.get("is_inconclusive"),
     }
     evidence_payload["codec_guard"] = {"codec_family": guarded, "setting": "AUDIO_CODEC_GUARD"} if guarded else None
-    if fusion.get("verdict_source") == "lcnn_asvspoof":
+    if fusion.get("verdict_source") in ("lcnn_asvspoof", "pellav2"):
         evidence_payload["decision_threshold"] = fusion["decision_threshold"]
         evidence_payload["uncertain_band"] = fusion["uncertain_band"]
 
-    if lcnn:
+    if verdict_model:
+        pellav2_decides = verdict_source == "pellav2"
         return AnalysisResult(
             fake_probability=round(final_fake_prob, 4),
-            model_name="LCNN (LFCC), ASVspoof 2019 LA",
-            model_version=lcnn["model_version"],
+            model_name="pellav2 (w2v-BERT 2.0)" if pellav2_decides else "LCNN (LFCC), ASVspoof 2019 LA",
+            model_version=(
+                f"pellav2@{verdict_model['metadata'].get('revision') or 'local'}"[:64]
+                if pellav2_decides else verdict_model["model_version"]
+            ),
             weights_status=TRAINED,
             evidence=evidence_payload,
             # The audio thresholds were frozen on ASVspoof dev and differ from the

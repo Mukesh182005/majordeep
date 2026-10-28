@@ -38,7 +38,7 @@ hf-xet==1.6.0             # via huggingface-hub, -c constraints-tested.txt
 httpcore==1.0.9           # via httpx, -c constraints-tested.txt
 httptools==0.8.0          # via uvicorn, -c constraints-tested.txt
 httpx==0.27.2             # via huggingface-hub, -c constraints-tested.txt
-huggingface-hub==1.30.0   # via timm, tokenizers, transformers, -c constraints-tested.txt
+huggingface-hub==1.30.0   # via timm, tokenizers, transformers, -c constraints-tested.txt, -r requirements-ml.txt
 idna==3.19                # via anyio, email-validator, httpx, requests, -c constraints-tested.txt
 imagehash==4.3.2          # via -c constraints-tested.txt, -r requirements-ml.txt
 imageio-ffmpeg==0.6.0     # via -c constraints-tested.txt, -r requirements-ml.txt
@@ -59,7 +59,7 @@ msgpack==1.2.2            # via librosa, -c constraints-tested.txt
 narwhals==2.26.0          # via scikit-learn, -c constraints-tested.txt
 networkx==3.6.1           # via torch, -c constraints-tested.txt
 numba==0.67.0             # via librosa, -c constraints-tested.txt
-numpy==1.26.4             # via contourpy, facenet-pytorch, imagehash, librosa, matplotlib, numba, opencv-python-headless, pywavelets, scikit-learn, scipy, soundfile, soxr, torchvision, transformers, -c constraints-tested.txt, -r requirements.txt
+numpy==1.26.4             # via contourpy, facenet-pytorch, imagehash, librosa, matplotlib, numba, opencv-python-headless, pyloudnorm, pywavelets, scikit-learn, scipy, soundfile, soxr, torchvision, transformers, -c constraints-tested.txt, -r requirements.txt
 opencv-python-headless==4.10.0.84  # via -c constraints-tested.txt, -r requirements-ml.txt
 packaging==26.3           # via huggingface-hub, kombu, lazy-loader, matplotlib, pooch, transformers, -c constraints-tested.txt
 passlib==1.7.4            # via -c constraints-tested.txt, -r requirements.txt
@@ -76,6 +76,7 @@ pydantic==2.13.5          # via fastapi, pydantic-settings, -c constraints-teste
 pydantic-core==2.46.5     # via pydantic, -c constraints-tested.txt
 pydantic-settings==2.15.0  # via -c constraints-tested.txt, -r requirements.txt
 pygments==2.21.0          # via rich, -c constraints-tested.txt
+pyloudnorm==0.2.0         # via -c constraints-tested.txt, -r requirements-ml.txt
 pyparsing==3.3.2          # via matplotlib, -c constraints-tested.txt
 python-dateutil==2.9.0.post0  # via celery, matplotlib, -c constraints-tested.txt
 python-dotenv==1.2.3      # via pydantic-settings, uvicorn, -c constraints-tested.txt
@@ -91,7 +92,7 @@ rich==15.0.0              # via typer, -c constraints-tested.txt
 rsa==4.9.1                # via python-jose, -c constraints-tested.txt
 safetensors==0.8.0        # via timm, transformers, -c constraints-tested.txt, -r requirements-ml.txt
 scikit-learn==1.9.1       # via librosa, -c constraints-tested.txt
-scipy==1.17.1             # via imagehash, librosa, scikit-learn, -c constraints-tested.txt, -r requirements-ml.txt
+scipy==1.17.1             # via imagehash, librosa, pyloudnorm, scikit-learn, -c constraints-tested.txt, -r requirements-ml.txt
 setuptools==81.0.0        # via torch
 shellingham==1.5.4        # via typer, -c constraints-tested.txt
 six==1.17.0               # via ecdsa, python-dateutil, -c constraints-tested.txt

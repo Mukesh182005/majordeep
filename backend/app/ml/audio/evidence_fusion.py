@@ -10,6 +10,8 @@ authentic below ``authentic_below``, AI-generated at or above
 mains-hum, splice, container and steganography signals are computed and
 reported as context with no weight: none separated bona fide from spoofed
 speech on dev (paper_results/audio_heuristics_dev/signal_auc.json).
+With ``AUDIO_PELLAV2_IN_VERDICT=true`` the same rule runs on the pellav2
+probability, with the thresholds in ``paper/config/pellav2_verdict_config.json``.
 
 **Hand-set rule** (``legacy``, no trained model; results are experimental):
 
@@ -82,7 +84,7 @@ def compute_evidence_fusion_and_risk(
 
     r_tamper = float(min(0.98, max(0.02, tamper_signals * 0.25)))
 
-    if verdict_config is not None and models_output.get("model_stage_source") == "lcnn_asvspoof":
+    if verdict_config is not None and models_output.get("model_stage_source") in ("lcnn_asvspoof", "pellav2"):
         return _trained_model_decision(
             float(ai_ml_prob), r_tamper, verdict_config, vault_record, file_dna, glottal_physics, models_output,
             splicing_timeline, enf_environment, glottal_err, coarticulation_err,
@@ -161,7 +163,7 @@ def _trained_model_decision(
     coarticulation_err: float,
     flags: dict[str, bool],
 ) -> dict[str, Any]:
-    """Verdict from the calibrated LCNN probability alone; heuristics are context."""
+    """Verdict from the trained model's probability alone (LCNN or pellav2); heuristics are context."""
     low, high = float(config["authentic_below"]), float(config["flagged_at_or_above"])
     if p >= high:
         verdict, decision_set = "AI_GENERATED", ["AI_GENERATED"]
@@ -182,7 +184,8 @@ def _trained_model_decision(
     if flags["stego"]:
         context.append("Possible steganographic payload (heuristic, unvalidated; no weight)")
 
-    signals = [f"LCNN spoof probability {p * 100:.1f}% (threshold {config['threshold']:.3f}, "
+    model_name = "pellav2" if models_output.get("model_stage_source") == "pellav2" else "LCNN"
+    signals = [f"{model_name} spoof probability {p * 100:.1f}% (threshold {config['threshold']:.3f}, "
                f"inconclusive band {low:.3f}-{high:.3f})"]
     return {
         "final_verdict": verdict,
@@ -203,7 +206,7 @@ def _trained_model_decision(
             "coarticulation_anomaly": round(float(coarticulation_err), 4),
             "hand_set_rule_score": models_output.get("legacy_fused_ai_probability"),
         },
-        "verdict_source": "lcnn_asvspoof",
+        "verdict_source": models_output.get("model_stage_source"),
         "evidence_graph": _build_evidence_graph(
             vault_record, file_dna, glottal_physics, models_output, splicing_timeline, enf_environment, verdict,
             trained_model_only=True,

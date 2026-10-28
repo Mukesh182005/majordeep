@@ -68,6 +68,9 @@ def _record(media: str, item: dict, result, latency_s: float) -> dict:
         "stages": _stages(ev), "latency_s": round(latency_s, 3),
     }
     if media == "image":
+        from app.config import settings
+
+        rec["commfor_weight"] = settings.commfor_weight
         rec["scene_model_scores"] = ev.get("scene_model_scores")
         rec["faces_detected"] = ev.get("faces_detected")
     else:

@@ -82,7 +82,7 @@ services:
       DEVICE: ${DEVICE:-cpu}
       # Community Forensics scene detector: weight 0 = scored and shown, not in the verdict.
       COMMFOR_ENABLED: ${COMMFOR_ENABLED:-true}
-      COMMFOR_WEIGHT: ${COMMFOR_WEIGHT:-0}
+      COMMFOR_WEIGHT: ${COMMFOR_WEIGHT:-4}
     volumes:
       # Shared with the worker: the API writes uploads, the worker reads them
       # and writes evidence back.

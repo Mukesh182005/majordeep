@@ -439,6 +439,31 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
             "fine pixel traces AI detectors rely on. No AI generation was detected, but that "
             "cannot establish authenticity — analyse the original file instead."
         )
+    elif (
+        would_be_authentic
+        and not camera_metadata
+        and final_fake_prob >= settings.image_authentic_max_prob_without_camera
+    ):
+        # Below the decision band, but not clearly: with no camera metadata there is
+        # nothing else to support an authentic call.
+        verdict_override = Verdict.INCONCLUSIVE
+        verdict_basis = "weak_indicators_no_camera_metadata"
+        dominant_threat = "Inconclusive — No Camera Metadata, Weak AI Indicators"
+        threat_code = "INCONCLUSIVE_UNVERIFIED_ORIGIN"
+        notes.append(
+            f"AI-generation probability {final_fake_prob * 100:.1f}%: below the flag threshold, but not "
+            f"low enough (< {settings.image_authentic_max_prob_without_camera * 100:.0f}%) to call an image "
+            "with no camera metadata authentic. Composites, heavily re-compressed images and newer "
+            "generators often score in this range."
+        )
+    elif threat_code == "AUTHENTIC_PHOTOGRAPH" and not camera_metadata:
+        # Nothing shows the picture came from a camera; say only what was found.
+        dominant_threat = "No AI Generation or Editing Detected (origin unverified: no camera metadata)"
+        threat_code = "NO_MANIPULATION_DETECTED"
+        notes.append(
+            "No detector or forensic check found AI generation or editing. The file has no camera "
+            "metadata, so this is absence of detected manipulation, not proof that it is a camera photograph."
+        )
 
     if final_fake_prob >= 0.50:
         overall_risk = max(overall_risk, round(final_fake_prob * 100))

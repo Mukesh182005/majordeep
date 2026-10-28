@@ -206,7 +206,7 @@ class TestMediaVariants:
         text = " ".join(pdf_text(generate_report(job, output_dir=tmp_path, evidence_dir=tmp_path).path).split())
         assert "ASVspoof 2019" in text and "LFCC" in text
         assert "has not been evaluated on real-world recordings" in text
-        assert "LIKELY AUTHENTIC" in text
+        assert "NO MANIPULATION DETECTED" in text
 
     def test_image_report_renders_without_a_timeline(self, tmp_path):
         job = make_job(

@@ -236,7 +236,10 @@ def _describe_audio() -> str:
     except (OSError, ValueError, KeyError):
         return "ASVspoof 2019 LA LCNN: calibration file missing or unreadable"
     present = (Path(settings.checkpoint_dir) / name).is_file()
-    return f"ASVspoof 2019 LA LCNN {name}, checkpoint {'present' if present else 'MISSING'}"
+    lcnn = f"ASVspoof 2019 LA LCNN {name}, checkpoint {'present' if present else 'MISSING'}"
+    if settings.audio_pellav2_enabled and settings.audio_pellav2_in_verdict:
+        return f"pellav2 (w2v-BERT 2.0) decides; fallback and context: {lcnn}"
+    return lcnn
 
 
 def reset_cache() -> None:

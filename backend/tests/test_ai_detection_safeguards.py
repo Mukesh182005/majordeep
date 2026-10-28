@@ -271,3 +271,44 @@ def test_video_scene_score_reaches_the_pipeline(tmp_path, monkeypatch):
     result = video.analyze_video(clip, tmp_path / "evidence", "video-scene-job")
     stage3 = next(m for m in result.evidence["pipeline_modules"] if m.get("stage") == 3)
     assert "Full-scene ViT GenAI: 90.0%" in stage3["desc"]
+
+
+class TestAuthenticNeedsEvidence:
+    """Without camera metadata, a low score is only 'no detector fired', never proof of a camera photo."""
+
+    @staticmethod
+    def _plain_image(tmp_path, exif_make: str | None = None):
+        source = tmp_path / "plain.jpg"
+        image = Image.new("RGB", (256, 256), (40, 90, 140))
+        if exif_make:
+            exif = Image.Exif()
+            exif[271] = exif_make  # Make
+            image.save(source, exif=exif)
+        else:
+            image.save(source)
+        return source
+
+    def test_weak_score_without_camera_metadata_is_inconclusive(self, tmp_path, monkeypatch):
+        import app.ml.image_pipeline as ip
+
+        monkeypatch.setattr(ip, "score_scene", _fixed_scene(0.10))  # below the band, above the authentic cut-off
+        result = ip.analyze_image(self._plain_image(tmp_path), tmp_path / "evidence", "weak-job")
+        assert result.verdict is Verdict.INCONCLUSIVE
+        assert result.evidence["threat_code"] == "INCONCLUSIVE_UNVERIFIED_ORIGIN"
+        assert result.evidence["verdict_basis"] == "weak_indicators_no_camera_metadata"
+
+    def test_clear_score_without_camera_metadata_says_only_what_was_found(self, tmp_path, monkeypatch):
+        import app.ml.image_pipeline as ip
+
+        monkeypatch.setattr(ip, "score_scene", _fixed_scene(0.001))
+        result = ip.analyze_image(self._plain_image(tmp_path), tmp_path / "evidence", "clear-job")
+        assert result.verdict is Verdict.AUTHENTIC
+        assert result.evidence["threat_code"] == "NO_MANIPULATION_DETECTED"
+        assert "Authentic Camera Photograph" not in json.dumps(result.evidence)
+
+    def test_camera_metadata_keeps_the_camera_label(self, tmp_path, monkeypatch):
+        import app.ml.image_pipeline as ip
+
+        monkeypatch.setattr(ip, "score_scene", _fixed_scene(0.10))
+        result = ip.analyze_image(self._plain_image(tmp_path, "Canon"), tmp_path / "evidence", "camera-job")
+        assert result.evidence["threat_code"] != "INCONCLUSIVE_UNVERIFIED_ORIGIN"

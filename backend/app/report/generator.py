@@ -59,7 +59,7 @@ MUTED = colors.HexColor("#5b6670")
 LIGHT = colors.HexColor("#eef2f6")
 
 VERDICT_STYLING: dict[Verdict, tuple[str, colors.Color]] = {
-    Verdict.AUTHENTIC: ("LIKELY AUTHENTIC", colors.HexColor("#2e7d32")),
+    Verdict.AUTHENTIC: ("NO MANIPULATION DETECTED", colors.HexColor("#2e7d32")),
     Verdict.MANIPULATED: ("LIKELY MANIPULATED", colors.HexColor("#c62828")),
     Verdict.INCONCLUSIVE: ("INCONCLUSIVE", colors.HexColor("#f9a825")),
 }

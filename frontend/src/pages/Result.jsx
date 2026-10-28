@@ -390,7 +390,9 @@ export default function Result() {
                 {result.verdict === 'INCONCLUSIVE' ? (
                   "Available evidence does not support a sufficiently reliable AI-generation or manipulation determination."
                 ) : result.verdict === 'AUTHENTIC' || result.verdict === 'likely_authentic' ? (
-                  "No strong indicators of manipulation or synthetic generation were verified across independent forensic modules."
+                  (evidence.threat_code === 'AUTHENTIC_PHOTOGRAPH'
+                    ? "No AI generation or manipulation was detected, and the file carries camera metadata. Detectors can still miss composites and very new generators."
+                    : "No AI generation or manipulation was detected. The file has no camera metadata, so its origin cannot be confirmed; this is absence of detected manipulation, not proof that it is genuine.")
                 ) : isSingleSignal ? (
                   "The available evidence contains an individual detector signal associated with synthetic-image characteristics, but the current evidence lacks independent corroboration across physical sensor and tampering modules."
                 ) : (

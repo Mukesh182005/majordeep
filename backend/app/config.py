@@ -126,11 +126,18 @@ class Settings(BaseSettings):
     audio_pellav2_max_windows: int = 8  # 8 x 4 s = the first 32 s of audio
     audio_pellav2_model_id: str = "Sadanie/pellav2-audio-deepfake-detector"  # or a local .pt / folder
     audio_pellav2_config_file: Path = ROOT_DIR / "paper" / "config" / "pellav2_verdict_config.json"
-    # Community Forensics ViT (app/ml/commfor.py), pretrained by its authors and
-    # not yet evaluated on our image set, so it carries no verdict weight.
+    # Community Forensics ViT (app/ml/commfor.py), pretrained by its authors. Its log-odds
+    # weight was chosen on the dev half of the COCO + Synthbuster set
+    # (evaluation/COMMFOR-02/scene_detector_eval_dev.json) and checked on the test half
+    # (evaluation/E2E-01). 0 = scored and shown, not counted in the verdict.
     commfor_enabled: bool = True
     commfor_model_id: str = "OwensLab/commfor-model-384"
-    commfor_weight: float = 0.0  # 0 = scored and shown, not counted in the verdict
+    commfor_weight: float = 4.0
+    # Without camera metadata nothing positively shows an image came from a camera, so a
+    # low score only means no detector fired. AUTHENTIC then needs a fused P(AI) below
+    # this; between it and the decision band the verdict is INCONCLUSIVE. Chosen on the
+    # same dev half at COMMFOR_WEIGHT=4: 99.0 % of real photos stay below it, 0.7 % of AI images.
+    image_authentic_max_prob_without_camera: float = 0.02
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5

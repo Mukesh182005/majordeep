@@ -250,6 +250,9 @@ def compute_risk_and_fusion(
     elif tampering.get("copy_move_detected"):
         dominant_threat = "Cloning / Photographic Splicing"
         threat_code = "SPLICING_TAMPERING"
+    elif camera_unknown:
+        dominant_threat = "No AI Generation or Editing Detected (origin unverified: no camera metadata)"
+        threat_code = "NO_MANIPULATION_DETECTED"
     else:
         dominant_threat = "Authentic Camera Photograph"
         threat_code = "AUTHENTIC_PHOTOGRAPH"

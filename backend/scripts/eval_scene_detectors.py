@@ -159,6 +159,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--data", type=Path, help="folder holding real/<source>/ and fake/<generator>/")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--grid", type=float, nargs="+", default=list(COMMFOR_WEIGHT_GRID),
+                        help="COMMFOR_WEIGHT values to try (must include 0, today's ensemble)")
     args = parser.parse_args()
 
     items, missing = collect(args.data)
@@ -206,7 +208,8 @@ def main() -> int:
 
     print(f"\nFusion, sweeping the {commfor_id} weight (others fixed):")
     per_weight = {}
-    for w in COMMFOR_WEIGHT_GRID:
+    grid = sorted(set(args.grid) | {0.0})
+    for w in grid:
         weights = {**base_weights, commfor_id: w}
         fused = [fuse(r["scores"], weights) for r in records]
         for record, value in zip(records, fused):
@@ -217,7 +220,7 @@ def main() -> int:
     baseline_flag = per_weight["0.0"]["real_flagged_rate"]
     allowed = baseline_flag + FLAG_RATE_SLACK
     eligible = [
-        w for w in COMMFOR_WEIGHT_GRID
+        w for w in grid
         if per_weight[str(w)]["real_flagged_rate"] <= allowed + 1e-12 and per_weight[str(w)]["auc"] is not None
     ]
     # Best AUC; on a tie, the smaller weight.
@@ -262,7 +265,7 @@ def main() -> int:
         ],
         "per_expert": per_expert,
         "commfor_model_id": commfor_id,
-        "commfor_weight_grid": list(COMMFOR_WEIGHT_GRID),
+        "commfor_weight_grid": grid,
         "per_commfor_weight": per_weight,
         "recommendation": {
             "commfor_weight": best,

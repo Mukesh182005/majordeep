@@ -41,7 +41,8 @@ from ml.evaluation.metrics import roc_auc  # noqa: E402
 
 DEFAULT_OUT = REPO / "evaluation" / "E2E-01"
 VERDICTS = ("AUTHENTIC", "INCONCLUSIVE", "MANIPULATED")
-PASSING = {"PASSED", "RECORDED", "NORMAL", "SECURE", "NEUTRAL", "INFO", "SKIPPED", None}
+# Statuses that are not a flag. CONSENSUS_REACHED: image stage 8 reports it on every file.
+PASSING = {"PASSED", "RECORDED", "NORMAL", "SECURE", "NEUTRAL", "INFO", "SKIPPED", "CONSENSUS_REACHED", None}
 
 
 # --------------------------------------------------------------------------- scoring
@@ -84,13 +85,28 @@ def _record(media: str, item: dict, result, latency_s: float) -> dict:
     return rec
 
 
-def score(media: str, items: list[dict], out_dir: Path, name: str) -> None:
+def _shard_of(item_id: str, n: int) -> int:
+    import hashlib
+
+    return int(hashlib.sha256(item_id.encode()).hexdigest(), 16) % n
+
+
+def score(media: str, items: list[dict], out_dir: Path, name: str, shard: str | None = None) -> None:
+    """Score items not yet in <name>.jsonl or any <name>.s*.jsonl; with ``shard`` "K/N", only shard K of N.
+
+    Each shard writes its own <name>.sK.jsonl, so parallel processes never share a file.
+    """
     from app.ml.pipeline import analyze
     from app.models import MediaType
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    out, errors = out_dir / f"{name}.jsonl", out_dir / f"{name}.errors.jsonl"
-    done = _done(out)
+    suffix = ""
+    if shard:
+        k, n = (int(v) for v in shard.split("/"))
+        items = [i for i in items if _shard_of(i["id"], n) == k]
+        suffix = f".s{k}"
+    out, errors = out_dir / f"{name}{suffix}.jsonl", out_dir / f"{name}{suffix}.errors.jsonl"
+    done = set().union(*(_done(f) for f in [out_dir / f"{name}.jsonl", *out_dir.glob(f"{name}.s*.jsonl")]))
     todo = [i for i in items if i["id"] not in done]
     print(f"{name}: {len(items)} items, {len(done)} already scored, {len(todo)} to score", flush=True)
     kind = MediaType.IMAGE if media == "image" else MediaType.AUDIO
@@ -290,6 +306,7 @@ def main() -> int:
     for p in (img, aud):
         p.add_argument("--name", required=True)
         p.add_argument("--split", default=None, help="score only manifest rows with this split")
+        p.add_argument("--shard", default=None, help="K/N: score only shard K of N (parallel runs)")
     summ = sub.add_parser("summarise")
     for p in (img, aud, summ):
         p.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
@@ -299,21 +316,34 @@ def main() -> int:
         items = image_items(args.manifest, args.root)
         if args.split:
             items = [i for i in items if i.get("split") == args.split]
-        score("image", items, args.out_dir, args.name)
+        score("image", items, args.out_dir, args.name, args.shard)
         return 0
     if args.cmd == "score-audio":
-        score("audio", audio_items(args), args.out_dir, args.name)
+        score("audio", audio_items(args), args.out_dir, args.name, args.shard)
         return 0
 
     summary = {"script": "backend/scripts/eval_end_to_end.py", "provenance": _provenance(), "sets": {}}
+    import re
+
+    sets: dict[str, list[Path]] = {}
     for path in sorted(args.out_dir.glob("*.jsonl")):
-        if path.name.endswith(".errors.jsonl"):
-            continue
-        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-        errors = args.out_dir / f"{path.stem}.errors.jsonl"
-        summary["sets"][path.stem] = {**summarise_set(rows),
-                                      "errors": len(errors.read_text().splitlines()) if errors.is_file() else 0}
-        print_set(path.stem, summary["sets"][path.stem])
+        if not path.name.endswith(".errors.jsonl"):
+            sets.setdefault(re.sub(r"\.s\d+$", "", path.stem), []).append(path)
+    for name, paths in sets.items():
+        rows = {}
+        for path in paths:  # shards of one set; an id scored twice keeps its first row
+            for line in path.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    row = json.loads(line)
+                    rows.setdefault(row["id"], row)
+        rows = list(rows.values())
+        n_errors = 0
+        for err in args.out_dir.glob(f"{name}*.errors.jsonl"):
+            if re.fullmatch(rf"{re.escape(name)}(\.s\d+)?\.errors\.jsonl", err.name):
+                failed = {json.loads(line)["id"] for line in err.read_text().splitlines() if line.strip()}
+                n_errors += len(failed - {r["id"] for r in rows})
+        summary["sets"][name] = {**summarise_set(rows), "errors_unresolved": n_errors}
+        print_set(name, summary["sets"][name])
     (args.out_dir / "summary.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
     print(f"\nWrote {args.out_dir / 'summary.json'}")
     return 0

@@ -27,3 +27,4 @@ timm>=1.0.15  # Community Forensics ViT (app/ml/commfor.py)
 safetensors>=0.4
 huggingface-hub>=0.23  # hf_hub_download for pellav2 and Community Forensics weights
 pyloudnorm>=0.2.0  # loudness normalisation in pellav2 preprocessing (app/ml/audio/pellav2.py)
+yacs>=0.1.8  # TruFor config objects (app/ml/trufor_vendor)

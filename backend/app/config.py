@@ -138,6 +138,15 @@ class Settings(BaseSettings):
     # this; between it and the decision band the verdict is INCONCLUSIVE. Chosen on the
     # same dev half at COMMFOR_WEIGHT=4: 99.0 % of real photos stay below it, 0.7 % of AI images.
     image_authentic_max_prob_without_camera: float = 0.02
+    # TruFor splice / edit localisation (app/ml/trufor.py). Nonprofit use only (its licence);
+    # set false for any commercial deployment. Shown as an unvalidated signal; it changes the
+    # verdict only with TRUFOR_IN_VERDICT=true, which needs a measured threshold first.
+    trufor_enabled: bool = True
+    trufor_in_verdict: bool = False
+    trufor_flag_at: float = 0.5  # integrity score at which a region is reported as possibly edited
+    trufor_max_side: int = 2048  # longer images are downscaled first (GPU memory)
+    trufor_weights: str = ""  # local trufor.pth.tar; empty = download once into trufor_cache_dir
+    trufor_cache_dir: Path = Path.home() / ".cache" / "deepsentinel" / "trufor"
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5

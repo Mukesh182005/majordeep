@@ -306,6 +306,7 @@ export default function Result() {
     ela: evidence.ela_url || forensics.visual_evidence?.ela_url,
     noise: evidence.noise_url || forensics.visual_evidence?.noise_url,
     tampering: evidence.tampering_url || forensics.visual_evidence?.tampering_url,
+    trufor: evidence.trufor_url,
   }
 
   return (
@@ -958,6 +959,7 @@ export default function Result() {
                         { id: 'ela', label: 'Error Level Analysis (ELA)' },
                         { id: 'noise', label: 'Sensor Noise Residual' },
                         { id: 'tampering', label: 'Tampering / Clone Map' },
+                        ...(evidence.trufor_url ? [{ id: 'trufor', label: 'TruFor Edit Map (unvalidated)' }] : []),
                       ].map(plate => (
                         <button
                           key={plate.id}

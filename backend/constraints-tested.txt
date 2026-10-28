@@ -145,3 +145,4 @@ watchfiles==1.2.0
 wcwidth==0.8.3
 webencodings==0.6.1
 websockets==17.1
+yacs==0.1.8

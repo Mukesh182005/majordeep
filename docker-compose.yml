@@ -83,6 +83,11 @@ services:
       # Community Forensics scene detector: weight 0 = scored and shown, not in the verdict.
       COMMFOR_ENABLED: ${COMMFOR_ENABLED:-true}
       COMMFOR_WEIGHT: ${COMMFOR_WEIGHT:-4}
+      # TruFor edit localisation: nonprofit use only (its licence). Weights (260 MB) are
+      # cached in the worker's HF cache volume.
+      TRUFOR_ENABLED: ${TRUFOR_ENABLED:-true}
+      TRUFOR_IN_VERDICT: ${TRUFOR_IN_VERDICT:-false}
+      TRUFOR_CACHE_DIR: /app/.cache/huggingface/trufor
     volumes:
       # Shared with the worker: the API writes uploads, the worker reads them
       # and writes evidence back.
@@ -101,6 +106,7 @@ services:
     command: >
       sh -c "python -c 'from app.ml.image_pipeline import get_scene_detector; get_scene_detector()' &&
              python -c 'from app.config import settings; from app.ml.audio.pellav2 import get_pellav2; settings.audio_pellav2_enabled and get_pellav2()' &&
+             python -c 'from app.ml.trufor import get_trufor; get_trufor()' &&
              celery -A app.worker.celery_app.celery_app worker --loglevel=info --concurrency=1"
     environment:
       <<: *backend_env

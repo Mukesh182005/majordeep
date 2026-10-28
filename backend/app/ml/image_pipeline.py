@@ -253,6 +253,29 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
             "an AUTHENTIC verdict cannot be issued for this image."
         )
 
+    # ------------------------------------------------ 2b. TruFor splice / edit localisation
+    # Looks for locally edited regions (splicing, inpainting) that whole-image AI
+    # detectors miss. Shown as an unvalidated signal; it changes the verdict only
+    # with TRUFOR_IN_VERDICT=true.
+    trufor_res = None
+    if settings.trufor_enabled:
+        try:
+            from app.ml import trufor
+
+            trufor_res = trufor.analyze(image, evidence_dir / f"{job_id}_trufor.png")
+        except Exception as exc:
+            logger.warning("TruFor failed: %s", exc)
+    trufor_flagged = bool(trufor_res and trufor_res["score"] >= settings.trufor_flag_at)
+    if trufor_res:
+        trufor_res["flagged"] = trufor_flagged
+        trufor_res["in_verdict"] = settings.trufor_in_verdict
+        if trufor_flagged:
+            notes.append(
+                f"TruFor (edit localisation, unvalidated here) marks a possibly edited region: integrity score "
+                f"{trufor_res['score'] * 100:.1f}%, {trufor_res['manipulated_area_fraction'] * 100:.1f}% of the image; "
+                "see the TruFor heatmap."
+            )
+
     # ------------------------------------------------ 3. Grad-CAM Visual Heatmap
     ai_heatmap_path = evidence_dir / f"{job_id}_heatmap.png"
     ai_heatmap_name = None
@@ -411,6 +434,11 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         dominant_threat = "Authentic Camera Photograph"
         threat_code = "AUTHENTIC_PHOTOGRAPH"
 
+    if settings.trufor_in_verdict and trufor_flagged and final_fake_prob < 0.50:
+        final_fake_prob = max(final_fake_prob, trufor_res["score"])
+        dominant_threat = "Possible Local Edit / Splice (TruFor)"
+        threat_code = "SPLICING_TAMPERING"
+
     # ------------------------------------------------ 7. Can the evidence support AUTHENTIC?
     # A low score is absence of detected manipulation, not proof of
     # authenticity. Two cases cannot support an authentic call: the AI
@@ -479,6 +507,14 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         for model_id, p in scene["model_scores"].items()
     ) or "unavailable"
     for mod in forensics.get("pipeline_modules", []):
+        if mod.get("stage") == 5 and trufor_res:
+            in_verdict = "" if settings.trufor_in_verdict else ", unvalidated, not in verdict"
+            mod["summary"] += f" | TruFor{in_verdict}: {trufor_res['score'] * 100:.1f}%"
+            if trufor_flagged:
+                mod["status"] = "SUSPICIOUS"
+                mod["findings"] = [
+                    f"TruFor marks a possibly edited region ({trufor_res['manipulated_area_fraction'] * 100:.1f}% of the image)."
+                ] + [f for f in mod.get("findings", []) if not f.startswith("No keypoint cloning")]
         if mod.get("stage") == 6:
             face_part = (
                 f" | Face GAN model (StyleGAN-trained{'' if face_model_counts else ', informational only'}): {round(face_fake_prob * 100, 1)}%"
@@ -515,6 +551,8 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "backbone": loaded.metadata.get("backbone", settings.image_model_backbone),
         "input_size": loaded.input_size,
         "scene_model_scores": scene["model_scores"],
+        "trufor": trufor_res,
+        "trufor_file": trufor_res.get("heatmap_file") if trufor_res else None,
         "verdict_basis": verdict_basis,
         "dominant_threat": dominant_threat,
         "threat_code": threat_code,

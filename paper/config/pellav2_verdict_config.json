@@ -1,0 +1,29 @@
+{
+  "purpose": "pellav2 audio verdict rule (AUDIO_PELLAV2_IN_VERDICT=true), fixed on ASVspoof 2019 LA dev only",
+  "model": "pellav2 (w2v-BERT 2.0)",
+  "hub_repo": "Sadanie/pellav2-audio-deepfake-detector",
+  "revision": "29daea8b04acf2d3f11d1d0da6b01c17fc8a1e4b",
+  "weights_sha256": "d21aedfb52e2f87706c2753715a29665482b0f4a034800c31579df5d458559ac",
+  "max_windows": 8,
+  "threshold": 0.5,
+  "threshold_rule": "threshold = 0.5, the authors' operating point (pellav2_infer.py), fixed before any scoring; the ASVspoof 2019 LA dev sample only checks it (its EER threshold is reported, not used: the scores saturate near 0 and 1, so the EER point falls anywhere in the gap between the classes); inconclusive band = the platform default UNCERTAIN_BAND (0.08), fixed in advance and not tuned on audio",
+  "inconclusive_band": 0.08,
+  "authentic_below": 0.42,
+  "flagged_at_or_above": 0.58,
+  "decision_rule": "pellav2 probability p: authentic if p < 0.4200, flagged (AI-generated) if p >= 0.5800, inconclusive otherwise; heuristic signals carry no weight",
+  "dev_sample": {
+    "n_bonafide": 1000,
+    "n_spoof": 1000,
+    "eer": 0.008,
+    "eer_threshold_information_only": 0.5148049999999998,
+    "at_threshold": {
+      "threshold": 0.5,
+      "accuracy": 0.993,
+      "real_flagged_rate": 0.009,
+      "fakes_missed_rate": 0.005
+    },
+    "note": "dev holds only the training attacks A01-A06; these numbers are optimistic"
+  },
+  "frozen_utc": "2026-10-28T07:18:28+00:00",
+  "source": "evaluation/AUDIO-PELLAV2-01/results.json"
+}

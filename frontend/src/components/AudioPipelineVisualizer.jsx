@@ -30,7 +30,7 @@ export const AUDIO_PHASES = [
     name: 'Linguistics & Neural Inference',
     stages: [5, 6],
     color: '#8B5CF6',
-    desc: 'Phonemic coarticulation prosody & trained LCNN acoustic feature classification'
+    desc: 'Phonemic coarticulation prosody & trained-model acoustic classification'
   },
   {
     phaseId: 4,
@@ -136,6 +136,12 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
   const evidence = result.evidence || {}
   const forensics = evidence.forensics || {}
   const rawModules = evidence.pipeline_modules || forensics.pipeline_modules || result.pipeline_modules || []
+  const fusionDecision = evidence.fusion_decision || forensics.fusion_decision || {}
+  const pellav2Decides = (fusionDecision.verdict_source || evidence.segment_scores_source) === 'pellav2'
+  const STAGE6_PELLAV2 = {
+    engine: 'pellav2 (w2v-BERT 2.0), pretrained by its authors',
+    desc: 'Scores consecutive 4.0s loudness-normalised windows with pellav2; the clip score is the mean of the windows. The ASVspoof LCNN is shown as context.'
+  }
 
   // Merge backend data with rich visual stage defaults
   const stages = DEFAULT_AUDIO_8_STAGES.map((defStage, idx) => {
@@ -143,10 +149,11 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
       (m) => m.stage === defStage.stage || m.id === defStage.stage || (m.name && m.name.toLowerCase().includes(defStage.category.toLowerCase().split(' ')[0]))
     ) || rawModules[idx]
 
-    if (!backendStage) return defStage
+    const def = defStage.stage === 6 && pellav2Decides ? { ...defStage, ...STAGE6_PELLAV2 } : defStage
+    if (!backendStage) return def
 
     return {
-      ...defStage,
+      ...def,
       ...backendStage,
       stage: defStage.stage,
       duration_ms: backendStage.duration_ms ?? defStage.duration_ms,

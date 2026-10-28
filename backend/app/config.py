@@ -119,8 +119,10 @@ class Settings(BaseSettings):
     # pellav2 (app/ml/audio/pellav2.py): pretrained by its authors, scored on every clip.
     audio_pellav2_enabled: bool = True
     # True: pellav2 decides the audio verdict, with the thresholds in audio_pellav2_config_file
-    # (written by scripts/eval_audio_detector.py). False: shown as context, the LCNN decides.
-    audio_pellav2_in_verdict: bool = False
+    # (written by scripts/eval_audio_detector.py); the LCNN is context, and decides only if pellav2
+    # cannot run. Default since it measured better on every test set: ASVspoof 2019 LA eval, its
+    # re-encoded copies and ASVspoof 5 eval (evaluation/AUDIO-PELLAV2-01*). False: the LCNN decides.
+    audio_pellav2_in_verdict: bool = True
     audio_pellav2_max_windows: int = 8  # 8 x 4 s = the first 32 s of audio
     audio_pellav2_model_id: str = "Sadanie/pellav2-audio-deepfake-detector"  # or a local .pt / folder
     audio_pellav2_config_file: Path = ROOT_DIR / "paper" / "config" / "pellav2_verdict_config.json"

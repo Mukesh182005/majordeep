@@ -24,6 +24,19 @@ Every count below is read from the file named next to it.
 - **Attacks:** train and dev hold attacks A01-A06; eval holds A07-A19
   (checked by `ml/preprocessing/build_asvspoof2019_la.py`).
 
+### ASVspoof 5 (evaluation set, sample)
+
+- **Role:** held-out test of both audio models (`evaluation/AUDIO-PELLAV2-01-ASVSPOOF5/`). Never used for
+  training, thresholds or any other choice.
+- **Source and licence:** Zenodo record 14498691 (v0.1, DOI 10.5281/zenodo.14498691); ODC-By 1.0. Cite
+  the ASVspoof 5 database paper and the 2024 workshop paper, as its README asks.
+- **What is on disk:** the protocol archive (MD5 matches the README) and a sample streamed from one of
+  the ten eval archives, `flac_E_aa.tar`. Only its first part was read, so that archive's MD5 could not
+  be checked; every kept clip was decoded instead (16 kHz, no failures). Kept: 125 bona fide clips per
+  codec condition (none and C01-C11) and 94 spoofed clips per attack (A17-A32), first come in archive
+  order, 3,004 in all. The file list and labels are in the results file (`files.asvspoof5_eval`).
+- **Labels:** `ASVspoof5.eval.track_1.tsv` (attack, codec, codec quality per clip).
+
 ### 140k Real and Fake Faces (Kaggle)
 
 - **Role:** training data of the face-crop classifier

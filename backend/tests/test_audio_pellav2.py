@@ -165,6 +165,7 @@ def test_pellav2_low_score_is_authentic(tmp_path, monkeypatch, pellav2_config):
 
 
 def test_shown_but_not_in_verdict_leaves_the_lcnn_verdict_unchanged(tmp_path, monkeypatch):
+    monkeypatch.setattr(settings, "audio_pellav2_in_verdict", False)
     baseline = _run(tmp_path / "off")
     monkeypatch.setattr(settings, "audio_pellav2_enabled", True)
     monkeypatch.setattr(pv, "score_clip", lambda *a, **k: _stub_clip(0.99))

@@ -51,6 +51,20 @@ and validate it before enabling it.
 
 ## Audio Detector
 
+### Verdict model: pellav2 (pretrained, not trained here)
+
+| Property | Value |
+|---|---|
+| **Source** | Hugging Face `Sadanie/pellav2-audio-deepfake-detector`, revision `29daea8b04acf2d3f11d1d0da6b01c17fc8a1e4b`, MIT licence; weights sha256 `d21aedfb52e2f87706c2753715a29665482b0f4a034800c31579df5d458559ac` |
+| **Architecture** | w2v-BERT 2.0 encoder (`facebook/w2v-bert-2.0` configuration) with a softmax-weighted sum of all hidden layers and a linear head; 580.5 M parameters (`backend/app/ml/audio/pellav2.py`, copied from the authors' `pellav2_infer.py`) |
+| **Training data** | Not published by the authors |
+| **Input** | 16 kHz mono; DC removal, 20 Hz high-pass; each consecutive 4 s window (up to 8, the first 32 s) loudness-normalised to -23 LUFS; 80-bin Kaldi filterbank |
+| **Output** | Mean of the window probabilities; AI-generated at >= 0.58, authentic below 0.42, inconclusive between (the authors' 0.5 +/- the platform band; `paper/config/pellav2_verdict_config.json`) |
+| **Served when** | `AUDIO_PELLAV2_IN_VERDICT=true` (default). If pellav2 cannot run, the LCNN below decides |
+| **Evaluation** | `docs/research/EVALUATION.md` section 7: EER 1.6 % on an ASVspoof 2019 LA eval sample, 18.5 % on an ASVspoof 5 eval sample; limits in `KNOWN_ISSUES.md` #16 |
+
+### Fallback and context model: LCNN
+
 | Property | Value |
 |---|---|
 | **Architecture** | LCNN (Light Convolutional Neural Network, 144,065 parameters; `build_audio_model` in `backend/app/ml/models_arch.py`) |

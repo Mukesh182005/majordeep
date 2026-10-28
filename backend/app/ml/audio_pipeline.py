@@ -34,8 +34,10 @@ LCNN_SCOPE_NOTE = (
 )
 PELLAV2_SCOPE_NOTE = (
     "Model stage: pellav2 (w2v-BERT 2.0), a pretrained detector from its authors whose training data is not "
-    "published. Its thresholds were fixed on ASVspoof 2019 LA dev; see evaluation/AUDIO-PELLAV2-01 for what "
-    "it was measured on."
+    "published; only the first 32 s are scored. On an ASVspoof 5 eval sample it wrongly flagged 17% of genuine "
+    "speech overall, 58-68% of genuine speech passed through the EnCodec neural codec and 9-22% after "
+    "narrowband (telephone-band) codecs, and missed 19% of fakes (evaluation/AUDIO-PELLAV2-01-ASVSPOOF5). "
+    "Treat a verdict on phone-call or neural-codec audio with caution."
 )
 
 

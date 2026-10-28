@@ -11,7 +11,8 @@ Datasets: [`DATASETS.md`](DATASETS.md).
 
 ## 1. Audio model on ASVspoof 2019 LA eval
 
-The served model is an LCNN on LFCC features, trained on the LA train
+Until the comparison in section 7, the served model was an LCNN on LFCC features (it is now the
+fallback and is shown as context), trained on the LA train
 partition, with the epoch, front end, seed, calibration and verdict rule all
 chosen on dev. Eval was scored once per frozen seed.
 
@@ -149,6 +150,76 @@ Not measured. FaceForensics++ and Celeb-DF v2 are not on this machine
 (`video` in `results/pipeline_eval.json`). The video verdict currently relies
 on a face classifier trained on StyleGAN faces and on unvalidated heuristics;
 no video accuracy is claimed.
+
+## 7. Audio: pellav2 compared with the LCNN
+
+pellav2 is a pretrained detector (w2v-BERT 2.0 backbone, Hugging Face `Sadanie/pellav2-audio-deepfake-detector`,
+revision `29daea8`, MIT licence); its training data is not published, so it may have seen any of these sets.
+Nothing was trained or tuned here. Its threshold is the authors' 0.5, fixed before scoring; ASVspoof 2019 LA
+dev only checks it (`pellav2_dev_verdict_config` in the first file). Since this comparison pellav2 decides the
+audio verdict (`AUDIO_PELLAV2_IN_VERDICT=true`) and the LCNN is shown as context. Both models scored the same
+files; samples are seeded, with spoof spread evenly over the attacks.
+
+Sources: `evaluation/AUDIO-PELLAV2-01/results.json` (ASVspoof 2019 LA) and
+`evaluation/AUDIO-PELLAV2-01-ASVSPOOF5/results.json` (ASVspoof 5), both written by
+`backend/scripts/eval_audio_detector.py`; key `results.<set>.<model>`. Errors at threshold 0.5.
+
+| Set and model | real / fake | EER (95 % CI) | AUC | real flagged | fakes missed |
+|---|---|---|---|---|---|
+| ASVspoof 2019 LA dev, pellav2 | 1,000 / 1,000 | 0.8 % (0.4 %–1.3 %) | 1.000 | 0.9 % | 0.5 % |
+| ASVspoof 2019 LA dev, LCNN | 1,000 / 1,000 | 0.3 % (0.1 %–0.5 %) | 1.000 | 0.2 % | 0.3 % |
+| ASVspoof 2019 LA eval, pellav2 | 2,000 / 2,000 | 1.6 % (1.1 %–1.9 %) | 0.998 | 0.5 % | 2.0 % |
+| ASVspoof 2019 LA eval, LCNN | 2,000 / 2,000 | 5.0 % (4.4 %–5.8 %) | 0.979 | 0.2 % | 13.8 % |
+| ASVspoof 5 eval sample, pellav2 | 1,500 / 1,504 | 18.5 % (17.1 %–19.9 %) | 0.902 | 17.3 % | 19.5 % |
+| ASVspoof 5 eval sample, LCNN | 1,500 / 1,504 | 40.0 % (38.2 %–41.8 %) | 0.635 | 81.1 % | 9.7 % |
+
+On LA eval pellav2's weakest attack is A10 (74.7 % caught); the LCNN's is A17 (8.4 %).
+On the ASVspoof 5 sample pellav2 misses most of A27 (7.4 % caught), A32 (21.3 % caught), A30 (46.8 % caught).
+
+**Re-encoding** (`codec_robustness.summary`, 200 + 200 LA eval clips, each re-encoded with every condition of
+`ml/preprocessing/audio_codecs.py`): real speech flagged at 0.5.
+
+| Condition | pellav2 | LCNN |
+|---|---|---|
+| original | 0.0 % | 0.0 % |
+| mp3_32k | 1.5 % | 100.0 % |
+| mp3_64k | 0.5 % | 100.0 % |
+| mp3_96k | 0.5 % | 100.0 % |
+| mp3_128k | 0.5 % | 100.0 % |
+| aac_32k | 14.0 % | 0.0 % |
+| aac_64k | 1.0 % | 0.0 % |
+| aac_96k | 0.5 % | 0.0 % |
+| opus_16k | 2.0 % | 61.5 % |
+| opus_24k | 1.5 % | 45.5 % |
+| opus_32k | 1.5 % | 46.0 % |
+| opus_48k | 1.5 % | 47.5 % |
+| resample_22k | 0.0 % | 95.5 % |
+| resample_44k | 0.0 % | 95.5 % |
+| resample_48k | 0.0 % | 95.5 % |
+| resample_48k_ffmpeg | 0.0 % | 48.5 % |
+
+**ASVspoof 5 per codec** (`results.asvspoof5_eval.<model>.per_codec`; 125 real clips per condition; codec names
+from `ASVspoof5.codec.config.csv`): real speech flagged at 0.5.
+
+| Codec | pellav2 | LCNN |
+|---|---|---|
+| - (none) | 0.0 % | 72.0 % |
+| C01 (Opus WB) | 8.8 % | 92.8 % |
+| C02 (AMR WB) | 6.4 % | 96.0 % |
+| C03 (Speex WB) | 13.6 % | 94.4 % |
+| C04 (EnCodec WB) | 68.0 % | 90.4 % |
+| C05 (MP3 WB) | 0.8 % | 94.4 % |
+| C06 (M4A WB) | 0.0 % | 67.2 % |
+| C07 (MP3 + EnCodec WB) | 58.4 % | 92.0 % |
+| C08 (Opus NB) | 21.6 % | 73.6 % |
+| C09 (AMR NB) | 8.8 % | 63.2 % |
+| C10 (Speex NB) | 20.8 % | 65.6 % |
+| C11 (MST) | 0.0 % | 72.0 % |
+
+Latency (`latency_seconds_per_clip`): pellav2 p50 0.029 s, p95 0.052 s per clip on NVIDIA GeForce RTX 5070, file decoding excluded (n = 6,000).
+ROC curves: `roc.png` in each folder. The ASVspoof 5 sample comes from one of the ten eval archives
+(`flac_E_aa.tar`); see `DATASETS.md`.
+
 
 ## Removed from the previous version of this page
 

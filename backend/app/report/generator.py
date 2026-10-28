@@ -116,9 +116,12 @@ METHODOLOGY_AUDIO_PELLAV2 = (
     "4-second windows (up to the first 32 seconds). Each window was loudness-normalised and "
     "scored by pellav2, a pretrained detector built on the w2v-BERT 2.0 speech model and "
     "released by its authors under the MIT licence; its training data is not published. The "
-    "reported probability is the mean of the window scores, and the decision thresholds were "
-    "fixed on the ASVspoof 2019 development set. The glottal, mains-hum, splice and container "
-    "checks listed in section 4 are heuristics whose discrimination has not been shown."
+    "reported probability is the mean of the window scores; the decision threshold is the "
+    "authors' 0.5, checked on the ASVspoof 2019 development set. On an ASVspoof 5 evaluation "
+    "sample it wrongly flagged 17% of genuine speech and missed 19% of synthetic speech, with "
+    "most false alarms on speech passed through neural or narrowband (telephone) codecs. The "
+    "glottal, mains-hum, splice and container checks listed in section 4 are heuristics whose "
+    "discrimination has not been shown."
 )
 
 METHODOLOGY_AUDIO_RULES = (

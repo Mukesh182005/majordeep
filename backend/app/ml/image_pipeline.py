@@ -50,6 +50,7 @@ class SceneDetectorSpec:
     model_id: str
     weight: float  # weight in the log-odds fusion
     role: str
+    loader: str = "pipeline"  # "pipeline" (transformers) or "commfor"
 
 
 # Chosen by measurement, not by model card. On 560 held-out images (200 real
@@ -66,6 +67,14 @@ SCENE_DETECTORS: tuple[SceneDetectorSpec, ...] = (
         "haywoodsloan/ai-image-detector-deploy", 0.75, "Modern diffusion & GAN detector (SwinV2)"
     ),
     SceneDetectorSpec("Organika/sdxl-detector", 0.25, "Stable Diffusion / SDXL specialist (Swin)"),
+    # Not yet measured on the set above. At weight 0 its score is reported in
+    # model_scores but adds nothing to the fusion.
+    SceneDetectorSpec(
+        settings.commfor_model_id,
+        settings.commfor_weight,
+        "Community Forensics, 4,803 generators (ViT-S/384)",
+        loader="commfor",
+    ),
 )
 _REAL_CLASS_NAMES = frozenset({"real", "human", "hum", "authentic"})
 
@@ -98,6 +107,19 @@ def get_scene_detector() -> list[LoadedSceneDetector]:
             device = resolve_device()
             loaded: list[LoadedSceneDetector] = []
             for spec in SCENE_DETECTORS:
+                if spec.loader == "commfor":
+                    if not settings.commfor_enabled:
+                        continue
+                    try:
+                        from app.ml.commfor import CommForScorer
+
+                        logger.info("Initializing scene detector %s on %s...", spec.model_id, device)
+                        scorer = CommForScorer(spec.model_id, device=device)
+                    except Exception as exc:
+                        logger.error("Failed to load scene detector %s: %s", spec.model_id, exc)
+                        continue
+                    loaded.append(LoadedSceneDetector(spec=spec, pipe=scorer, real_labels=frozenset({"real"})))
+                    continue
                 try:
                     logger.info("Initializing scene detector %s on %s...", spec.model_id, device)
                     pipe = pipeline("image-classification", model=spec.model_id, device=device)

@@ -76,6 +76,11 @@ class Settings(BaseSettings):
     # faces, so its score is reported but kept out of verdicts until a
     # retrained model is validated.
     face_model_in_verdict: bool = False
+    # Community Forensics ViT (app/ml/commfor.py), pretrained by its authors and
+    # not yet evaluated on our image set, so it carries no verdict weight.
+    commfor_enabled: bool = True
+    commfor_model_id: str = "OwensLab/commfor-model-384"
+    commfor_weight: float = 0.0  # 0 = scored and shown, not counted in the verdict
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5

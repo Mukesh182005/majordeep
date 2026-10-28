@@ -16,3 +16,5 @@ opencv-python-headless>=4.10.0.84
 pillow-heif>=0.16.0
 imageio-ffmpeg>=0.5.1
 transformers>=4.30.0
+timm>=1.0.15  # Community Forensics ViT (app/ml/commfor.py)
+safetensors>=0.4

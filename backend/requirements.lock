@@ -38,7 +38,7 @@ hf-xet==1.6.0             # via huggingface-hub, -c constraints-tested.txt
 httpcore==1.0.9           # via httpx, -c constraints-tested.txt
 httptools==0.8.0          # via uvicorn, -c constraints-tested.txt
 httpx==0.27.2             # via huggingface-hub, -c constraints-tested.txt
-huggingface-hub==1.30.0   # via tokenizers, transformers, -c constraints-tested.txt
+huggingface-hub==1.30.0   # via timm, tokenizers, transformers, -c constraints-tested.txt
 idna==3.19                # via anyio, email-validator, httpx, requests, -c constraints-tested.txt
 imagehash==4.3.2          # via -c constraints-tested.txt, -r requirements-ml.txt
 imageio-ffmpeg==0.6.0     # via -c constraints-tested.txt, -r requirements-ml.txt
@@ -82,14 +82,14 @@ python-dotenv==1.2.3      # via pydantic-settings, uvicorn, -c constraints-teste
 python-jose==3.5.0        # via -c constraints-tested.txt, -r requirements.txt
 python-multipart==0.0.32  # via -c constraints-tested.txt, -r requirements.txt
 pywavelets==1.9.0         # via imagehash, -c constraints-tested.txt
-pyyaml==6.0.3             # via huggingface-hub, transformers, uvicorn, -c constraints-tested.txt
+pyyaml==6.0.3             # via huggingface-hub, timm, transformers, uvicorn, -c constraints-tested.txt
 redis==8.1.0              # via -c constraints-tested.txt, -r requirements.txt
 regex==2026.9.3           # via transformers, -c constraints-tested.txt
 reportlab==5.0.1          # via -c constraints-tested.txt, -r requirements.txt
 requests==2.34.2          # via facenet-pytorch, pooch, -c constraints-tested.txt
 rich==15.0.0              # via typer, -c constraints-tested.txt
 rsa==4.9.1                # via python-jose, -c constraints-tested.txt
-safetensors==0.8.0        # via transformers, -c constraints-tested.txt
+safetensors==0.8.0        # via timm, transformers, -c constraints-tested.txt, -r requirements-ml.txt
 scikit-learn==1.9.1       # via librosa, -c constraints-tested.txt
 scipy==1.17.1             # via imagehash, librosa, scikit-learn, -c constraints-tested.txt, -r requirements-ml.txt
 setuptools==81.0.0        # via torch
@@ -102,9 +102,10 @@ sqlalchemy==2.0.52        # via alembic, -c constraints-tested.txt, -r requireme
 starlette==1.6.0          # via fastapi, -c constraints-tested.txt
 sympy==1.14.0             # via torch, -c constraints-tested.txt
 threadpoolctl==3.6.0      # via scikit-learn, -c constraints-tested.txt
+timm==1.0.30              # via -c constraints-tested.txt, -r requirements-ml.txt
 tokenizers==0.23.2        # via transformers, -c constraints-tested.txt
-torch==2.12.0+cpu         # via torchvision, -c constraints-tested.txt, -r requirements-ml.txt
-torchvision==0.27.0+cpu   # via facenet-pytorch, -c constraints-tested.txt, -r requirements-ml.txt
+torch==2.12.0+cpu         # via timm, torchvision, -c constraints-tested.txt, -r requirements-ml.txt
+torchvision==0.27.0+cpu   # via facenet-pytorch, timm, -c constraints-tested.txt, -r requirements-ml.txt
 tqdm==4.70.0              # via huggingface-hub, transformers, -c constraints-tested.txt
 transformers==5.16.1      # via -c constraints-tested.txt, -r requirements-ml.txt
 typer==0.27.2             # via transformers, -c constraints-tested.txt

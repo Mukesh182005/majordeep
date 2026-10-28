@@ -116,6 +116,11 @@ class Settings(BaseSettings):
     # guard_rule). Audio in these codecs gets an INCONCLUSIVE audio verdict, and
     # a video's audio track in them is left out of the video score. Empty: no guard.
     audio_codec_guard: CsvList = Field(default_factory=list)
+    # Community Forensics ViT (app/ml/commfor.py), pretrained by its authors and
+    # not yet evaluated on our image set, so it carries no verdict weight.
+    commfor_enabled: bool = True
+    commfor_model_id: str = "OwensLab/commfor-model-384"
+    commfor_weight: float = 0.0  # 0 = scored and shown, not counted in the verdict
 
     # --- Decision thresholds ---
     fake_threshold: float = 0.5

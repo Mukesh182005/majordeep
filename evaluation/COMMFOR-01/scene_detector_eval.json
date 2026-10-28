@@ -1,0 +1,2601 @@
+{
+  "created_at": "2026-10-28T05:58:12+00:00",
+  "script": "backend/scripts/eval_scene_detectors.py",
+  "git_commit": "1de4b2ed4ab74e69cb6a57df82fdc6816096121e-dirty",
+  "device": "cuda",
+  "data": "accuracy_test",
+  "folder_counts": {
+    "100_real": 20,
+    "100_real_whatsapp": 20,
+    "100_real_edited": 20,
+    "100_ai": 40,
+    "100_ai_processed": 20
+  },
+  "missing_or_empty_folders": [],
+  "flag_threshold": 0.5,
+  "experts": [
+    {
+      "model_id": "haywoodsloan/ai-image-detector-deploy",
+      "role": "Modern diffusion & GAN detector (SwinV2)",
+      "weight": 0.75,
+      "loader": "pipeline"
+    },
+    {
+      "model_id": "Organika/sdxl-detector",
+      "role": "Stable Diffusion / SDXL specialist (Swin)",
+      "weight": 0.25,
+      "loader": "pipeline"
+    },
+    {
+      "model_id": "OwensLab/commfor-model-384",
+      "role": "Community Forensics, 4,803 generators (ViT-S/384)",
+      "weight": 0.0,
+      "loader": "commfor"
+    }
+  ],
+  "per_expert": {
+    "haywoodsloan/ai-image-detector-deploy": {
+      "auc": 0.45166666666666666,
+      "real_flagged_rate": 0.06666666666666667,
+      "ai_caught_rate": 0.05,
+      "real_flagged": 4,
+      "n_real": 60,
+      "ai_caught": 3,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "Organika/sdxl-detector": {
+      "auc": 0.46680555555555553,
+      "real_flagged_rate": 0.15,
+      "ai_caught_rate": 0.1,
+      "real_flagged": 9,
+      "n_real": 60,
+      "ai_caught": 6,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "OwensLab/commfor-model-384": {
+      "auc": 0.9322222222222222,
+      "real_flagged_rate": 0.016666666666666666,
+      "ai_caught_rate": 0.5833333333333334,
+      "real_flagged": 1,
+      "n_real": 60,
+      "ai_caught": 35,
+      "n_ai": 60,
+      "n_unscored": 0
+    }
+  },
+  "commfor_model_id": "OwensLab/commfor-model-384",
+  "commfor_weight_grid": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0,
+    3.0
+  ],
+  "per_commfor_weight": {
+    "0.0": {
+      "auc": 0.4488888888888889,
+      "real_flagged_rate": 0.03333333333333333,
+      "ai_caught_rate": 0.03333333333333333,
+      "real_flagged": 2,
+      "n_real": 60,
+      "ai_caught": 2,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "0.25": {
+      "auc": 0.7419444444444444,
+      "real_flagged_rate": 0.03333333333333333,
+      "ai_caught_rate": 0.06666666666666667,
+      "real_flagged": 2,
+      "n_real": 60,
+      "ai_caught": 4,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "0.5": {
+      "auc": 0.8488888888888889,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.11666666666666667,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 7,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "0.75": {
+      "auc": 0.8858333333333334,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.2,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 12,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "1.0": {
+      "auc": 0.9025,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.31666666666666665,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 19,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "1.5": {
+      "auc": 0.9136111111111112,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.45,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 27,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "2.0": {
+      "auc": 0.9205555555555556,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.45,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 27,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "3.0": {
+      "auc": 0.9244444444444444,
+      "real_flagged_rate": 0.016666666666666666,
+      "ai_caught_rate": 0.48333333333333334,
+      "real_flagged": 1,
+      "n_real": 60,
+      "ai_caught": 29,
+      "n_ai": 60,
+      "n_unscored": 0
+    }
+  },
+  "recommendation": {
+    "commfor_weight": 3.0,
+    "rule": "best AUC with real_flagged_rate <= weight-0 rate + 0.01; ties go to the smaller weight",
+    "real_flagged_rate_limit": 0.043333333333333335,
+    "note": "Weight chosen on the same images it is measured on; not a held-out estimate."
+  },
+  "per_folder_at_recommended": {
+    "100_real": {
+      "label": 0,
+      "flagged": 1,
+      "n": 20,
+      "flagged_rate": 0.05
+    },
+    "100_real_whatsapp": {
+      "label": 0,
+      "flagged": 0,
+      "n": 20,
+      "flagged_rate": 0.0
+    },
+    "100_real_edited": {
+      "label": 0,
+      "flagged": 0,
+      "n": 20,
+      "flagged_rate": 0.0
+    },
+    "100_ai": {
+      "label": 1,
+      "flagged": 24,
+      "n": 40,
+      "flagged_rate": 0.6
+    },
+    "100_ai_processed": {
+      "label": 1,
+      "flagged": 5,
+      "n": 20,
+      "flagged_rate": 0.25
+    }
+  },
+  "images": [
+    {
+      "path": "accuracy_test/100_real/instagram_real_003278.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.025610923767089844,
+        "Organika/sdxl-detector": 1.9073486328125e-06,
+        "OwensLab/commfor-model-384": 8.763084770180285e-05
+      },
+      "fused": {
+        "0.0": 0.002420054048577248,
+        "0.25": 0.0012470933258630092,
+        "0.5": 0.0008013122511313525,
+        "0.75": 0.000584178345578835,
+        "1.0": 0.0004608780352959565,
+        "1.5": 0.00033069249878105395,
+        "2.0": 0.0002650375329211479,
+        "3.0": 0.00020098023494510695
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_003478.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.03519153594970703,
+        "Organika/sdxl-detector": 9.417533874511719e-06,
+        "OwensLab/commfor-model-384": 1.5710126035628491e-06
+      },
+      "fused": {
+        "0.0": 0.00460235133512362,
+        "0.25": 0.0009350101755482645,
+        "0.5": 0.00032253396739281734,
+        "0.75": 0.00015076061643334193,
+        "1.0": 8.522063040346021e-05,
+        "1.5": 3.8342888072144014e-05,
+        "2.0": 2.251324908004032e-05,
+        "3.0": 1.157113679529854e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_003905.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.8860413134098053,
+        "Organika/sdxl-detector": 0.0001538991928100586,
+        "OwensLab/commfor-model-384": 0.00018388185708317906
+      },
+      "fused": {
+        "0.0": 0.3415107548879277,
+        "0.25": 0.09574163576315052,
+        "0.5": 0.03540949222045843,
+        "0.75": 0.01693422386806821,
+        "1.0": 0.009671999857381448,
+        "1.5": 0.004393405531897091,
+        "2.0": 0.0025916165547914447,
+        "3.0": 0.0013384320334276583
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_004165.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.8868732154369354,
+        "Organika/sdxl-detector": 2.0265579223632812e-06,
+        "OwensLab/commfor-model-384": 0.6691193580627441
+      },
+      "fused": {
+        "0.0": 0.15021729434882233,
+        "0.25": 0.22348402295359038,
+        "0.5": 0.28484985717924943,
+        "0.75": 0.3343834686904161,
+        "1.0": 0.37417515187145733,
+        "1.5": 0.43275089744585105,
+        "2.0": 0.47298563938579624,
+        "3.0": 0.523714471094834
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_011395.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.06265383958816528,
+        "Organika/sdxl-detector": 0.0017020106315612793,
+        "OwensLab/commfor-model-384": 0.0007510572322644293
+      },
+      "fused": {
+        "0.0": 0.026017317551456143,
+        "0.25": 0.012909982482500752,
+        "0.5": 0.00805922062318276,
+        "0.75": 0.005749318196883019,
+        "1.0": 0.004460809428640938,
+        "1.5": 0.0031255365725900517,
+        "2.0": 0.002465082305001786,
+        "3.0": 0.0018318126182639463
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_012280.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0047438740730285645,
+        "Organika/sdxl-detector": 2.4080276489257812e-05,
+        "OwensLab/commfor-model-384": 5.640617359858879e-07
+      },
+      "fused": {
+        "0.0": 0.0012691564568990995,
+        "0.25": 0.0003041734663192004,
+        "0.5": 0.00011730782875122781,
+        "0.75": 5.9391841687461686e-05,
+        "1.0": 3.564659783213721e-05,
+        "1.5": 1.7442927097719893e-05,
+        "2.0": 1.083139729267587e-05,
+        "3.0": 5.970550940347987e-06
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_013434.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006270289421081543,
+        "Organika/sdxl-detector": 0.8733680844306946,
+        "OwensLab/commfor-model-384": 0.0001423422509105876
+      },
+      "fused": {
+        "0.0": 0.0350106784880722,
+        "0.25": 0.011837228584877582,
+        "0.5": 0.005689914516604248,
+        "0.75": 0.0033647313891494203,
+        "1.0": 0.0022675190621693213,
+        "1.5": 0.0013041928822758258,
+        "2.0": 0.0009017745246672946,
+        "3.0": 0.0005684853584062816
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_014592.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009600341320037842,
+        "Organika/sdxl-detector": 0.0007539987564086914,
+        "OwensLab/commfor-model-384": 0.00014200956502463669
+      },
+      "fused": {
+        "0.0": 0.005094056082236211,
+        "0.25": 0.0024935433783330537,
+        "0.5": 0.00154753904258226,
+        "0.75": 0.001100422929048635,
+        "1.0": 0.0008520406043152986,
+        "1.5": 0.0005954996967119739,
+        "2.0": 0.0004689678073544215,
+        "3.0": 0.0003478994672152438
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_018289.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.003161907196044922,
+        "Organika/sdxl-detector": 2.002716064453125e-05,
+        "OwensLab/commfor-model-384": 6.023906280461233e-07
+      },
+      "fused": {
+        "0.0": 0.0008933306768427491,
+        "0.25": 0.00022962578926248356,
+        "0.5": 9.280259045845197e-05,
+        "0.75": 4.8584036491115476e-05,
+        "1.0": 2.9901117939450165e-05,
+        "1.5": 1.5154926511802957e-05,
+        "2.0": 9.633769156112723e-06,
+        "3.0": 5.4682460554120175e-06
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_028657.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0034133195877075195,
+        "Organika/sdxl-detector": 0.02966928482055664,
+        "OwensLab/commfor-model-384": 0.0017082960112020373
+      },
+      "fused": {
+        "0.0": 0.0058854498164612155,
+        "0.25": 0.004597633898463444,
+        "0.5": 0.0038991268367045123,
+        "0.75": 0.003465925983371713,
+        "1.0": 0.0031728118757458528,
+        "1.5": 0.002803505640377898,
+        "2.0": 0.0025814415619462316,
+        "3.0": 0.0023283736585001224
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_029256.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.07269978523254395,
+        "Organika/sdxl-detector": 0.10338634252548218,
+        "OwensLab/commfor-model-384": 6.79880686220713e-05
+      },
+      "fused": {
+        "0.0": 0.07947568767399422,
+        "0.25": 0.0202564841787824,
+        "0.5": 0.007909903991064513,
+        "0.75": 0.004020467270270884,
+        "1.0": 0.0024170167708866316,
+        "1.5": 0.0011842471134518413,
+        "2.0": 0.0007357351780313461,
+        "3.0": 0.0004057141890254878
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_030495.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006751418113708496,
+        "Organika/sdxl-detector": 1.7881393432617188e-06,
+        "OwensLab/commfor-model-384": 6.821041097282432e-06
+      },
+      "fused": {
+        "0.0": 0.000864923163555278,
+        "0.25": 0.0003284813389253898,
+        "0.5": 0.00017223124938060233,
+        "0.75": 0.00010859411466809648,
+        "1.0": 7.683694764470989e-05,
+        "1.5": 4.734051146605517e-05,
+        "2.0": 3.4277197464816475e-05,
+        "3.0": 2.2893838198688225e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_032098.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.06268209218978882,
+        "Organika/sdxl-detector": 3.8743019104003906e-05,
+        "OwensLab/commfor-model-384": 8.441311365459114e-06
+      },
+      "fused": {
+        "0.0": 0.010268625993458881,
+        "0.25": 0.002494560199544772,
+        "0.5": 0.0009676406029128891,
+        "0.75": 0.0004916715694069588,
+        "1.0": 0.00029585286962178467,
+        "1.5": 0.00014527238128686013,
+        "2.0": 9.04138138030242e-05,
+        "3.0": 4.997896210125439e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_036048.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.16460037231445312,
+        "Organika/sdxl-detector": 0.32944256067276,
+        "OwensLab/commfor-model-384": 0.0051207938231527805
+      },
+      "fused": {
+        "0.0": 0.19845653686734635,
+        "0.25": 0.10241840148982728,
+        "0.5": 0.06373985483947298,
+        "0.75": 0.044960295901594574,
+        "1.0": 0.034468246886951555,
+        "1.5": 0.023661161530199048,
+        "2.0": 0.01837537369925884,
+        "3.0": 0.013374031065560586
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_055302.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.027155816555023193,
+        "Organika/sdxl-detector": 0.00031960010528564453,
+        "OwensLab/commfor-model-384": 1.156913822342176e-05
+      },
+      "fused": {
+        "0.0": 0.009049055972887205,
+        "0.25": 0.002399158324856379,
+        "0.5": 0.0009871288411756544,
+        "0.75": 0.0005231754811042684,
+        "1.0": 0.00032492822573536653,
+        "1.5": 0.00016677526235032032,
+        "2.0": 0.00010690744835625178,
+        "3.0": 6.131838026798725e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_066237.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0059868693351745605,
+        "Organika/sdxl-detector": 7.05718994140625e-05,
+        "OwensLab/commfor-model-384": 0.0004153492336627096
+      },
+      "fused": {
+        "0.0": 0.0019777054068940403,
+        "0.25": 0.0014477935214396306,
+        "0.5": 0.0011758931644617766,
+        "0.75": 0.001013505994880128,
+        "1.0": 0.0009065957696764161,
+        "1.5": 0.0007755822875464782,
+        "2.0": 0.0006989284126424217,
+        "3.0": 0.0006136689091307613
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_071482.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005295455455780029,
+        "Organika/sdxl-detector": 1.1920928955078125e-07,
+        "OwensLab/commfor-model-384": 3.7675054045394063e-06
+      },
+      "fused": {
+        "0.0": 0.000622854253967183,
+        "0.25": 0.00022430517618911595,
+        "0.5": 0.00011352039237878098,
+        "0.75": 6.979069059928527e-05,
+        "1.0": 4.845462387040859e-05,
+        "1.5": 2.9072574656211528e-05,
+        "2.0": 2.0681420838749598e-05,
+        "3.0": 1.3511389927213744e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_073563.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0035325288772583008,
+        "Organika/sdxl-detector": 6.4373016357421875e-06,
+        "OwensLab/commfor-model-384": 3.263245525886305e-05
+      },
+      "fused": {
+        "0.0": 0.0007312668873117508,
+        "0.25": 0.0003927146342525148,
+        "0.5": 0.0002594404523544472,
+        "0.75": 0.00019294150287957554,
+        "1.0": 0.00015451180212507675,
+        "1.5": 0.00011321569224063117,
+        "2.0": 9.201681314258116e-05,
+        "3.0": 7.100934473717773e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_077397.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0011458396911621094,
+        "Organika/sdxl-detector": 0.002496063709259033,
+        "OwensLab/commfor-model-384": 0.0005992687656544149
+      },
+      "fused": {
+        "0.0": 0.0013921837405045196,
+        "0.25": 0.0011762686579523686,
+        "0.5": 0.0010512473958350192,
+        "0.75": 0.0009701593606161553,
+        "1.0": 0.0009134712666525051,
+        "1.5": 0.0008396243573586392,
+        "2.0": 0.0007937376829787287,
+        "3.0": 0.0007398870669153417
+      }
+    },
+    {
+      "path": "accuracy_test/100_real/instagram_real_078907.jpg",
+      "folder": "100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002824544906616211,
+        "Organika/sdxl-detector": 3.0040740966796875e-05,
+        "OwensLab/commfor-model-384": 3.43395095114829e-06
+      },
+      "fused": {
+        "0.0": 0.0009081738769677923,
+        "0.25": 0.0002977698049693006,
+        "0.5": 0.0001415509473474504,
+        "0.75": 8.32143656544212e-05,
+        "1.0": 5.586699679491795e-05,
+        "1.5": 3.1980768668671305e-05,
+        "2.0": 2.2048311886931215e-05,
+        "3.0": 1.3851014014180153e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_002847.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0016373991966247559,
+        "Organika/sdxl-detector": 0.15864241123199463,
+        "OwensLab/commfor-model-384": 1.736633748805616e-05
+      },
+      "fused": {
+        "0.0": 0.0053417463770503125,
+        "0.25": 0.0017029834510792667,
+        "0.5": 0.0007935361997777696,
+        "0.75": 0.0004597703580475686,
+        "1.0": 0.00030530222175711064,
+        "1.5": 0.00017209112432244533,
+        "2.0": 0.00011742556091529576,
+        "3.0": 7.28211529141418e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_006078.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032900571823120117,
+        "Organika/sdxl-detector": 2.384185791015625e-07,
+        "OwensLab/commfor-model-384": 5.001418685424142e-06
+      },
+      "fused": {
+        "0.0": 0.0004352983404262715,
+        "0.25": 0.00017820609605368043,
+        "0.5": 9.824411074408615e-05,
+        "0.75": 6.420528316699572e-05,
+        "1.0": 4.666760081717114e-05,
+        "1.5": 2.9856211881961907e-05,
+        "2.0": 2.2167293038942033e-05,
+        "3.0": 1.5277733437183653e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_006338.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00667649507522583,
+        "Organika/sdxl-detector": 1.537799835205078e-05,
+        "OwensLab/commfor-model-384": 0.01236824132502079
+      },
+      "fused": {
+        "0.0": 0.0014678512252872043,
+        "0.25": 0.0022512295055857248,
+        "0.5": 0.002993291691006784,
+        "0.75": 0.0036682908385366896,
+        "1.0": 0.004272253897517294,
+        "1.5": 0.005287535513043604,
+        "2.0": 0.006094345799646427,
+        "3.0": 0.0072768400448255995
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_006698.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.2772483825683594,
+        "Organika/sdxl-detector": 0.9061748683452606,
+        "OwensLab/commfor-model-384": 0.0004178228846285492
+      },
+      "fused": {
+        "0.0": 0.4621565162051936,
+        "0.25": 0.15744825807947935,
+        "0.5": 0.06330138752983584,
+        "0.75": 0.031646616160444715,
+        "1.0": 0.018599434842388313,
+        "1.5": 0.008760644071505253,
+        "2.0": 0.0052867822694902976,
+        "3.0": 0.002806680273298646
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_008180.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.017138957977294922,
+        "Organika/sdxl-detector": 4.1961669921875e-05,
+        "OwensLab/commfor-model-384": 4.416994670464192e-06
+      },
+      "fused": {
+        "0.0": 0.0038473602758952565,
+        "0.25": 0.000995549262411854,
+        "0.5": 0.0004037310970503687,
+        "0.75": 0.0002118423963949347,
+        "1.0": 0.0001305948826970589,
+        "1.5": 6.634118888084652e-05,
+        "2.0": 4.2235714095543607e-05,
+        "3.0": 2.4018473681447544e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_010189.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006835758686065674,
+        "Organika/sdxl-detector": 4.470348358154297e-05,
+        "OwensLab/commfor-model-384": 2.8179740638734074e-06
+      },
+      "fused": {
+        "0.0": 0.0019501439423649835,
+        "0.25": 0.0005278249274710006,
+        "0.5": 0.00022071227896617622,
+        "0.75": 0.00011838639028972082,
+        "1.0": 7.419832452930941e-05,
+        "1.5": 3.857553416832872e-05,
+        "2.0": 2.4941321215539133e-05,
+        "3.0": 1.4460256262550141e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_014110.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0025874972343444824,
+        "Organika/sdxl-detector": 0.6754917800426483,
+        "OwensLab/commfor-model-384": 7.4220374699507374e-06
+      },
+      "fused": {
+        "0.0": 0.01361905829542478,
+        "0.25": 0.003053928497890888,
+        "0.5": 0.001121389382286491,
+        "0.75": 0.000547794367712432,
+        "1.0": 0.00032001871832648476,
+        "1.5": 0.0001507617958800988,
+        "2.0": 9.127364715333112e-05,
+        "3.0": 4.874153558120148e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_017335.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002779841423034668,
+        "Organika/sdxl-detector": 6.16312026977539e-05,
+        "OwensLab/commfor-model-384": 0.00014248781371861696
+      },
+      "fused": {
+        "0.0": 0.001073771810945239,
+        "0.25": 0.0007170662100984469,
+        "0.5": 0.0005478070490766846,
+        "0.75": 0.0004519538864917701,
+        "1.0": 0.0003912363067842054,
+        "1.5": 0.0003196806433285352,
+        "2.0": 0.00027940311255759997,
+        "3.0": 0.00023611403180637955
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_022059.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.021899104118347168,
+        "Organika/sdxl-detector": 0.012329697608947754,
+        "OwensLab/commfor-model-384": 0.0003465171030256897
+      },
+      "fused": {
+        "0.0": 0.018979947678105104,
+        "0.25": 0.00858076640571023,
+        "0.5": 0.005037055328993933,
+        "0.75": 0.0034396720253009206,
+        "1.0": 0.0025829912131390843,
+        "1.5": 0.001729101057416747,
+        "2.0": 0.0013229626012977753,
+        "3.0": 0.0009465627147296459
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_022541.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0036266446113586426,
+        "Organika/sdxl-detector": 0.051546454429626465,
+        "OwensLab/commfor-model-384": 8.102185529423878e-05
+      },
+      "fused": {
+        "0.0": 0.007104140690880242,
+        "0.25": 0.002911705023872155,
+        "0.5": 0.0016041825205400009,
+        "0.75": 0.0010475272541649535,
+        "1.0": 0.0007608377628244051,
+        "1.5": 0.0004861993345592979,
+        "2.0": 0.0003606928426360609,
+        "3.0": 0.0002483259656233179
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_023526.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.016543328762054443,
+        "Organika/sdxl-detector": 0.033290863037109375,
+        "OwensLab/commfor-model-384": 2.0382925868034363e-05
+      },
+      "fused": {
+        "0.0": 0.019724509146551533,
+        "0.25": 0.0050418086068858715,
+        "0.5": 0.002016757812065254,
+        "0.75": 0.0010468785567504324,
+        "1.0": 0.0006400128232979782,
+        "1.5": 0.0003212838505442848,
+        "2.0": 0.0002029153045564472,
+        "3.0": 0.00011424085135482079
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_024807.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0026514530181884766,
+        "Organika/sdxl-detector": 0.45040011405944824,
+        "OwensLab/commfor-model-384": 0.0002937467652373016
+      },
+      "fused": {
+        "0.0": 0.011016778576867938,
+        "0.25": 0.005355261520339097,
+        "0.5": 0.0033050114423401724,
+        "0.75": 0.002340101182851902,
+        "1.0": 0.0018059186418632473,
+        "1.5": 0.0012562057679138153,
+        "2.0": 0.0009861142012651065,
+        "3.0": 0.0007285769127582103
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_024898.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.08219385147094727,
+        "Organika/sdxl-detector": 0.10101521015167236,
+        "OwensLab/commfor-model-384": 9.178114123642445e-05
+      },
+      "fused": {
+        "0.0": 0.08657596087565204,
+        "0.25": 0.023109183267800745,
+        "0.5": 0.009290251344899523,
+        "0.75": 0.004818835193181342,
+        "1.0": 0.0029408982688383903,
+        "1.5": 0.0014713854509257255,
+        "2.0": 0.0009269033157103107,
+        "3.0": 0.0005200562153191983
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_030108.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00766521692276001,
+        "Organika/sdxl-detector": 0.00510329008102417,
+        "OwensLab/commfor-model-384": 1.4919922932676855e-06
+      },
+      "fused": {
+        "0.0": 0.006924683510936986,
+        "0.25": 0.0012850770807980563,
+        "0.5": 0.0004168884025286695,
+        "0.75": 0.00018647876500160735,
+        "1.0": 0.00010198779203687834,
+        "1.5": 4.381354612086765e-05,
+        "2.0": 2.4944409780783403e-05,
+        "3.0": 1.2336003921559568e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_035142.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009661853313446045,
+        "Organika/sdxl-detector": 2.0265579223632812e-06,
+        "OwensLab/commfor-model-384": 0.000515465100761503
+      },
+      "fused": {
+        "0.0": 0.0011698745862395135,
+        "0.25": 0.0009930503902857866,
+        "0.5": 0.0008902651427939089,
+        "0.75": 0.0008234216519086734,
+        "1.0": 0.0007766011452119497,
+        "1.5": 0.0007154876455619405,
+        "2.0": 0.0006774392815980213,
+        "3.0": 0.0006327096241161775
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_039565.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004908084869384766,
+        "Organika/sdxl-detector": 0.216846764087677,
+        "OwensLab/commfor-model-384": 1.6162468455149792e-05
+      },
+      "fused": {
+        "0.0": 0.013321068276707168,
+        "0.25": 0.0035032359919439154,
+        "0.5": 0.0014315006992433087,
+        "0.75": 0.000754769777645179,
+        "1.0": 0.0004669131756427481,
+        "1.5": 0.00023831456974496916,
+        "2.0": 0.00015219420066833942,
+        "3.0": 8.688385801510192e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_047823.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008941471576690674,
+        "Organika/sdxl-detector": 0.008871316909790039,
+        "OwensLab/commfor-model-384": 0.00023042981047183275
+      },
+      "fused": {
+        "0.0": 0.008923881536224374,
+        "0.25": 0.004307353127389493,
+        "0.5": 0.0026466296035500114,
+        "0.75": 0.0018682337715386812,
+        "1.0": 0.0014385255283774758,
+        "1.5": 0.0009975358731881588,
+        "2.0": 0.0007814512941967187,
+        "3.0": 0.0005758913815876542
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_050036.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.14691555500030518,
+        "Organika/sdxl-detector": 1.5497207641601562e-06,
+        "OwensLab/commfor-model-384": 1.9308714399812743e-05
+      },
+      "fused": {
+        "0.0": 0.009344221530998748,
+        "0.25": 0.002726859429389249,
+        "0.5": 0.001196228983832308,
+        "0.75": 0.0006636881200272681,
+        "1.0": 0.0004265851604645567,
+        "1.5": 0.0002297234908912925,
+        "2.0": 0.00015204841848164092,
+        "3.0": 9.0768879321758e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_052895.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01571178436279297,
+        "Organika/sdxl-detector": 0.0006221532821655273,
+        "OwensLab/commfor-model-384": 0.0001846082741394639
+      },
+      "fused": {
+        "0.0": 0.007043677824140045,
+        "0.25": 0.0034078400724307533,
+        "0.5": 0.002097867029293498,
+        "0.75": 0.0014829861514673555,
+        "1.0": 0.0011431509794687003,
+        "1.5": 0.0007939654236585385,
+        "2.0": 0.0006226445340779716,
+        "3.0": 0.0004594796135485025
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_whatsapp/snapchat_real_055541.jpg",
+      "folder": "100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005181729793548584,
+        "Organika/sdxl-detector": 0.6059228479862213,
+        "OwensLab/commfor-model-384": 9.943728400685359e-06
+      },
+      "fused": {
+        "0.0": 0.021133943628200567,
+        "0.25": 0.004622790665783473,
+        "0.5": 0.0016645590133241728,
+        "0.75": 0.0008014809134093068,
+        "1.0": 0.0004631314160574576,
+        "1.5": 0.00021485315429481646,
+        "2.0": 0.00012874554882700277,
+        "3.0": 6.787346486027964e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_000425.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.11542665958404541,
+        "Organika/sdxl-detector": 6.628036499023438e-05,
+        "OwensLab/commfor-model-384": 4.705700121121481e-06
+      },
+      "fused": {
+        "0.0": 0.019213527115660704,
+        "0.25": 0.0036859345891103045,
+        "0.5": 0.0012162848669263577,
+        "0.75": 0.0005503252200960376,
+        "1.0": 0.00030352720343845233,
+        "1.5": 0.00013192634427849602,
+        "2.0": 7.56941290204215e-05,
+        "3.0": 3.77973594238373e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_010463.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.911177009344101,
+        "Organika/sdxl-detector": 0.42105424404144287,
+        "OwensLab/commfor-model-384": 0.02052631787955761
+      },
+      "fused": {
+        "0.0": 0.8411028708985626,
+        "0.25": 0.6364766201071167,
+        "0.5": 0.45574994092226667,
+        "0.75": 0.33085972197605135,
+        "1.0": 0.24984759694867964,
+        "1.5": 0.1607576299875911,
+        "2.0": 0.11697574994000462,
+        "3.0": 0.07710364447836592
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_013031.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002668619155883789,
+        "Organika/sdxl-detector": 0.8702820092439651,
+        "OwensLab/commfor-model-384": 2.4653845684952103e-06
+      },
+      "fused": {
+        "0.0": 0.018582497506762868,
+        "0.25": 0.003153592863735074,
+        "0.5": 0.0009587650291064673,
+        "0.75": 0.000409181802363699,
+        "1.0": 0.00021601016666901462,
+        "1.5": 8.830660886017104e-05,
+        "2.0": 4.8639167520978974e-05,
+        "3.0": 2.3078993023842136e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_014446.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008874595165252686,
+        "Organika/sdxl-detector": 0.00013494491577148438,
+        "OwensLab/commfor-model-384": 0.00017545692389830947
+      },
+      "fused": {
+        "0.0": 0.0031275792427022547,
+        "0.25": 0.0017592988131892658,
+        "0.5": 0.001198415146667208,
+        "0.75": 0.0009108849569990522,
+        "1.0": 0.0007414563681083933,
+        "1.5": 0.0005558198727231971,
+        "2.0": 0.0004586571353170232,
+        "3.0": 0.00036072026094778153
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_018210.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032431483268737793,
+        "Organika/sdxl-detector": 8.368492126464844e-05,
+        "OwensLab/commfor-model-384": 0.00013135180051904172
+      },
+      "fused": {
+        "0.0": 0.0013013333084740456,
+        "0.25": 0.000822819136631257,
+        "0.5": 0.0006060899867590152,
+        "0.75": 0.00048717807250532206,
+        "1.0": 0.0004135651467837149,
+        "1.5": 0.00032880215672694723,
+        "2.0": 0.00028217866792965837,
+        "3.0": 0.00023308111710191193
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_018231.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.055429816246032715,
+        "Organika/sdxl-detector": 0.9694528393447399,
+        "OwensLab/commfor-model-384": 0.004849531687796116
+      },
+      "fused": {
+        "0.0": 0.2205706090995806,
+        "0.25": 0.11158248139228402,
+        "0.5": 0.0681009438765682,
+        "0.75": 0.047287872997750655,
+        "1.0": 0.035805966157302346,
+        "1.5": 0.024142453331352776,
+        "2.0": 0.018521595816393618,
+        "3.0": 0.013273872186378051
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_022298.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0065498948097229,
+        "Organika/sdxl-detector": 0.0016499757766723633,
+        "OwensLab/commfor-model-384": 0.00014717094018124044
+      },
+      "fused": {
+        "0.0": 0.0046434796712597455,
+        "0.25": 0.0023316068194504463,
+        "0.5": 0.0014719696114873612,
+        "0.75": 0.0010595654895920667,
+        "1.0": 0.0008279720968193332,
+        "1.5": 0.0005861690708857108,
+        "2.0": 0.0004655968471261562,
+        "3.0": 0.00034912348188528695
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_027493.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.14466649293899536,
+        "Organika/sdxl-detector": 0.01533442735671997,
+        "OwensLab/commfor-model-384": 1.5267885373759782e-06
+      },
+      "fused": {
+        "0.0": 0.08522793155275953,
+        "0.25": 0.01017952669487601,
+        "0.5": 0.0023609095251741516,
+        "0.75": 0.0008279140913327892,
+        "1.0": 0.00037701665531015974,
+        "1.5": 0.00012529130615509973,
+        "2.0": 6.010583236719982e-05,
+        "3.0": 2.399614663213355e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_027696.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032821297645568848,
+        "Organika/sdxl-detector": 0.0002898573875427246,
+        "OwensLab/commfor-model-384": 1.2085050911991857e-05
+      },
+      "fused": {
+        "0.0": 0.0017905517285272247,
+        "0.25": 0.000659441715978907,
+        "0.5": 0.00033867327911473073,
+        "0.75": 0.00021039046089299632,
+        "1.0": 0.00014721278402991187,
+        "1.5": 8.929343637443791e-05,
+        "2.0": 6.39827789762321e-05,
+        "3.0": 4.218065111842592e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_029439.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.015829026699066162,
+        "Organika/sdxl-detector": 1.6808509826660156e-05,
+        "OwensLab/commfor-model-384": 2.6164327209698968e-05
+      },
+      "fused": {
+        "0.0": 0.002883485567271176,
+        "0.25": 0.0011271763880123156,
+        "0.5": 0.0006022266049339731,
+        "0.75": 0.0003848044046628215,
+        "1.0": 0.000274996368053631,
+        "1.5": 0.00017180139711806962,
+        "2.0": 0.00012555000040645264,
+        "3.0": 8.48294843063326e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_035713.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0028311610221862793,
+        "Organika/sdxl-detector": 1.5616416931152344e-05,
+        "OwensLab/commfor-model-384": 1.5715623931100708e-06
+      },
+      "fused": {
+        "0.0": 0.0007726063620191937,
+        "0.25": 0.0002237713218076129,
+        "0.5": 9.793340810774733e-05,
+        "0.75": 5.427158845784929e-05,
+        "1.0": 3.4857640824478024e-05,
+        "1.5": 1.875464381027709e-05,
+        "2.0": 1.2406448246674334e-05,
+        "3.0": 7.401495942038342e-06
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_038618.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.001356661319732666,
+        "Organika/sdxl-detector": 0.0014127492904663086,
+        "OwensLab/commfor-model-384": 5.639246410282794e-06
+      },
+      "fused": {
+        "0.0": 0.001370471312050739,
+        "0.25": 0.0004571077405980357,
+        "0.5": 0.00021976376380182308,
+        "0.75": 0.00013023683308997533,
+        "1.0": 8.796427528122174e-05,
+        "1.5": 5.078065242046436e-05,
+        "2.0": 3.520645024693905e-05,
+        "3.0": 2.227277623480197e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_042590.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0012714266777038574,
+        "Organika/sdxl-detector": 1.4781951904296875e-05,
+        "OwensLab/commfor-model-384": 0.00010837336594704539
+      },
+      "fused": {
+        "0.0": 0.00041772068642037145,
+        "0.25": 0.0003189402555032083,
+        "0.5": 0.00026643162575284903,
+        "0.75": 0.00023430464177655362,
+        "1.0": 0.00021277770224568436,
+        "1.5": 0.00018592080898539355,
+        "2.0": 0.00016992675377451206,
+        "3.0": 0.00015185466116280169
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_045753.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.07946836948394775,
+        "Organika/sdxl-detector": 0.9959997008554637,
+        "OwensLab/commfor-model-384": 0.005752239376306534
+      },
+      "fused": {
+        "0.0": 0.3874960436747872,
+        "0.25": 0.1983308732639138,
+        "0.5": 0.11684020636597679,
+        "0.75": 0.07800271372848878,
+        "1.0": 0.05704793984847347,
+        "1.5": 0.03645367736927334,
+        "2.0": 0.026921276850431042,
+        "3.0": 0.01836522592192605
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_045962.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.016129612922668457,
+        "Organika/sdxl-detector": 0.6757811903953552,
+        "OwensLab/commfor-model-384": 0.00399791169911623
+      },
+      "fused": {
+        "0.0": 0.05217752989774813,
+        "0.25": 0.03157798792130862,
+        "0.5": 0.02248124836558409,
+        "0.75": 0.017606682361506067,
+        "1.0": 0.01464726232268782,
+        "1.5": 0.011311130688100019,
+        "2.0": 0.00951658965676104,
+        "3.0": 0.007665262548848278
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_046925.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.015486538410186768,
+        "Organika/sdxl-detector": 0.08093768358230591,
+        "OwensLab/commfor-model-384": 9.926494385581464e-06
+      },
+      "fused": {
+        "0.0": 0.023624777345051983,
+        "0.25": 0.0050600834222035975,
+        "0.5": 0.001794681006744268,
+        "0.75": 0.0008547306627460323,
+        "1.0": 0.0004898496501163364,
+        "1.5": 0.00022463785688666188,
+        "2.0": 0.00013357518514063848,
+        "3.0": 6.974412214583432e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_049729.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.012166857719421387,
+        "Organika/sdxl-detector": 0.2664715647697449,
+        "OwensLab/commfor-model-384": 1.7125430531450547e-05
+      },
+      "fused": {
+        "0.0": 0.027902269940334675,
+        "0.25": 0.006460388856016719,
+        "0.5": 0.0024105781663610595,
+        "0.75": 0.001190084718690033,
+        "1.0": 0.0007006238026982179,
+        "1.5": 0.00033359251901967285,
+        "2.0": 0.00020338589048955657,
+        "3.0": 0.00010956491790681751
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_052810.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.9537355415523052,
+        "Organika/sdxl-detector": 0.9870502976700664,
+        "OwensLab/commfor-model-384": 0.0008888214942999184
+      },
+      "fused": {
+        "0.0": 0.966200368833628,
+        "0.25": 0.7820055256283893,
+        "0.5": 0.47345147232256635,
+        "0.75": 0.2507452916559603,
+        "1.0": 0.1375367022154319,
+        "1.5": 0.0534707846046724,
+        "2.0": 0.02750466910159367,
+        "3.0": 0.011770560522543206
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_053046.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01407170295715332,
+        "Organika/sdxl-detector": 8.118152618408203e-05,
+        "OwensLab/commfor-model-384": 0.0018524228362366557
+      },
+      "fused": {
+        "0.0": 0.0039043626633425534,
+        "0.25": 0.0033639146788620846,
+        "0.5": 0.003045718593394904,
+        "0.75": 0.002836981666388283,
+        "1.0": 0.00268984640537499,
+        "1.5": 0.0024965557620514073,
+        "2.0": 0.0023754564658102894,
+        "3.0": 0.002232290700462505
+      }
+    },
+    {
+      "path": "accuracy_test/100_real_edited/facebook_real_056970.jpg",
+      "folder": "100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006274878978729248,
+        "Organika/sdxl-detector": 0.049488604068756104,
+        "OwensLab/commfor-model-384": 2.5978653866332024e-05
+      },
+      "fused": {
+        "0.0": 0.010586903093247984,
+        "0.25": 0.003199241107956437,
+        "0.5": 0.0014360824221002566,
+        "0.75": 0.0008098909425420059,
+        "1.0": 0.0005269636842075818,
+        "1.5": 0.0002886741403093643,
+        "2.0": 0.00019325546045227687,
+        "3.0": 0.00011702211423943629
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_001051.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 1.2040138244628906e-05,
+        "Organika/sdxl-detector": 0.0003230571746826172,
+        "OwensLab/commfor-model-384": 0.9999653100967407
+      },
+      "fused": {
+        "0.0": 2.7404416153531405e-05,
+        "0.25": 0.0017436704442756188,
+        "0.5": 0.027115049663347046,
+        "0.75": 0.16774147145615123,
+        "1.0": 0.4705651015873987,
+        "1.5": 0.8764793423681289,
+        "2.0": 0.965921804679197,
+        "3.0": 0.99379129975927
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_001832.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00017780065536499023,
+        "Organika/sdxl-detector": 0.0,
+        "OwensLab/commfor-model-384": 0.9999819993972778
+      },
+      "fused": {
+        "0.0": 4.86952832716237e-05,
+        "0.25": 0.0031447026329852897,
+        "0.5": 0.048419391285081104,
+        "0.75": 0.270509981570139,
+        "1.0": 0.6218960533999819,
+        "1.5": 0.9297660062902492,
+        "2.0": 0.9815384617866654,
+        "3.0": 0.9967026900917895
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_002168.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0023325085639953613,
+        "Organika/sdxl-detector": 3.5762786865234375e-07,
+        "OwensLab/commfor-model-384": 0.9998770952224731
+      },
+      "fused": {
+        "0.0": 0.00033611057933376307,
+        "0.25": 0.009977532790724728,
+        "0.5": 0.08862852129931505,
+        "0.75": 0.3293146977440761,
+        "1.0": 0.623192682094013,
+        "1.5": 0.9005448322387822,
+        "2.0": 0.9656679409340684,
+        "3.0": 0.9914526489399812
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_002339.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.011280834674835205,
+        "Organika/sdxl-detector": 0.12711656093597412,
+        "OwensLab/commfor-model-384": 0.999643087387085
+      },
+      "fused": {
+        "0.0": 0.021110396846812485,
+        "0.25": 0.18515719563347557,
+        "0.5": 0.52201543871824,
+        "0.75": 0.7702073071741863,
+        "1.0": 0.88599860596437,
+        "1.5": 0.9618721399996988,
+        "2.0": 0.9822400650811297,
+        "3.0": 0.9932677018712189
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_005354.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.011886894702911377,
+        "Organika/sdxl-detector": 2.9802322387695312e-06,
+        "OwensLab/commfor-model-384": 0.9999929666519165
+      },
+      "fused": {
+        "0.0": 0.0015069686100062038,
+        "0.25": 0.05604362578991708,
+        "0.5": 0.40713598014715685,
+        "0.75": 0.7978398479383917,
+        "1.0": 0.9360966411400291,
+        "1.5": 0.9892330167999033,
+        "2.0": 0.9968099114698814,
+        "3.0": 0.9993075582350457
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_005607.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005875885486602783,
+        "Organika/sdxl-detector": 0.8079869300127029,
+        "OwensLab/commfor-model-384": 0.9236698746681213
+      },
+      "fused": {
+        "0.0": 0.0296265994220556,
+        "0.25": 0.09174190919250312,
+        "0.5": 0.18318592281151025,
+        "0.75": 0.28390615703734834,
+        "1.0": 0.3780435534271461,
+        "1.5": 0.5250711767370707,
+        "2.0": 0.6222686242576274,
+        "3.0": 0.7306087272422288
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_006913.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004435539245605469,
+        "Organika/sdxl-detector": 4.887580871582031e-06,
+        "OwensLab/commfor-model-384": 0.9999009370803833
+      },
+      "fused": {
+        "0.0": 0.0008101768002346987,
+        "0.25": 0.020835797999940977,
+        "0.5": 0.15819149395789298,
+        "0.75": 0.47107442825613094,
+        "1.0": 0.7409869114803751,
+        "1.5": 0.9361246283882491,
+        "2.0": 0.9775543049739335,
+        "3.0": 0.9941496155001344
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_007196.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.003915548324584961,
+        "Organika/sdxl-detector": 0.0006136894226074219,
+        "OwensLab/commfor-model-384": 0.9996933937072754
+      },
+      "fused": {
+        "0.0": 0.0024652114787389497,
+        "0.25": 0.039753976238539414,
+        "0.5": 0.21324757332136351,
+        "0.75": 0.5091732753061526,
+        "1.0": 0.7394891296582362,
+        "1.5": 0.9207499076919621,
+        "2.0": 0.9674564053452196,
+        "3.0": 0.9897124213248061
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_007505.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.026612579822540283,
+        "Organika/sdxl-detector": 0.0030708909034729004,
+        "OwensLab/commfor-model-384": 0.9914257526397705
+      },
+      "fused": {
+        "0.0": 0.015592857845263881,
+        "0.25": 0.08579413708884598,
+        "0.5": 0.2350478602509733,
+        "0.75": 0.4175538037472022,
+        "1.0": 0.5750723950831023,
+        "1.5": 0.7671232021851211,
+        "2.0": 0.856335111923585,
+        "3.0": 0.9259773731026094
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_008021.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.001238107681274414,
+        "Organika/sdxl-detector": 1.1920928955078125e-07,
+        "OwensLab/commfor-model-384": 0.935237467288971
+      },
+      "fused": {
+        "0.0": 0.00020887272259392805,
+        "0.25": 0.0019366702148163847,
+        "0.5": 0.00850106316862594,
+        "0.75": 0.024180604969330107,
+        "1.0": 0.052067039571769114,
+        "1.5": 0.14339342179447317,
+        "2.0": 0.26028713513115453,
+        "3.0": 0.4710725356651287
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_008773.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002554655075073242,
+        "Organika/sdxl-detector": 0.0,
+        "OwensLab/commfor-model-384": 0.9998284578323364
+      },
+      "fused": {
+        "0.0": 0.0003598952809688876,
+        "0.25": 0.009859923465020659,
+        "0.5": 0.0834740149905253,
+        "0.75": 0.30680112735105464,
+        "1.0": 0.5916006167137464,
+        "1.5": 0.883969650084609,
+        "2.0": 0.9584024864924178,
+        "3.0": 0.9892341081720604
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_008845.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.015113532543182373,
+        "Organika/sdxl-detector": 0.004360556602478027,
+        "OwensLab/commfor-model-384": 0.9996160268783569
+      },
+      "fused": {
+        "0.0": 0.011091768889070491,
+        "0.25": 0.11718023893734836,
+        "0.5": 0.4080383118780241,
+        "0.75": 0.6909536052114689,
+        "1.0": 0.8438394827638129,
+        "1.5": 0.9489510904625751,
+        "2.0": 0.9769379911382954,
+        "3.0": 0.9916392886363462
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_010336.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01606649160385132,
+        "Organika/sdxl-detector": 0.9977432440500706,
+        "OwensLab/commfor-model-384": 0.9998397827148438
+      },
+      "fused": {
+        "0.0": 0.17318437297248104,
+        "0.25": 0.6217973119974056,
+        "0.5": 0.8665496404909032,
+        "0.75": 0.9454187177261838,
+        "1.0": 0.9730852497270381,
+        "1.5": 0.9902240085058572,
+        "2.0": 0.99505688700113,
+        "3.0": 0.9978991460513906
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_010626.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0004761219024658203,
+        "Organika/sdxl-detector": 0.0012472867965698242,
+        "OwensLab/commfor-model-384": 0.9970153570175171
+      },
+      "fused": {
+        "0.0": 0.00060576986655525,
+        "0.25": 0.008455335337023199,
+        "0.5": 0.04734277430971374,
+        "0.75": 0.1489547397883833,
+        "1.0": 0.3103338030589455,
+        "1.5": 0.6279447553027112,
+        "2.0": 0.8029322153265612,
+        "3.0": 0.9245867167982172
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_012433.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00035190582275390625,
+        "Organika/sdxl-detector": 1.5497207641601562e-06,
+        "OwensLab/commfor-model-384": 0.999596893787384
+      },
+      "fused": {
+        "0.0": 9.066896022596831e-05,
+        "0.25": 0.00277761157178712,
+        "0.5": 0.026592658849848464,
+        "0.75": 0.12246413383459148,
+        "1.0": 0.3216610448936425,
+        "1.5": 0.7243738980472522,
+        "2.0": 0.8916657436699074,
+        "3.0": 0.9716640627449317
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_013145.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00039273500442504883,
+        "Organika/sdxl-detector": 1.1920928955078125e-07,
+        "OwensLab/commfor-model-384": 0.9995489716529846
+      },
+      "fused": {
+        "0.0": 8.823978487687423e-05,
+        "0.25": 0.002657825376560604,
+        "0.5": 0.025191530273418576,
+        "0.75": 0.11578334380623154,
+        "1.0": 0.30663093290870985,
+        "1.5": 0.7084714441836778,
+        "2.0": 0.883283472768478,
+        "3.0": 0.9690458794847663
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_015147.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0013682246208190918,
+        "Organika/sdxl-detector": 0.0612604022026062,
+        "OwensLab/commfor-model-384": 0.998950183391571
+      },
+      "fused": {
+        "0.0": 0.003586429725957266,
+        "0.25": 0.041887157831637524,
+        "0.5": 0.18765697608256643,
+        "0.75": 0.4313732883020273,
+        "1.0": 0.6492039934126876,
+        "1.5": 0.8657684932327441,
+        "2.0": 0.9368133615739789,
+        "3.0": 0.9767247828978161
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_017502.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.016198575496673584,
+        "Organika/sdxl-detector": 5.733966827392578e-05,
+        "OwensLab/commfor-model-384": 0.999987006187439
+      },
+      "fused": {
+        "0.0": 0.003983945525658051,
+        "0.25": 0.10275442199847741,
+        "0.5": 0.517329960162138,
+        "0.75": 0.8411393579612215,
+        "1.0": 0.9460769961891177,
+        "1.5": 0.9894603804958307,
+        "2.0": 0.9965302119567842,
+        "3.0": 0.9991401527039605
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_018250.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.8401273787021637,
+        "Organika/sdxl-detector": 0.0028339028358459473,
+        "OwensLab/commfor-model-384": 0.9999960660934448
+      },
+      "fused": {
+        "0.0": 0.44486671463476163,
+        "0.25": 0.9098682988923439,
+        "0.5": 0.9820314831670844,
+        "0.75": 0.9945539968179953,
+        "1.0": 0.9977892716438329,
+        "1.5": 0.9993761339322278,
+        "2.0": 0.99973178084983,
+        "3.0": 0.9999066486493167
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/diffusion_fake_019960.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.020121991634368896,
+        "Organika/sdxl-detector": 0.0003031492233276367,
+        "OwensLab/commfor-model-384": 0.056292641907930374
+      },
+      "fused": {
+        "0.0": 0.007107607421286186,
+        "0.25": 0.010820688174182386,
+        "0.5": 0.014305225782046616,
+        "0.75": 0.017450239508021725,
+        "1.0": 0.020245798221811395,
+        "1.5": 0.024908213067085995,
+        "2.0": 0.028581795930398633,
+        "3.0": 0.03391798372978567
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_009065.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.11622130870819092,
+        "Organika/sdxl-detector": 0.46089208126068115,
+        "OwensLab/commfor-model-384": 0.0023282100446522236
+      },
+      "fused": {
+        "0.0": 0.17354323847070244,
+        "0.25": 0.07866382583925176,
+        "0.5": 0.04476252215049054,
+        "0.75": 0.029623319885385125,
+        "1.0": 0.02165718825960537,
+        "1.5": 0.013919008213080552,
+        "2.0": 0.010349059236724424,
+        "3.0": 0.007136125005869395
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_009150.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004296600818634033,
+        "Organika/sdxl-detector": 1.5497207641601562e-06,
+        "OwensLab/commfor-model-384": 0.001743215136229992
+      },
+      "fused": {
+        "0.0": 0.0005936792718309352,
+        "0.25": 0.0007364607741276382,
+        "0.5": 0.0008502370481060678,
+        "0.75": 0.0009421064740506621,
+        "1.0": 0.001017459553113291,
+        "1.5": 0.0011331743559568862,
+        "2.0": 0.0012175308865843616,
+        "3.0": 0.0013318496049805606
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_009363.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0445026159286499,
+        "Organika/sdxl-detector": 0.3043564558029175,
+        "OwensLab/commfor-model-384": 0.0002680927573237568
+      },
+      "fused": {
+        "0.0": 0.07539173523324028,
+        "0.25": 0.025329743574623198,
+        "0.5": 0.011980547082584904,
+        "0.75": 0.006985443204959497,
+        "1.0": 0.004654335412653487,
+        "1.5": 0.002632948238296942,
+        "2.0": 0.0018000058002001827,
+        "3.0": 0.0011185530462770978
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_013934.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0008298158645629883,
+        "Organika/sdxl-detector": 0.00021690130233764648,
+        "OwensLab/commfor-model-384": 9.076265996554866e-05
+      },
+      "fused": {
+        "0.0": 0.0005933869784176114,
+        "0.25": 0.000407651349558438,
+        "0.5": 0.0003173765854386473,
+        "0.75": 0.00026540957511176375,
+        "1.0": 0.0002320974684141957,
+        "1.5": 0.00019236353418559246,
+        "2.0": 0.00016972896730649883,
+        "3.0": 0.0001451429296544087
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_014373.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.07271158695220947,
+        "Organika/sdxl-detector": 1.3113021850585938e-06,
+        "OwensLab/commfor-model-384": 0.00022197209182195365
+      },
+      "fused": {
+        "0.0": 0.0049893636028518545,
+        "0.25": 0.0026809395500711334,
+        "0.5": 0.0017708161699300845,
+        "0.75": 0.0013165446170231374,
+        "1.0": 0.00105401820799732,
+        "1.5": 0.0007719487388192352,
+        "2.0": 0.0006271862557642458,
+        "3.0": 0.00048377152022227295
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_016162.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.04540008306503296,
+        "Organika/sdxl-detector": 0.04714721441268921,
+        "OwensLab/commfor-model-384": 0.004422564525157213
+      },
+      "fused": {
+        "0.0": 0.04583099681464806,
+        "0.25": 0.028972019594630968,
+        "0.5": 0.021259670431618565,
+        "0.75": 0.017020161119207955,
+        "1.0": 0.014396888198752074,
+        "1.5": 0.011381559846639105,
+        "2.0": 0.009727446051625814,
+        "3.0": 0.007990951287454343
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_017219.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.040129780769348145,
+        "Organika/sdxl-detector": 0.9802195131778717,
+        "OwensLab/commfor-model-384": 0.0048699029721319675
+      },
+      "fused": {
+        "0.0": 0.19698601808630356,
+        "0.25": 0.10081955542213454,
+        "0.5": 0.06238042700089135,
+        "0.75": 0.04381781543244036,
+        "1.0": 0.03348758340716359,
+        "1.5": 0.022888292908888868,
+        "2.0": 0.01772411442811665,
+        "3.0": 0.012854043922487245
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_017359.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.998068300075829,
+        "Organika/sdxl-detector": 0.2180371880531311,
+        "OwensLab/commfor-model-384": 0.6460779309272766
+      },
+      "fused": {
+        "0.0": 0.9874608437059238,
+        "0.25": 0.9737475599241445,
+        "0.5": 0.9573633258063285,
+        "0.75": 0.940079759070952,
+        "1.0": 0.9230169257921678,
+        "1.5": 0.8916414321623303,
+        "2.0": 0.864906676648461,
+        "3.0": 0.8238935493952899
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_020622.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008547425270080566,
+        "Organika/sdxl-detector": 1.9073486328125e-06,
+        "OwensLab/commfor-model-384": 0.08080536872148514
+      },
+      "fused": {
+        "0.0": 0.0010503253877514292,
+        "0.25": 0.0025417070616766033,
+        "0.5": 0.004576557734459767,
+        "0.75": 0.006959367416236988,
+        "1.0": 0.009522502787497129,
+        "1.5": 0.014746191380833051,
+        "2.0": 0.019707769306306487,
+        "3.0": 0.02825036114802105
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_023723.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.018565654754638672,
+        "Organika/sdxl-detector": 0.000283658504486084,
+        "OwensLab/commfor-model-384": 0.0001085359399439767
+      },
+      "fused": {
+        "0.0": 0.006576592107806436,
+        "0.25": 0.0029010526739313537,
+        "0.5": 0.0016790157965813676,
+        "0.75": 0.0011357105468764949,
+        "1.0": 0.0008469848022337326,
+        "1.5": 0.0005616619952704688,
+        "2.0": 0.00042708775998018315,
+        "3.0": 0.000303249744012215
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_025928.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.003588378429412842,
+        "Organika/sdxl-detector": 0.09718406200408936,
+        "OwensLab/commfor-model-384": 2.2118369088275358e-05
+      },
+      "fused": {
+        "0.0": 0.00835029530115478,
+        "0.25": 0.002559260429725956,
+        "0.5": 0.001160501328163954,
+        "0.75": 0.0006593164294835275,
+        "1.0": 0.0004313856936905505,
+        "1.5": 0.00023817248815994143,
+        "2.0": 0.00016028272038451594,
+        "3.0": 9.769345907984685e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_026175.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00989001989364624,
+        "Organika/sdxl-detector": 5.6743621826171875e-05,
+        "OwensLab/commfor-model-384": 2.132460576831363e-05
+      },
+      "fused": {
+        "0.0": 0.002734836502800114,
+        "0.25": 0.0010371080040065491,
+        "0.5": 0.00054301023224417,
+        "0.75": 0.0003419922486522088,
+        "1.0": 0.00024176892767434804,
+        "1.5": 0.00014877084713300147,
+        "2.0": 0.0001076267791610954,
+        "3.0": 7.180698589867055e-05
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_028077.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.007548272609710693,
+        "Organika/sdxl-detector": 0.10441833734512329,
+        "OwensLab/commfor-model-384": 4.970093505107798e-05
+      },
+      "fused": {
+        "0.0": 0.014826352454684234,
+        "0.25": 0.00477765268568062,
+        "0.5": 0.0022361666274364673,
+        "0.75": 0.0012990123348485655,
+        "1.0": 0.0008641286229275536,
+        "1.5": 0.00048823421505631357,
+        "2.0": 0.0003336463279853195,
+        "3.0": 0.0002072907665100944
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_030071.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.013741612434387207,
+        "Organika/sdxl-detector": 0.0064858198165893555,
+        "OwensLab/commfor-model-384": 0.009562154300510883
+      },
+      "fused": {
+        "0.0": 0.011396074310144392,
+        "0.25": 0.011003398878007118,
+        "0.5": 0.010749079243043858,
+        "0.75": 0.010570990594865118,
+        "1.0": 0.010439342625280021,
+        "1.5": 0.010257756744934126,
+        "2.0": 0.010138439652926445,
+        "3.0": 0.009991223419573125
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_032717.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.9466787129640579,
+        "Organika/sdxl-detector": 0.004084646701812744,
+        "OwensLab/commfor-model-384": 0.09406008571386337
+      },
+      "fused": {
+        "0.0": 0.6864041078547027,
+        "0.25": 0.5433114886953458,
+        "0.5": 0.4420682971930169,
+        "0.75": 0.3721285636058109,
+        "1.0": 0.32282072089628255,
+        "1.5": 0.2600557180599709,
+        "2.0": 0.22288962781040061,
+        "3.0": 0.18198758230948633
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_035322.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009979605674743652,
+        "Organika/sdxl-detector": 1.1324882507324219e-05,
+        "OwensLab/commfor-model-384": 0.9999939203262329
+      },
+      "fused": {
+        "0.0": 0.001842089973619145,
+        "0.25": 0.0669884178367909,
+        "0.5": 0.451860579471003,
+        "0.75": 0.8249471030025984,
+        "1.0": 0.945719007148432,
+        "1.5": 0.9908818446646952,
+        "2.0": 0.9972916366648118,
+        "3.0": 0.9994096251905392
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_036789.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006358087062835693,
+        "Organika/sdxl-detector": 4.5180320739746094e-05,
+        "OwensLab/commfor-model-384": 0.9996219873428345
+      },
+      "fused": {
+        "0.0": 0.00185144085677053,
+        "0.25": 0.03059311634066205,
+        "0.5": 0.17270776814404382,
+        "0.75": 0.4459570341612152,
+        "1.0": 0.6889325122310105,
+        "1.5": 0.901335086679371,
+        "2.0": 0.9591767613100725,
+        "3.0": 0.987101592486042
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_037170.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.02198636531829834,
+        "Organika/sdxl-detector": 0.004462122917175293,
+        "OwensLab/commfor-model-384": 0.999976396560669
+      },
+      "fused": {
+        "0.0": 0.014799664965812224,
+        "0.25": 0.22657135866541953,
+        "0.5": 0.6797314353910963,
+        "0.75": 0.8972509478115671,
+        "1.0": 0.9618718005754316,
+        "1.5": 0.9911034955728988,
+        "2.0": 0.9966761965383453,
+        "3.0": 0.9990336433576466
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_038242.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01569664478302002,
+        "Organika/sdxl-detector": 0.015016138553619385,
+        "OwensLab/commfor-model-384": 0.9996613264083862
+      },
+      "fused": {
+        "0.0": 0.015523725013196453,
+        "0.25": 0.15164393037849883,
+        "0.5": 0.47424402075958355,
+        "0.75": 0.7413627253758326,
+        "1.0": 0.8721604414112036,
+        "1.5": 0.9582810204038159,
+        "2.0": 0.9809883740990494,
+        "3.0": 0.9930024024829316
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai/inpaint_fake_038311.jpg",
+      "folder": "100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.09678620100021362,
+        "Organika/sdxl-detector": 0.006764829158782959,
+        "OwensLab/commfor-model-384": 0.9999747276306152
+      },
+      "fused": {
+        "0.0": 0.051057354657992604,
+        "0.25": 0.4450319949470018,
+        "0.5": 0.8292505924137324,
+        "0.75": 0.9461815423881433,
+        "1.0": 0.978786742022299,
+        "1.5": 0.9944174124342208,
+        "2.0": 0.9977239825502617,
+        "3.0": 0.9992604512366658
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_006006.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.011657774448394775,
+        "Organika/sdxl-detector": 0.00010347366333007812,
+        "OwensLab/commfor-model-384": 0.9904956817626953
+      },
+      "fused": {
+        "0.0": 0.0035969546397887687,
+        "0.25": 0.027385887643923718,
+        "0.5": 0.09970053200616805,
+        "0.75": 0.22751237835940236,
+        "1.0": 0.38017570555732993,
+        "1.5": 0.6314051924557933,
+        "2.0": 0.7725825259004193,
+        "3.0": 0.8888283146231897
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_009116.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004360318183898926,
+        "Organika/sdxl-detector": 0.002007007598876953,
+        "OwensLab/commfor-model-384": 0.2038455456495285
+      },
+      "fused": {
+        "0.0": 0.0035921503842328045,
+        "0.25": 0.008385664287830994,
+        "0.5": 0.014709920384357781,
+        "0.75": 0.021915190611016683,
+        "1.0": 0.029485774426172465,
+        "1.5": 0.0444628074957166,
+        "2.0": 0.05822660541148985,
+        "3.0": 0.0810493359281532
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_010328.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.13425326347351074,
+        "Organika/sdxl-detector": 0.00043910741806030273,
+        "OwensLab/commfor-model-384": 0.33079931139945984
+      },
+      "fused": {
+        "0.0": 0.034540216738215744,
+        "0.25": 0.05703852545644593,
+        "0.5": 0.0790607565777831,
+        "0.75": 0.09929424952462741,
+        "1.0": 0.11737503897996011,
+        "1.5": 0.14742579187787191,
+        "2.0": 0.17081321730498683,
+        "3.0": 0.20406984695075833
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_010458.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.013316214084625244,
+        "Organika/sdxl-detector": 0.9898437159135938,
+        "OwensLab/commfor-model-384": 0.2917579114437103
+      },
+      "fused": {
+        "0.0": 0.11064576772086167,
+        "0.25": 0.13649617240848474,
+        "0.5": 0.1564263755007143,
+        "0.75": 0.17206916003865758,
+        "1.0": 0.184596354007946,
+        "1.5": 0.20330223634189543,
+        "2.0": 0.21653712711494189,
+        "3.0": 0.2339416465993971
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_013238.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.03192341327667236,
+        "Organika/sdxl-detector": 1.52587890625e-05,
+        "OwensLab/commfor-model-384": 0.016072940081357956
+      },
+      "fused": {
+        "0.0": 0.004813222893814086,
+        "0.25": 0.006131693348381177,
+        "0.5": 0.0072042970847766485,
+        "0.75": 0.008082583450999993,
+        "1.0": 0.008810259431319549,
+        "1.5": 0.009939255268394124,
+        "2.0": 0.010770334819441105,
+        "3.0": 0.011906393973362047
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_021319.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.001638948917388916,
+        "Organika/sdxl-detector": 0.002717733383178711,
+        "OwensLab/commfor-model-384": 0.15825825929641724
+      },
+      "fused": {
+        "0.0": 0.0018599317964736789,
+        "0.25": 0.004667134021603058,
+        "0.5": 0.008600327003674805,
+        "0.75": 0.013283257581971521,
+        "1.0": 0.018373537601424846,
+        "1.5": 0.028835502361180085,
+        "2.0": 0.03881794247885289,
+        "3.0": 0.056000120533694055
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_025203.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002779364585876465,
+        "Organika/sdxl-detector": 0.00015616416931152344,
+        "OwensLab/commfor-model-384": 0.6775969862937927
+      },
+      "fused": {
+        "0.0": 0.0013542207792537264,
+        "0.25": 0.00585848184182731,
+        "0.5": 0.015450656812276165,
+        "0.75": 0.030622452859528394,
+        "1.0": 0.0506801342787477,
+        "1.5": 0.10014456177161167,
+        "2.0": 0.15369742108249276,
+        "3.0": 0.2509164092774615
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_027460.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0011234879493713379,
+        "Organika/sdxl-detector": 6.198883056640625e-06,
+        "OwensLab/commfor-model-384": 0.34298714995384216
+      },
+      "fused": {
+        "0.0": 0.0003063644888262453,
+        "0.25": 0.001355342253173493,
+        "0.5": 0.003646663632730852,
+        "0.75": 0.007379239938791351,
+        "1.0": 0.012490477277285174,
+        "1.5": 0.025927594778259396,
+        "2.0": 0.041880590303863055,
+        "3.0": 0.07515210921820838
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_029871.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0026424527168273926,
+        "Organika/sdxl-detector": 0.00320512056350708,
+        "OwensLab/commfor-model-384": 0.9965708255767822
+      },
+      "fused": {
+        "0.0": 0.0027731341118737637,
+        "0.25": 0.027289088430923297,
+        "0.5": 0.11581558109165858,
+        "0.75": 0.2825191735198805,
+        "1.0": 0.4734002004903477,
+        "1.5": 0.740621312535884,
+        "2.0": 0.8605261721114207,
+        "3.0": 0.9417365426342791
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_030512.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0020894408226013184,
+        "Organika/sdxl-detector": 0.0,
+        "OwensLab/commfor-model-384": 0.9289065599441528
+      },
+      "fused": {
+        "0.0": 0.0003094350783832613,
+        "0.25": 0.002598135739850913,
+        "0.5": 0.010662554119395642,
+        "0.75": 0.028861308414156142,
+        "1.0": 0.05979252914401396,
+        "1.5": 0.15575305650052343,
+        "2.0": 0.2728635689309077,
+        "3.0": 0.4768656849482742
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_034993.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008933484554290771,
+        "Organika/sdxl-detector": 0.0034865736961364746,
+        "OwensLab/commfor-model-384": 0.6054918169975281
+      },
+      "fused": {
+        "0.0": 0.007064614648472265,
+        "0.25": 0.020416712403453923,
+        "0.5": 0.04092436400843484,
+        "0.75": 0.06645663073167807,
+        "1.0": 0.09461168182155837,
+        "1.5": 0.15171844326354078,
+        "2.0": 0.2037658765841572,
+        "3.0": 0.2859592110845784
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_036434.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009904861450195312,
+        "Organika/sdxl-detector": 2.2649765014648438e-06,
+        "OwensLab/commfor-model-384": 0.8081462979316711
+      },
+      "fused": {
+        "0.0": 0.0012256378505856363,
+        "0.25": 0.006213166931899825,
+        "0.5": 0.018174840597309352,
+        "0.75": 0.038640990247403195,
+        "1.0": 0.06707404056256484,
+        "1.5": 0.13962344830652618,
+        "2.0": 0.21828605349089486,
+        "3.0": 0.35497095476448687
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_037930.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.10409754514694214,
+        "Organika/sdxl-detector": 0.00040072202682495117,
+        "OwensLab/commfor-model-384": 0.7387555241584778
+      },
+      "fused": {
+        "0.0": 0.027389131414471152,
+        "0.25": 0.06611435111527865,
+        "0.5": 0.11574168213278574,
+        "0.75": 0.16876534635268142,
+        "1.0": 0.22008626974858053,
+        "1.5": 0.30912164630941996,
+        "2.0": 0.3782602824030264,
+        "3.0": 0.4718232194171528
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_038427.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.013443827629089355,
+        "Organika/sdxl-detector": 0.0678369402885437,
+        "OwensLab/commfor-model-384": 0.2231605350971222
+      },
+      "fused": {
+        "0.0": 0.020295031939371037,
+        "0.25": 0.033863455737663604,
+        "0.5": 0.04740941625814463,
+        "0.75": 0.06009045553326194,
+        "1.0": 0.07161720298047287,
+        "1.5": 0.09119292369736563,
+        "2.0": 0.10679992980044359,
+        "3.0": 0.12957456658946873
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_046566.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005717873573303223,
+        "Organika/sdxl-detector": 0.961212370544672,
+        "OwensLab/commfor-model-384": 0.07216138392686844
+      },
+      "fused": {
+        "0.0": 0.04451918318747099,
+        "0.25": 0.04908710193809798,
+        "0.5": 0.052375771855561935,
+        "0.75": 0.05485113979912165,
+        "1.0": 0.05677955919747031,
+        "1.5": 0.05958656587971776,
+        "2.0": 0.061529577738722856,
+        "3.0": 0.06404159778831149
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_047400.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0015823841094970703,
+        "Organika/sdxl-detector": 0.0010427236557006836,
+        "OwensLab/commfor-model-384": 0.9958750605583191
+      },
+      "fused": {
+        "0.0": 0.0014257248200789615,
+        "0.25": 0.015611628207044388,
+        "0.5": 0.0731751550498738,
+        "0.75": 0.19902303275017444,
+        "1.0": 0.3699249321643261,
+        "1.5": 0.6617903846040504,
+        "2.0": 0.8136389674048135,
+        "3.0": 0.9225147522338563
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_047819.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.029746294021606445,
+        "Organika/sdxl-detector": 0.0007422566413879395,
+        "OwensLab/commfor-model-384": 0.17135335505008698
+      },
+      "fused": {
+        "0.0": 0.011951110010349921,
+        "0.25": 0.020894782728538105,
+        "0.5": 0.03021818131683164,
+        "0.75": 0.039231200468354786,
+        "1.0": 0.04763017210114869,
+        "1.5": 0.06229216295802773,
+        "2.0": 0.07430636840030061,
+        "3.0": 0.09230781588929612
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_048520.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008769989013671875,
+        "Organika/sdxl-detector": 0.3642050623893738,
+        "OwensLab/commfor-model-384": 0.8227327466011047
+      },
+      "fused": {
+        "0.0": 0.02448277412815747,
+        "0.25": 0.06654565179861702,
+        "0.5": 0.12509873611998087,
+        "0.75": 0.1903299563780109,
+        "1.0": 0.25445100242487906,
+        "1.5": 0.3651650808358049,
+        "2.0": 0.4489244252064525,
+        "3.0": 0.5572429637217972
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_049823.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.06264150142669678,
+        "Organika/sdxl-detector": 0.7933332473039627,
+        "OwensLab/commfor-model-384": 0.6465282440185547
+      },
+      "fused": {
+        "0.0": 0.15538901491625698,
+        "0.25": 0.22555320961597372,
+        "0.5": 0.283460924490884,
+        "0.75": 0.3299039138474592,
+        "1.0": 0.3671261594130892,
+        "1.5": 0.42192164986382896,
+        "2.0": 0.45964482077224844,
+        "3.0": 0.5074054272148194
+      }
+    },
+    {
+      "path": "accuracy_test/100_ai_processed/instagram_fake_059429.jpg",
+      "folder": "100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032238364219665527,
+        "Organika/sdxl-detector": 0.0002726912498474121,
+        "OwensLab/commfor-model-384": 0.0006304401904344559
+      },
+      "fused": {
+        "0.0": 0.0017398934080192995,
+        "0.25": 0.0014203305102677868,
+        "0.5": 0.0012405647533147858,
+        "0.75": 0.0011262498537857977,
+        "1.0": 0.0010474738753702474,
+        "1.5": 0.0009463483887668754,
+        "2.0": 0.0008844105084037962,
+        "3.0": 0.0008126527111900505
+      }
+    }
+  ]
+}

@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DeepSentinel AI: Technical Architecture &amp; Model Documentation</title>
+<meta name="description" content="End-to-end technical documentation for DeepSentinel AI: technology stack, models, architecture, API endpoints and limitations.">
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 20mm 16mm;
+    @bottom-center { content: "DeepSentinel AI · Technical Documentation · Page " counter(page); font: 8pt "Segoe UI", sans-serif; color: #7a8599; }
+  }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+
+  :root {
+    --ink: #1a2233; --ink2: #4a5468; --muted: #7a8599;
+    --accent: #2b5fd9; --accent-soft: #e8efff;
+    --teal: #0f8b8d; --teal-soft: #e3f5f5;
+    --amber: #b36b00; --amber-soft: #fff4e0;
+    --red: #b42318; --red-soft: #fdecea;
+    --green: #157f3d; --green-soft: #e6f6ec;
+    --line: #dde3ee; --panel: #f6f8fc;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Segoe UI", "Inter", Roboto, Arial, sans-serif; color: var(--ink); font-size: 9.6pt; line-height: 1.5; margin: 0; }
+  h1, h2, h3, h4 { font-weight: 700; color: var(--ink); margin: 0; }
+  h2 { font-size: 17pt; margin: 0 0 4mm; padding-bottom: 2mm; border-bottom: 2.5px solid var(--accent); }
+  h2 .num { color: var(--accent); margin-right: 3mm; }
+  h3 { font-size: 12pt; margin: 6mm 0 2mm; color: #13305f; }
+  h4 { font-size: 10pt; margin: 4mm 0 1.5mm; }
+  p { margin: 0 0 2.5mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5.5mm; }
+  li { margin-bottom: 1mm; }
+  code, .mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.4pt; background: #eef1f7; padding: 0.3mm 1.2mm; border-radius: 2px; }
+  section { page-break-before: always; }
+  .avoid { page-break-inside: avoid; break-inside: avoid; }
+
+  /* ---------- cover ---------- */
+  .cover { height: 297mm; width: 210mm; position: relative; color: #fff; overflow: hidden;
+    background: radial-gradient(circle at 85% 15%, #3a6df0 0%, transparent 45%),
+                radial-gradient(circle at 10% 90%, #0f8b8d 0%, transparent 40%),
+                linear-gradient(160deg, #0b1630 0%, #13254d 55%, #0b1630 100%); }
+  .cover .inner { position: absolute; left: 20mm; right: 20mm; top: 52mm; }
+  .cover .kicker { letter-spacing: 3px; text-transform: uppercase; font-size: 9pt; color: #9fb7ff; font-weight: 600; }
+  .cover h1 { color: #fff; font-size: 38pt; line-height: 1.05; margin: 5mm 0 4mm; }
+  .cover .sub { font-size: 14pt; color: #d6e0ff; max-width: 150mm; }
+  .cover .chips { margin-top: 12mm; display: flex; flex-wrap: wrap; gap: 2.5mm; }
+  .cover .chip { border: 1px solid rgba(255,255,255,0.35); border-radius: 20px; padding: 1.2mm 4mm; font-size: 8.5pt; color: #e8eeff; background: rgba(255,255,255,0.06); }
+  .cover .meta { position: absolute; left: 20mm; right: 20mm; bottom: 22mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; border-top: 1px solid rgba(255,255,255,0.25); padding-top: 6mm; font-size: 8.5pt; color: #c8d4f5; }
+  .cover .meta b { display: block; color: #fff; font-size: 9.5pt; margin-bottom: 1mm; }
+  .cover .disclaimer { position: absolute; left: 20mm; right: 20mm; bottom: 52mm; background: rgba(255,255,255,0.08); border-left: 3px solid #ffb547; padding: 3mm 4mm; font-size: 9pt; color: #ffe6bf; }
+
+  /* ---------- components ---------- */
+  .callout { border-radius: 4px; padding: 3mm 4mm; margin: 3mm 0; border-left: 4px solid; font-size: 9pt; }
+  .callout b:first-child { display: block; margin-bottom: 1mm; }
+  .note { background: var(--accent-soft); border-color: var(--accent); }
+  .warn { background: var(--amber-soft); border-color: var(--amber); }
+  .crit { background: var(--red-soft); border-color: var(--red); }
+  .ok { background: var(--green-soft); border-color: var(--green); }
+
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 8.6pt; page-break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  th { background: #13254d; color: #fff; text-align: left; padding: 1.8mm 2.2mm; font-weight: 600; }
+  td { padding: 1.6mm 2.2mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:nth-child(even) td { background: var(--panel); }
+
+  .badge { display: inline-block; font-size: 7pt; font-weight: 700; letter-spacing: 0.4px; padding: 0.3mm 1.8mm; border-radius: 10px; text-transform: uppercase; white-space: nowrap; }
+  .b-trained { background: var(--green-soft); color: var(--green); border: 1px solid #9fd8b4; }
+  .b-pre { background: var(--accent-soft); color: var(--accent); border: 1px solid #b3c8f7; }
+  .b-unval { background: var(--amber-soft); color: var(--amber); border: 1px solid #f0cf98; }
+  .b-info { background: #eef1f7; color: var(--ink2); border: 1px solid var(--line); }
+  .b-wip { background: var(--red-soft); color: var(--red); border: 1px solid #f2b8b2; }
+  .m { font-weight: 700; color: #fff; padding: 0.3mm 1.6mm; border-radius: 2px; font-size: 7.4pt; font-family: Consolas, monospace; }
+  .GET { background: #157f3d; } .POST { background: #2b5fd9; } .DELETE { background: #b42318; } .WS { background: #7a3fd1; }
+
+  .toc { counter-reset: none; margin-top: 4mm; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .toc .row { display: flex; align-items: baseline; padding: 1.6mm 0; border-bottom: 1px dotted #c6cede; font-size: 10.5pt; }
+  .toc .row .n { width: 10mm; color: var(--accent); font-weight: 700; }
+  .toc .row .t { flex: 1; }
+  .toc .row .d { color: var(--muted); font-size: 8.5pt; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+  .card { border: 1px solid var(--line); border-radius: 5px; padding: 3mm 3.5mm; background: #fff; }
+  .card h4 { margin-top: 0; }
+  .kpi { text-align: center; border: 1px solid var(--line); border-radius: 5px; padding: 3mm 2mm; background: var(--panel); }
+  .kpi .v { font-size: 17pt; font-weight: 800; color: #13305f; }
+  .kpi .l { font-size: 7.6pt; color: var(--ink2); text-transform: uppercase; letter-spacing: 0.4px; }
+  .kpi .s { font-size: 7pt; color: var(--muted); margin-top: 0.8mm; }
+
+  /* ---------- diagrams ---------- */
+  .diagram { border: 1px solid var(--line); border-radius: 6px; padding: 5mm; background: linear-gradient(180deg, #fbfcff, #f3f6fc); margin: 3mm 0 4mm; }
+  .diagram .cap { font-size: 8pt; color: var(--muted); text-align: center; margin-top: 3mm; font-style: italic; }
+  .lane { display: flex; align-items: stretch; justify-content: center; gap: 0; }
+  .node { border-radius: 5px; padding: 2.5mm 3mm; text-align: center; font-size: 8.4pt; min-width: 28mm; background: #fff; border: 1.5px solid #13254d; box-shadow: 0 1px 0 rgba(19,37,77,0.08); }
+  .node b { display: block; font-size: 9pt; }
+  .node small { color: var(--ink2); font-size: 7.4pt; display: block; }
+  .node.blue { border-color: var(--accent); background: var(--accent-soft); }
+  .node.teal { border-color: var(--teal); background: var(--teal-soft); }
+  .node.amber { border-color: var(--amber); background: var(--amber-soft); }
+  .node.green { border-color: var(--green); background: var(--green-soft); }
+  .node.gray { border-color: #9aa5b8; background: #f1f3f7; }
+  .arrow { display: flex; align-items: center; justify-content: center; padding: 0 1.5mm; color: #5a6680; font-size: 13pt; font-weight: 700; }
+  .arrow small { font-size: 6.6pt; display: block; color: var(--muted); font-weight: 400; text-align: center; }
+  .varrow { text-align: center; color: #5a6680; font-size: 13pt; line-height: 1; margin: 1.2mm 0; }
+  .varrow small { font-size: 6.8pt; color: var(--muted); display: block; }
+  .group { border: 1.5px dashed #9aa5b8; border-radius: 6px; padding: 3mm; position: relative; margin-top: 2mm; }
+  .group > .gl { position: absolute; top: -2.6mm; left: 3mm; background: #f6f8fc; padding: 0 1.5mm; font-size: 7.4pt; font-weight: 700; color: var(--ink2); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { position: relative; padding: 2mm 0 2mm 11mm; border-left: 2px solid var(--line); margin-left: 4mm; margin-bottom: 0; }
+  .steps li::before { counter-increment: step; content: counter(step); position: absolute; left: -4.2mm; top: 1.6mm; width: 6.5mm; height: 6.5mm; border-radius: 50%; background: var(--accent); color: #fff; font-size: 8pt; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .steps li b { color: #13305f; }
+
+  .src { font-size: 7.4pt; color: var(--muted); }
+  .why { background: var(--teal-soft); border-left: 4px solid var(--teal); padding: 2.5mm 3.5mm; border-radius: 4px; margin: 2mm 0 3mm; font-size: 9pt; }
+  .why b:first-child { color: var(--teal); }
+</style>
+</head>
+<body>
+
+<!-- ======================================================== COVER -->
+<div class="cover">
+  <div class="inner">
+    <div class="kicker">Technical Architecture &amp; Model Documentation</div>
+    <h1>DeepSentinel AI</h1>
+    <div class="sub">Detecting manipulated images, audio and video, end to end: the technology stack, the models and why each was chosen, the system architecture, the API, and what has and has not been validated.</div>
+    <div class="chips">
+      <span class="chip">FastAPI · SQLAlchemy · Alembic</span>
+      <span class="chip">Celery + Redis</span>
+      <span class="chip">PostgreSQL 16</span>
+      <span class="chip">PyTorch · torchvision · transformers</span>
+      <span class="chip">React 18 · Vite 5 · Tailwind 3</span>
+      <span class="chip">Docker Compose · nginx</span>
+    </div>
+  </div>
+  <div class="disclaimer"><b>Automated assessment only. Not forensic or legal evidence.</b> Every metric in this document is copied from a file the repository's own scripts wrote; Appendix A lists the file for every number. Signals that have not been validated on labelled data are marked <b>UNVALIDATED</b>.</div>
+  <div class="meta">
+    <div><b>Repository</b>majordeep (Mukesh182005)</div>
+    <div><b>API version</b>1.0.0 (backend/app/__init__.py)</div>
+    <div><b>Document date</b>24 October 2026 · branch ui/video-results</div>
+  </div>
+</div>
+
+<!-- ======================================================== TOC -->
+<section style="page-break-before: auto;">
+  <h2>Contents</h2>
+  <div class="toc">
+    <div class="row"><span class="n">1</span><span class="t">Executive summary</span><span class="d">What the system does, in one page</span></div>
+    <div class="row"><span class="n">2</span><span class="t">Technology stack and why</span><span class="d">Every layer, with the reason for the choice</span></div>
+    <div class="row"><span class="n">3</span><span class="t">System architecture</span><span class="d">Containers, data stores, process boundaries</span></div>
+    <div class="row"><span class="n">4</span><span class="t">End-to-end request lifecycle</span><span class="d">Upload → queue → inference → result → PDF</span></div>
+    <div class="row"><span class="n">5</span><span class="t">Model inventory</span><span class="d">Trained, third-party pretrained, and heuristic</span></div>
+    <div class="row"><span class="n">6</span><span class="t">Image pipeline</span><span class="d">Scene-detector ensemble, face model, forensics</span></div>
+    <div class="row"><span class="n">7</span><span class="t">Audio pipeline</span><span class="d">LCNN on LFCC, ASVspoof 2019 LA</span></div>
+    <div class="row"><span class="n">8</span><span class="t">Video pipeline</span><span class="d">11 stages, frame aggregation, face-swap status</span></div>
+    <div class="row"><span class="n">9</span><span class="t">Decision logic and verdicts</span><span class="d">Thresholds, uncertainty band, INCONCLUSIVE</span></div>
+    <div class="row"><span class="n">10</span><span class="t">API endpoint reference</span><span class="d">All 17 routes, auth and payloads</span></div>
+    <div class="row"><span class="n">11</span><span class="t">Data model</span><span class="d">users, jobs, reports, upload_events</span></div>
+    <div class="row"><span class="n">12</span><span class="t">Frontend architecture</span><span class="d">Pages, result views, API client</span></div>
+    <div class="row"><span class="n">13</span><span class="t">Security, privacy and deployment</span><span class="d">Cookies, signed links, retention, Compose</span></div>
+    <div class="row"><span class="n">14</span><span class="t">Limitations and open items</span><span class="d">What is unvalidated or unfinished</span></div>
+    <div class="row"><span class="n">A</span><span class="t">Appendix A: Provenance of every number</span><span class="d">Value → file → key</span></div>
+    <div class="row"><span class="n">B</span><span class="t">Appendix B: Running the project</span><span class="d">Commands for local and Docker runs</span></div>
+  </div>
+
+  <div class="callout note avoid" style="margin-top:8mm;">
+    <b>How to read this document</b>
+    Each component has a <i>Why</i> box explaining the design decision. Status badges show how much trust a signal has earned:
+    <span class="badge b-trained">Trained &amp; evaluated</span> a model trained in this repo with a held-out evaluation file ·
+    <span class="badge b-pre">Third-party pretrained</span> public weights, chosen by a measurement in this repo ·
+    <span class="badge b-info">Informational</span> computed and shown, but not used in the verdict ·
+    <span class="badge b-unval">Unvalidated heuristic</span> hand-set rule, no labelled evaluation ·
+    <span class="badge b-wip">In progress</span> not on this branch.
+  </div>
+</section>
+
+<!-- ======================================================== 1 SUMMARY -->
+<section>
+  <h2><span class="num">1</span>Executive summary</h2>
+  <p>DeepSentinel AI is a web platform that takes an uploaded image, audio file or video, runs it through a detection pipeline for that media type, and returns a <b>probability that the media is manipulated or AI-generated</b>, a three-way verdict (<code>AUTHENTIC</code>, <code>MANIPULATED</code>, <code>INCONCLUSIVE</code>), visual evidence (heatmaps, spectrograms, timelines), and a downloadable PDF report with a SHA-256 hash.</p>
+
+  <div class="grid3 avoid" style="margin:4mm 0;">
+    <div class="card"><h4>Image</h4>Two public scene-level AI-image detectors fused in log-odds space (0.75 / 0.25) make the decision. A face-crop EfficientNet-B4 is shown but kept out of the verdict. A forensic suite (ELA, CFA, metadata, C2PA) adds context.</div>
+    <div class="card"><h4>Audio</h4>A Light CNN (LCNN) over LFCC features, trained in this repo on ASVspoof 2019 LA, is the only input to the audio verdict. It scores each 4-second window to build the timeline.</div>
+    <div class="card"><h4>Video</h4>Samples 1 frame/s (max 32), crops the largest face with MTCNN, scores frames, runs the scene ensemble on the worst frame, then 11 stages with hand-set fusion. A trained face-swap model is <span class="badge b-wip">in progress</span>.</div>
+  </div>
+
+  <h3>Headline evaluated result</h3>
+  <div class="grid3 avoid">
+    <div class="kpi"><div class="v">4.78%</div><div class="l">Audio EER, served seed</div><div class="s">ASVspoof 2019 LA eval · 71,237 utts</div></div>
+    <div class="kpi"><div class="v">0.9865</div><div class="l">Audio AUC, served seed</div><div class="s">bona fide vs spoof</div></div>
+    <div class="kpi"><div class="v">5.26 ± 0.65%</div><div class="l">Audio EER, 3 seeds</div><div class="s">mean ± SD</div></div>
+  </div>
+  <p class="src">Source: results/audio_eval.json and paper_results/audio_asvspoof2019la/metrics.json (Appendix A).</p>
+
+  <div class="callout warn avoid">
+    <b>What this evaluation does and does not cover</b>
+    The audio model is the only detector here with a held-out evaluation file from a public benchmark. That benchmark is studio-quality English read speech. The model has <b>not</b> been evaluated on phone calls, real-world recordings or other languages (<code>LCNN_SCOPE_NOTE</code>, audio_pipeline.py). The image ensemble was chosen on a 560-image measurement that is recorded only in a source-code comment. The video verdict uses hand-set fusion weights.
+  </div>
+
+  <h3>Design principles that run through the codebase</h3>
+  <ul>
+    <li><b>Measured, not assumed.</b> Detectors are kept, reweighted or dropped based on measurements. Example: <code>umm-maybe/AI-image-detector</code> scored AUC 0.469 and was removed.</li>
+    <li><b>Refuse rather than guess.</b> An uncertainty band around the threshold returns <code>INCONCLUSIVE</code>. An unflagged screenshot is INCONCLUSIVE, never AUTHENTIC.</li>
+    <li><b>Weights must match their calibration.</b> The audio checkpoint is loaded only if its SHA-256 matches the calibration file. A missing image checkpoint is flagged <code>untrained-backbone</code> everywhere.</li>
+    <li><b>Heuristics carry zero weight until proven.</b> Audio heuristics get weight only if their bootstrap 95% AUC lower bound on dev is above 0.6. None passed.</li>
+  </ul>
+</section>
+
+<!-- ======================================================== 2 STACK -->
+<section>
+  <h2><span class="num">2</span>Technology stack and why</h2>
+  <p>Versions are the lower bounds in <code>backend/requirements*.txt</code>, <code>frontend/package.json</code> and the Dockerfiles. Exact tested versions are pinned in <code>backend/requirements.lock</code>.</p>
+
+  <h3>Backend and ML</h3>
+  <table>
+    <thead><tr><th style="width:20%">Layer</th><th style="width:22%">Technology</th><th>Why this choice</th></tr></thead>
+    <tbody>
+      <tr><td>Language</td><td>Python 3.11<br><span class="src">python:3.11-slim image</span></td><td>The ML ecosystem (PyTorch, librosa, OpenCV, transformers) is Python-first. Keeping the API and inference in one language lets the API import the pipelines directly in eager mode.</td></tr>
+      <tr><td>Web framework</td><td>FastAPI ≥ 0.115 + Uvicorn</td><td>Async I/O for uploads and WebSockets, Pydantic validation of every request and response, and OpenAPI docs generated at <code>/docs</code>.</td></tr>
+      <tr><td>Validation / settings</td><td>Pydantic 2, pydantic-settings</td><td>One typed <code>Settings</code> class reads env vars and <code>.env</code>. Production refuses to boot with the placeholder JWT secret (<code>InsecureConfigurationError</code>).</td></tr>
+      <tr><td>ORM / migrations</td><td>SQLAlchemy 2 + Alembic</td><td>The same models run on SQLite (local dev) and PostgreSQL (production). Alembic owns the production schema, so <code>create_all</code> never alters a live database.</td></tr>
+      <tr><td>Database</td><td>PostgreSQL 16 (prod), SQLite (dev)</td><td>Postgres handles concurrent API and worker writes. SQLite means no setup for local development and tests.</td></tr>
+      <tr><td>Task queue</td><td>Celery ≥ 5.4 + Redis 7</td><td>Inference takes seconds to minutes and needs a GPU. A queue keeps HTTP requests fast. Workers run with <code>--concurrency=1</code> so only one model copy sits in GPU memory. <code>beat</code> schedules the hourly retention purge.</td></tr>
+      <tr><td>Auth</td><td>python-jose (JWT), passlib, httpOnly cookie</td><td>A stateless JWT in an httpOnly <code>SameSite=Lax</code> cookie can't be read by page scripts. A Bearer header is still accepted for API clients.</td></tr>
+      <tr><td>Deep learning</td><td>PyTorch ≥ 2.2, torchvision ≥ 0.17</td><td>torchvision provides ImageNet-pretrained EfficientNet. The LCNN and Xception are defined in-repo (<code>models_arch.py</code>), so there's no dependency on the unmaintained <code>pretrainedmodels</code> package.</td></tr>
+      <tr><td>Pretrained hub models</td><td>Hugging Face transformers ≥ 4.30</td><td>Loads the two scene-level AI-image detectors through <code>pipeline("image-classification")</code>. Cached in a named volume (<code>HF_HOME</code>), so weights download once.</td></tr>
+      <tr><td>Face detection</td><td>facenet-pytorch (MTCNN)</td><td>Deepfake artefacts are concentrated in the face, and FF++-style models expect face crops. If MTCNN can't load, the pipeline falls back to the full frame and says so in the notes.</td></tr>
+      <tr><td>Signal / media</td><td>librosa, scipy, soundfile, OpenCV, imageio-ffmpeg, imagehash, Pillow, pillow-heif</td><td>Audio decoding and features, video frame sampling and optical flow, perceptual hashes, and HEIC photos from phones.</td></tr>
+      <tr><td>Reports</td><td>ReportLab + Matplotlib</td><td>Generates PDFs server-side without a headless browser. Matplotlib draws the timeline and score charts embedded in the report.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Frontend</h3>
+  <table>
+    <thead><tr><th style="width:20%">Layer</th><th style="width:22%">Technology</th><th>Why this choice</th></tr></thead>
+    <tbody>
+      <tr><td>UI library</td><td>React 18.3 + React Router 6</td><td>The result pages are component-heavy (tabs, per-media views, pipeline visualisers). Routes: upload, result, report, history, privacy.</td></tr>
+      <tr><td>Build tool</td><td>Vite 5.4</td><td>Fast dev server with an <code>/api</code> proxy (including WebSockets) to port 8000, so the browser sees one origin in development. Recharts gets its own chunk for cache stability.</td></tr>
+      <tr><td>Styling</td><td>Tailwind CSS 3.4 + PostCSS</td><td>Design tokens (status colours, surfaces) shared by all forensic views.</td></tr>
+      <tr><td>Charts / motion</td><td>Recharts 2, Framer Motion, GSAP</td><td>Per-window and per-frame score timelines, and UI transitions.</td></tr>
+      <tr><td>Testing / lint</td><td>Vitest 2 + Testing Library + jsdom, ESLint 8</td><td>Component tests render real API responses from fixture JSON exported from actual jobs.</td></tr>
+      <tr><td>Serving</td><td>nginx 1.27-alpine</td><td>Serves the static build and reverse-proxies <code>/api</code>. It has a fixed IP (172.28.0.10), so the API trusts <code>X-Real-IP</code> only from it.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Infrastructure</h3>
+  <table>
+    <thead><tr><th style="width:20%">Concern</th><th style="width:22%">Technology</th><th>Why this choice</th></tr></thead>
+    <tbody>
+      <tr><td>Orchestration</td><td>Docker Compose</td><td>Six services (db, redis, api, worker, beat, frontend) come up with one command. Named volumes: <code>db_data</code>, <code>redis_data</code>, <code>media</code>, <code>hf_cache</code>.</td></tr>
+      <tr><td>TLS / edge</td><td>Caddy or Cloudflare Tunnel</td><td><code>deploy/Caddyfile</code> and <code>deploy/cloudflare-tunnel.yml</code> cover a public VM and a lab machine with no public IP.</td></tr>
+      <tr><td>Ops</td><td>pg_dump backups, uptime check</td><td><code>deploy/backup.*</code> and <code>deploy/uptime_check.*</code> probe <code>/api/health</code>.</td></tr>
+      <tr><td>CI</td><td>GitHub Actions</td><td><code>.github/workflows/ci.yml</code> builds the backend image, runs pytest inside it, then runs <code>npm ci</code>, tests and a build for the frontend.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================================================== 3 ARCHITECTURE -->
+<section>
+  <h2><span class="num">3</span>System architecture</h2>
+  <p>The system has two modes, chosen by whether <code>CELERY_BROKER_URL</code> is set. In <b>queued mode</b> (Docker Compose) the API never loads a model, and only the worker holds models in memory. In <b>eager mode</b> (local development, as currently running) the API runs the pipeline in-process and warms up the models at startup.</p>
+
+  <div class="diagram avoid">
+    <div class="lane">
+      <div class="node gray"><b>Browser</b><small>React SPA</small><small>httpOnly cookie</small></div>
+      <div class="arrow">→<small>HTTPS</small></div>
+      <div class="node gray"><b>Caddy / CF Tunnel</b><small>TLS termination</small></div>
+      <div class="arrow">→</div>
+      <div class="node blue"><b>frontend</b><small>nginx 1.27</small><small>static build + /api proxy</small><small>172.28.0.10 · :8080</small></div>
+      <div class="arrow">→<small>/api, ws</small></div>
+      <div class="node blue"><b>api</b><small>FastAPI + Uvicorn :8000</small><small>auth · upload · jobs · history</small><small>no models in queued mode</small></div>
+    </div>
+    <div class="varrow">↓<small>enqueue jobs.analyze(job_id)</small></div>
+    <div class="lane">
+      <div class="node teal"><b>redis</b><small>Celery broker (db 0)</small><small>result backend (db 1)</small></div>
+      <div class="arrow">→</div>
+      <div class="node green" style="min-width:62mm;"><b>worker</b><small>Celery · concurrency=1</small><small>image · audio · video pipelines</small><small>EfficientNet-B4 · LCNN · HF scene detectors · MTCNN</small></div>
+      <div class="arrow">←<small>hourly purge</small></div>
+      <div class="node teal"><b>beat</b><small>Celery scheduler</small></div>
+    </div>
+    <div class="varrow">↓<small>read upload · write verdict, evidence</small></div>
+    <div class="lane">
+      <div class="node amber"><b>db</b><small>PostgreSQL 16</small><small>users · jobs · reports · upload_events</small></div>
+      <div class="arrow" style="width:8mm;"></div>
+      <div class="node amber"><b>media volume</b><small>/app/storage</small><small>uploads · evidence · reports</small></div>
+      <div class="arrow" style="width:8mm;"></div>
+      <div class="node amber"><b>checkpoints (ro)</b><small>image_detector.pt</small><small>audio_lcnn_…seed2.pt</small></div>
+      <div class="arrow" style="width:8mm;"></div>
+      <div class="node amber"><b>hf_cache</b><small>HF_HOME</small><small>scene-detector weights</small></div>
+    </div>
+    <div class="cap">Figure 1: Container topology in queued mode (docker-compose.yml). The API and worker share the media volume. Checkpoints and paper/config are mounted read-only.</div>
+  </div>
+
+  <h3>Backend module map</h3>
+  <table>
+    <thead><tr><th style="width:32%">Path</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>app/main.py</code></td><td>App factory, lifespan (directories, DB init, model warm-up only when no broker is set), CORS, security headers, request-ID middleware, early 413 on oversized uploads, error handlers that never leak stack traces.</td></tr>
+      <tr><td><code>app/routers/</code></td><td><code>health</code>, <code>auth</code>, <code>uploads</code>, <code>jobs</code>, <code>history</code>, all mounted under <code>/api</code>.</td></tr>
+      <tr><td><code>app/worker/</code></td><td><code>celery_app.py</code>, <code>tasks.py</code>: <code>jobs.analyze</code> (1 retry) and <code>maintenance.purge_expired_guest_jobs</code>.</td></tr>
+      <tr><td><code>app/ml/pipeline.py</code></td><td>Dispatches by media type to the three live pipelines.</td></tr>
+      <tr><td><code>app/ml/image_pipeline.py</code></td><td>Recapture cropping, MTCNN faces, scene ensemble, Grad-CAM, forensic suite, final probability.</td></tr>
+      <tr><td><code>app/ml/audio_pipeline.py</code>, <code>app/ml/audio/</code></td><td>LCNN verdict, per-window timeline, context signals (weight 0).</td></tr>
+      <tr><td><code>app/ml/video/__init__.py</code></td><td>11-stage video orchestrator and hand-set fusion (<code>video/fusion.py</code>).</td></tr>
+      <tr><td><code>app/ml/registry.py</code></td><td>Loads each model once per process (thread-safe cache), records <code>weights_status</code>, enforces the audio checkpoint hash.</td></tr>
+      <tr><td><code>app/report/</code></td><td>ReportLab PDF generator and Matplotlib charts.</td></tr>
+      <tr><td><code>app/signing.py</code>, <code>app/security.py</code>, <code>app/deps.py</code></td><td>HMAC-signed short-lived URLs, password hashing / JWT, request dependencies (current user, guest access).</td></tr>
+      <tr><td><code>app/retention.py</code>, <code>app/storage.py</code></td><td>Guest-job expiry and file deletion. Upload storage and SHA-256 hashing.</td></tr>
+      <tr><td><code>app/ml_v1/</code></td><td>Legacy copy. <b>Never edited, never imported by live pipelines.</b></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================================================== 4 LIFECYCLE -->
+<section>
+  <h2><span class="num">4</span>End-to-end request lifecycle</h2>
+  <p>This is what happens between a user dropping a file on the Upload page and downloading the PDF.</p>
+  <ol class="steps">
+    <li><b>Limits check.</b> The SPA calls <code>GET /api/upload/limits</code> for allowed extensions, the size limit (<code>MAX_UPLOAD_MB</code>, default 100), duration limits (audio 600 s, video 300 s), enabled media types and guest retention hours.</li>
+    <li><b>Upload.</b> <code>POST /api/upload</code> (multipart). Middleware rejects an over-size <code>Content-Length</code> with 413 before reading the body. The router checks the media type is enabled (else 403), checks duration (else 400), applies per-user/IP rate limits (<code>upload_events</code>), stores the file, computes SHA-256, and creates a <code>jobs</code> row with status <code>queued</code>.</li>
+    <li><b>202 Accepted.</b> The response contains <code>id</code>, <code>case_reference</code>, <code>sha256</code>, <code>file_size_bytes</code>, <code>uploaded_at</code>.</li>
+    <li><b>Enqueue.</b> <code>enqueue_analysis(job_id)</code> sends <code>jobs.analyze</code> to Redis. In eager mode it runs in-process.</li>
+    <li><b>Live progress.</b> The SPA calls <code>POST /api/jobs/{id}/links</code> for signed <code>ws_url</code> / <code>report_url</code> (5-minute TTL), then opens <code>/api/jobs/{id}/ws</code>. It falls back to polling <code>GET /api/jobs/{id}/status</code>.</li>
+    <li><b>Inference.</b> The worker sets <code>processing</code> and calls <code>analyze(media_type, path, EVIDENCE_DIR, job_id)</code>. The pipeline returns an <code>AnalysisResult</code>: probability, verdict (or a verdict override for audio), confidence, model name/version, <code>weights_status</code> and an evidence dictionary. Evidence images are written as <code>EVIDENCE_DIR/&lt;job_id&gt;_*.png</code>.</li>
+    <li><b>Persist.</b> The verdict, probability, model info, JSON-safe evidence and <code>processing_ms</code> are written to the job. Status becomes <code>done</code>, or <code>failed</code> with a user-facing message (corrupt media, missing detector, missing file).</li>
+    <li><b>Result.</b> <code>GET /api/jobs/{id}/result</code> returns <code>JobResultOut</code>, including <code>experimental</code>, <code>experimental_reason</code> and the fixed <code>disclaimer</code>. Evidence images come from <code>GET /api/jobs/{id}/evidence/{kind}</code>.</li>
+    <li><b>Report.</b> <code>POST /api/jobs/{id}/report</code> builds the PDF, stores its SHA-256 in <code>reports</code>, and returns <code>report_reference</code> and <code>download_url</code>. <code>GET /api/jobs/{id}/report</code> streams it with an <code>X-Report-SHA256</code> header. <code>GET /api/reports/{ref}/verify</code> checks a report reference.</li>
+    <li><b>Deletion / retention.</b> <code>DELETE /api/history/{id}</code> removes the upload, every evidence file, the report PDFs and the database rows. Guest jobs are purged automatically after <code>RETENTION_HOURS</code> (72).</li>
+  </ol>
+
+  <div class="diagram avoid">
+    <div class="lane">
+      <div class="node gray"><b>queued</b><small>row created</small></div>
+      <div class="arrow">→<small>worker picks up</small></div>
+      <div class="node blue"><b>processing</b><small>started_at set</small></div>
+      <div class="arrow">→<small>AnalysisResult</small></div>
+      <div class="node green"><b>done</b><small>verdict + evidence</small></div>
+      <div class="arrow" style="width:6mm;"></div>
+      <div class="node" style="border-color:var(--red);background:var(--red-soft);"><b>failed</b><small>error_message</small></div>
+    </div>
+    <div class="cap">Figure 2: Job status machine (JobStatus enum in app/models.py). <code>jobs.analyze</code> retries once with a 10-second delay on unexpected errors. User errors are not retried.</div>
+  </div>
+</section>
+
+<!-- ======================================================== 5 INVENTORY -->
+<section>
+  <h2><span class="num">5</span>Model inventory</h2>
+  <p>Every component that produces a score, with its status. The <b>In verdict?</b> column is the most important: it shows which numbers can actually change the result a user sees.</p>
+  <table>
+    <thead><tr><th style="width:24%">Component</th><th style="width:9%">Media</th><th style="width:17%">Status</th><th style="width:11%">In verdict?</th><th>Architecture / source</th></tr></thead>
+    <tbody>
+      <tr><td><b>haywoodsloan/ai-image-detector-deploy</b></td><td>Image, video keyframe</td><td><span class="badge b-pre">Third-party pretrained</span></td><td>Yes (weight 0.75)</td><td>SwinV2 image classifier from the Hugging Face Hub.</td></tr>
+      <tr><td><b>Organika/sdxl-detector</b></td><td>Image, video keyframe</td><td><span class="badge b-pre">Third-party pretrained</span></td><td>Yes (weight 0.25)</td><td>Swin classifier, Stable Diffusion / SDXL specialist.</td></tr>
+      <tr><td><b>EfficientNet-B4 face model</b><br><span class="src">checkpoints/image_detector.pt</span></td><td>Image faces, video frames</td><td><span class="badge b-info">Informational</span></td><td>No (<code>FACE_MODEL_IN_VERDICT=false</code>)</td><td>torchvision EfficientNet-B4, ImageNet init, 1-logit head, 224 px input. Trained in-repo on face crops.</td></tr>
+      <tr><td><b>LCNN (LFCC), ASVspoof 2019 LA</b><br><span class="src">audio_lcnn_asvspoof_lfcc_seed2.pt</span></td><td>Audio, video soundtrack</td><td><span class="badge b-trained">Trained &amp; evaluated</span></td><td>Yes (sole input)</td><td>Light CNN with Max-Feature-Map activations over 60×401 LFCC windows. Trained in-repo, 3 seeds, served seed picked on dev EER.</td></tr>
+      <tr><td><b>MTCNN</b></td><td>Image, video</td><td><span class="badge b-pre">Third-party pretrained</span></td><td>Indirectly (crop only)</td><td>facenet-pytorch face detector. 25% margin, minimum box 48 px, largest face first.</td></tr>
+      <tr><td>Hand-set provenance floors</td><td>Image</td><td><span class="badge b-unval">Unvalidated heuristic</span></td><td>Yes (raises the floor)</td><td>C2PA AI disclosure → ≥ 0.97; generator metadata → ≥ 0.93; multi-signal consensus → ≥ 0.88; corroboration → ≥ 0.82.</td></tr>
+      <tr><td>Image forensic suite (ELA, CFA, stego, hashes, metadata)</td><td>Image</td><td><span class="badge b-unval">Unvalidated heuristic</span></td><td>Via floors above</td><td>Classical signal processing. The face-seam check is reported only (fired on 30% of real portraits).</td></tr>
+      <tr><td>Video stages 5–9, 11 (jitter, rPPG, 4D tensor, lip kinematics, optical flow, generator profile)</td><td>Video</td><td><span class="badge b-unval">Unvalidated heuristic</span></td><td>Yes (hand-set fusion)</td><td>Hand-set thresholds and weights in <code>video/fusion.py</code>. Generator "profiles" named after Sora/Veo/Kling/Runway/Luma have never been tested on labelled video.</td></tr>
+      <tr><td>Audio glottal, ENF, splice, container, watermark</td><td>Audio</td><td><span class="badge b-unval">Unvalidated heuristic</span></td><td>No (weight 0)</td><td>Dev AUCs 0.43–0.57, all below the 0.6 inclusion bar.</td></tr>
+      <tr><td><b>Face-swap video model</b></td><td>Video</td><td><span class="badge b-wip">In progress</span></td><td>Not on this branch</td><td>Being wired on <code>ml/faceswap-wire</code>. Dataset from FF++ (c23) and Celeb-DF v2. No evaluation file exists on this branch.</td></tr>
+      <tr><td>Retired: <code>audio_detector.pt</code></td><td>-</td><td><span class="badge b-info">Never loaded</span></td><td>No</td><td>Trained on NumPy-generated tones, not speech. Its "AUC 1.0" was measured on tones.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================================================== 6 IMAGE -->
+<section>
+  <h2><span class="num">6</span>Image pipeline</h2>
+  <div class="diagram avoid">
+    <div class="lane">
+      <div class="node gray"><b>Upload</b><small>JPEG/PNG/HEIC…</small></div>
+      <div class="arrow">→</div>
+      <div class="node blue"><b>Recapture crop</b><small>remove viewer / letterbox borders</small></div>
+      <div class="arrow">→</div>
+      <div class="node blue"><b>MTCNN</b><small>≤ 5 faces</small></div>
+      <div class="arrow">→</div>
+      <div class="node gray"><b>EfficientNet-B4</b><small>face P(fake)</small><small>informational</small></div>
+    </div>
+    <div class="varrow">↓</div>
+    <div class="lane">
+      <div class="node green"><b>Scene ensemble</b><small>SwinV2 ×0.75 + Swin ×0.25</small><small>log-odds mean</small></div>
+      <div class="arrow">→</div>
+      <div class="node amber"><b>Forensic suite</b><small>ELA · CFA · metadata · C2PA</small><small>unvalidated</small></div>
+      <div class="arrow">→</div>
+      <div class="node amber"><b>Provenance floors</b><small>0.97 / 0.93 / 0.88 / 0.82</small><small>unvalidated</small></div>
+      <div class="arrow">→</div>
+      <div class="node green"><b>Verdict</b><small>threshold 0.5 ± 0.08</small></div>
+    </div>
+    <div class="cap">Figure 3: Image flow (image_pipeline.py). Grad-CAM is computed on the highest-scoring face crop.</div>
+  </div>
+
+  <h3>6.1 Scene-detector ensemble <span class="badge b-pre">Third-party pretrained</span></h3>
+  <p>For each detector, <i>P(AI) = 1 − P(real class)</i>, where the real class is found in that model's own label map ("real", "human", "hum", "authentic"). This stops a model with unusual label names from being silently mis-scored. The fused score is <code>sigmoid(Σ wᵢ·logit(pᵢ) / Σ wᵢ)</code>.</p>
+  <div class="why"><b>Why these two models and this fusion?</b> They were chosen by measurement, not by model card. A comment in <code>image_pipeline.py</code> records a test on 560 held-out images: 200 real COCO/Flickr photos and 360 from SD 2.1, SDXL, SD3, DALL-E 3, Midjourney v6, Flux.1-dev, and Gemini "Nano Banana" / Nano Banana Pro. Each was scored as the original file, as a normalised JPEG and as a simulated screenshot. Log-odds averaging was chosen over max-of-experts so that one over-eager model can't flag a real photo on its own.</div>
+  <table class="avoid">
+    <thead><tr><th>Configuration (from source comment)</th><th>AUC</th><th>Real photos scored ≥ 0.5</th></tr></thead>
+    <tbody>
+      <tr><td>haywoodsloan alone</td><td>0.973</td><td>3.5%</td></tr>
+      <tr><td><b>0.75 / 0.25 fusion with Organika (served)</b></td><td><b>0.984</b> (0.980 on held-out halves)</td><td>3.5%</td></tr>
+      <tr><td>Organika alone</td><td>0.836</td><td>23%</td></tr>
+      <tr><td>umm-maybe/AI-image-detector</td><td>0.469 (below chance, removed)</td><td>-</td></tr>
+      <tr><td>Max-of-experts (old rule)</td><td>-</td><td>26–36%</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn avoid"><b>Provenance caveat</b>These figures appear only in a source-code comment. No results file for them exists in <code>results/</code> or <code>paper_results/</code> on this branch. The script <code>ml/evaluation/eval_image_detectors.py</code> exists. Re-running it and committing its output file would make these numbers citable.</div>
+
+  <h3>6.2 EfficientNet-B4 face model <span class="badge b-info">Informational</span></h3>
+  <p>A torchvision EfficientNet-B4 (ImageNet init) with its classifier swapped for a single logit, trained at 224 px. It runs in float32, because float16 autocast overflowed to NaN on some inputs. Its per-face score and Grad-CAM heatmap are shown, but <code>face_model_in_verdict=False</code> keeps it out of the verdict.</p>
+  <div class="why"><b>Why is it excluded from the verdict?</b> The comment in <code>config.py</code> says it was trained on StyleGAN faces only. On real vs modern-AI photos with faces it flagged 21% of real faces and only 15% of AI faces, so it can't tell them apart on current generators. It stays out until a retrained model is validated.</div>
+  <table class="avoid">
+    <thead><tr><th>Checkpoint summary field</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Validation accuracy / AUC / EER (threshold 0.5)</td><td>0.99977 / 0.999999 / 0.00015</td></tr>
+      <tr><td>Confusion matrix (tn / fp / fn / tp)</td><td>81,968 / 32 / 5 / 81,995</td></tr>
+      <tr><td>Train / validation size; epochs</td><td>936,009 / 164,000; 1 epoch, AMP</td></tr>
+      <tr><td>Recorded model_version</td><td><code>image-detector-v2.1.0-b4-expanded</code></td></tr>
+    </tbody>
+  </table>
+  <div class="callout crit avoid"><b>Do not read these as real-world accuracy</b>These are <b>in-distribution validation</b> numbers from <code>checkpoints/image_detector.summary.json</code>. The validation split comes from the same sources as training. The 21% / 15% result above shows how far they are from out-of-distribution performance. Also, <code>/api/health</code> reports the <i>configured</i> version <code>image-detector-v3.0.0-b4-800k</code>, while the checkpoint summary records v2.1.0. The authoritative version for any analysis is the one stored on its job.</div>
+
+  <h3>6.3 Screenshots and forensic suite <span class="badge b-unval">Unvalidated</span></h3>
+  <ul>
+    <li><b>Recapture handling:</b> uniform viewer bars are cropped before any pixel analysis. A screenshot that the detectors don't flag is reported <code>INCONCLUSIVE</code>, because recapture destroys the evidence an AUTHENTIC verdict needs.</li>
+    <li><b>Camera-trace absence</b> (no CFA trace) only corroborates a detector that has already fired. It was missing in all 196 real web JPEGs measured (source comment), so on its own it means nothing.</li>
+    <li><b>Declared provenance</b> (C2PA <code>trainedAlgorithmicMedia</code>, generator parameters in metadata) raises the floor. The floor values are hand-set.</li>
+  </ul>
+</section>
+
+<!-- ======================================================== 7 AUDIO -->
+<section>
+  <h2><span class="num">7</span>Audio pipeline</h2>
+  <div class="diagram avoid">
+    <div class="lane">
+      <div class="node gray"><b>Audio file</b><small>resample 16 kHz</small><small>no peak normalisation</small></div>
+      <div class="arrow">→</div>
+      <div class="node blue"><b>4 s windows</b><small>64,000 samples</small><small>non-overlapping</small></div>
+      <div class="arrow">→</div>
+      <div class="node blue"><b>LFCC</b><small>20 + Δ + ΔΔ</small><small>(60 × 401)</small></div>
+      <div class="arrow">→</div>
+      <div class="node green"><b>LCNN</b><small>spoof logit / window</small></div>
+      <div class="arrow">→</div>
+      <div class="node green"><b>Calibrate</b><small>dev-fitted</small><small>→ P(spoof)</small></div>
+      <div class="arrow">→</div>
+      <div class="node green"><b>Verdict</b><small>&lt; 0.417 · ≥ 0.577</small></div>
+    </div>
+    <div class="varrow">↓<small>context only (weight 0)</small></div>
+    <div class="lane"><div class="node amber" style="min-width:150mm;"><b>Supporting signals (unvalidated)</b><small>glottal flow · coarticulation · ENF mains-hum · splice timeline · container DNA · watermark</small></div></div>
+    <div class="cap">Figure 4: Audio flow. Features are computed by asvspoof_frontend.py, the same code used in training.</div>
+  </div>
+
+  <h3>7.1 Front end: LFCC <span class="badge b-trained">Trained &amp; evaluated</span></h3>
+  <p>Each window: 20 ms Hamming (320 samples) zero-padded to a 512-point FFT, 10 ms hop, centred frames, 20 linear triangular filters from 0 to 8 kHz, natural log with a 1e-10 floor, orthonormal DCT-II keeping c0–c19, plus deltas and double deltas over 3 frames. That gives a <b>60 × 401</b> matrix. Features are rounded through float16 exactly as during training.</p>
+  <div class="why"><b>Why LFCC?</b> The front end was chosen on the dev set by <code>ml/evaluation/select_asvspoof_frontend.py</code>; a log-Mel checkpoint also exists for comparison. Linear filters keep high-frequency resolution where vocoder artefacts tend to sit. Serving imports the training feature code, so the deployed model sees exactly the features it was evaluated on. That's why the waveform is deliberately <i>not</i> peak-normalised: normalising shifts c0.</div>
+
+  <h3>7.2 Network: Light CNN (LCNN)</h3>
+  <p>Nine convolution blocks with <b>Max-Feature-Map</b> activations (split channels in half, take the element-wise max), BatchNorm and four 2×2 max-pools. Then global average pooling and a head of Dropout 0.3 → Linear 32→64 → BN → ReLU → Linear 64→1. The checkpoint is about 600 KB.</p>
+  <div class="why"><b>Why LCNN?</b> It's the architecture used by the ASVspoof anti-spoofing baselines, so results can be compared with published systems. It's small enough to run on CPU. Max-Feature-Map acts as a learned feature selector, which suits narrow spectral artefacts.</div>
+
+  <h3>7.3 Serving safeguards</h3>
+  <ul>
+    <li>The checkpoint named in <code>paper/config/audio_calibration.json</code> is loaded <b>only if its SHA-256 matches</b> (<code>7ca31fd0…</code>). Any other weights make the detector unavailable, rather than producing probabilities nobody measured.</li>
+    <li>The verdict thresholds are frozen on dev in <code>frozen_audio_config.json</code>: decision threshold 0.497 from dev, band ±0.08. That gives AUTHENTIC &lt; 0.417, MANIPULATED ≥ 0.577, INCONCLUSIVE in between.</li>
+    <li><code>AUDIO_MODEL_SOURCE=legacy</code> switches back to hand-set rules and marks every result <code>experimental: true</code>.</li>
+  </ul>
+
+  <h3>7.4 Evaluation: ASVspoof 2019 LA eval</h3>
+  <div class="grid3 avoid" style="margin-bottom:3mm;">
+    <div class="kpi"><div class="v">4.78%</div><div class="l">EER (served seed 2)</div><div class="s">7,355 bona fide · 63,882 spoof</div></div>
+    <div class="kpi"><div class="v">0.1025</div><div class="l">min t-DCF (seed 2)</div><div class="s">3-seed mean 0.1104 ± 0.0142</div></div>
+    <div class="kpi"><div class="v">8.09%</div><div class="l">Published B02 LFCC-GMM</div><div class="s">B01 CQCC-GMM: 9.57%</div></div>
+  </div>
+  <table class="avoid">
+    <thead><tr><th>Attack</th><th>A07</th><th>A08</th><th>A09</th><th>A10</th><th>A11</th><th>A12</th><th>A13</th><th>A14</th><th>A15</th><th>A16</th><th>A17</th><th>A18</th><th>A19</th></tr></thead>
+    <tbody><tr><td>EER %, 3-seed mean</td><td>0.32</td><td>1.74</td><td>0.10</td><td>0.78</td><td>0.41</td><td>0.30</td><td>0.39</td><td>2.44</td><td>2.74</td><td>0.55</td><td style="color:var(--red);font-weight:700;">26.90</td><td>2.06</td><td>3.53</td></tr></tbody>
+  </table>
+  <div class="callout warn avoid"><b>Known weak spot: attack A17</b>EER is 26.90% (mean of 3 seeds), far above every other attack. Any spoofing method similar to A17 will often get through. The model is also untested outside ASVspoof's studio-quality English read speech.</div>
+
+  <h3>7.5 Why the heuristics get zero weight</h3>
+  <p>The inclusion rule in <code>frozen_audio_config.json</code>: a signal gets weight above 0 only if its bootstrap 95% AUC lower bound on the balanced dev subsample (1,000 bona fide + 1,000 spoof) is above 0.6. On that subsample the LCNN scored AUC 1.000. Every heuristic sat near chance:</p>
+  <table class="avoid">
+    <thead><tr><th>Signal</th><th>Dev AUC [95% CI]</th><th>Signal</th><th>Dev AUC [95% CI]</th></tr></thead>
+    <tbody>
+      <tr><td>Glottal anomaly</td><td>0.552 [0.527, 0.578]</td><td>Splice worst segment</td><td>0.499 [0.498, 0.500]</td></tr>
+      <tr><td>Coarticulation anomaly</td><td>0.518 [0.494, 0.543]</td><td>Splice F1 spikes</td><td>0.428 [0.404, 0.453]</td></tr>
+      <tr><td>Environment / mains-hum</td><td>0.504 [0.499, 0.509]</td><td>Legacy final probability</td><td>0.556 [0.543, 0.569]</td></tr>
+    </tbody>
+  </table>
+  <p>The legacy rule-based verdict labelled 99.1% of bona fide and 87.0% of spoof clips INCONCLUSIVE, which is why it was replaced.</p>
+</section>
+
+<!-- ======================================================== 8 VIDEO -->
+<section>
+  <h2><span class="num">8</span>Video pipeline</h2>
+  <p>The served video detector, as <code>/api/health</code> reports it, is <i>"frame-aggregation over the image model"</i>, version <code>video-frame-agg-v1.0.0</code>. The orchestrator in <code>app/ml/video/__init__.py</code> runs 11 stages and records the timing and status of each in <code>pipeline_modules</code>.</p>
+  <table>
+    <thead><tr><th style="width:6%">#</th><th style="width:30%">Stage</th><th style="width:20%">Status</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Container &amp; bitstream</td><td><span class="badge b-unval">Unvalidated</span></td><td>Container format, atom hierarchy, screen-recording detection, compression fingerprint.</td></tr>
+      <tr><td>2</td><td>Frame sampling &amp; shots</td><td><span class="badge b-info">Pre-processing</span></td><td><code>VIDEO_SAMPLE_FPS</code>=1, <code>VIDEO_MAX_FRAMES</code>=32. Shot-boundary detection.</td></tr>
+      <tr><td>3</td><td>Spatial neural + GenAI</td><td><span class="badge b-pre">Pretrained</span> / <span class="badge b-info">Info</span></td><td>MTCNN largest face → EfficientNet-B4 per frame (informational). Scene ensemble on the worst face frame. Frames with no face are excluded, because the face model scores scenery as noise.</td></tr>
+      <tr><td>4</td><td>Image forensic suite on keyframe</td><td><span class="badge b-unval">Unvalidated</span></td><td>CFA periodicity, Fourier slope, ELA, matte voids.</td></tr>
+      <tr><td>5</td><td>Temporal jitter &amp; facial dynamics</td><td><span class="badge b-unval">Unvalidated</span></td><td>Box jitter, landmark jitter, blink rhythm.</td></tr>
+      <tr><td>6</td><td>rPPG</td><td><span class="badge b-unval">Unvalidated</span></td><td>CHROM/POS pulse estimation, 0.75–2.5 Hz band.</td></tr>
+      <tr><td>7</td><td>Spatio-temporal tensor</td><td><span class="badge b-unval">Unvalidated</span></td><td>Space-time patch variance statistics (named after TimeSformer/SlowFast; no such trained model is loaded).</td></tr>
+      <tr><td>8</td><td>Lip kinematics</td><td><span class="badge b-unval">Unvalidated</span></td><td>Mouth aspect ratio trajectory, articulatory jerk.</td></tr>
+      <tr><td>9</td><td>Optical flow</td><td><span class="badge b-unval">Unvalidated</span></td><td>Farneback dense flow, face-vs-background divergence.</td></tr>
+      <tr><td>10</td><td>Audio track &amp; lip-sync</td><td><span class="badge b-trained">LCNN</span> + <span class="badge b-unval">Unvalidated</span></td><td>Demuxes the soundtrack and runs the audio suite (LCNN). Audio-visual correlation is a heuristic.</td></tr>
+      <tr><td>11</td><td>Generator profile match</td><td><span class="badge b-unval">Unvalidated</span></td><td>Hand-set profiles named after Sora, Veo, Kling, Runway and Luma. <b>Never tested on labelled video.</b></td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn avoid"><b>How the current video score is produced</b><code>fuse_video_forensics()</code> combines these signals with <b>hand-set weights</b>. Because the face model is informational, the spatial input is 0 unless <code>FACE_MODEL_IN_VERDICT</code> is true, so in practice the scene ensemble and the heuristics drive the score. No labelled-video evaluation of this fused score exists in the repository.</div>
+
+  <h3>8.1 Face-swap model <span class="badge b-wip">In progress</span></h3>
+  <p>A trained face-swap detector is being built to replace the hand-set face signal:</p>
+  <ul>
+    <li><b>Data:</b> face crops from FaceForensics++ (c23) and Celeb-DF v2, 32 frames per video, the same MTCNN setup and margin as <code>backend/app/ml/faces.py</code>, official splits by video, and an audit that fails if any video or identity appears in two splits.</li>
+    <li><b>Scoring contract the UI already supports</b> (<code>VideoForensicsView.jsx</code>): <code>face_tracks[]</code>, one entry per tracked face, scored as the <b>mean of the top 25% of its frame scores</b>. The video score is the <b>highest track score</b>. A calibrated <code>segment_timeline</code> is built from the same scores. With no face track, the UI says <i>"No face found: face-swap check not applicable."</i></li>
+    <li><b>Status:</b> the backend wiring lives on <code>ml/faceswap-wire</code>, which is not merged into this branch and has no checkpoint or results file here. <b>No accuracy figure is claimed for it.</b></li>
+  </ul>
+</section>
+
+<!-- ======================================================== 9 DECISION -->
+<section>
+  <h2><span class="num">9</span>Decision logic and verdicts</h2>
+  <div class="grid2 avoid">
+    <div class="card">
+      <h4>Image and video (platform default)</h4>
+      <p><code>FAKE_THRESHOLD</code> = 0.50, <code>UNCERTAIN_BAND</code> = 0.08</p>
+      <ul>
+        <li>p &lt; 0.42 → <b style="color:var(--green)">AUTHENTIC</b></li>
+        <li>0.42 ≤ p &lt; 0.58 → <b style="color:var(--amber)">INCONCLUSIVE</b></li>
+        <li>p ≥ 0.58 → <b style="color:var(--red)">MANIPULATED</b></li>
+      </ul>
+      <p class="src">app/config.py and app/ml/base.py <code>classify()</code>. Pipeline-specific overrides apply, e.g. an unflagged screenshot → INCONCLUSIVE, no scene detector loaded → AUTHENTIC impossible.</p>
+    </div>
+    <div class="card">
+      <h4>Audio (frozen on ASVspoof dev)</h4>
+      <p>Threshold 0.497 (from dev), band ±0.08</p>
+      <ul>
+        <li>p &lt; 0.417 → <b style="color:var(--green)">AUTHENTIC</b></li>
+        <li>0.417 ≤ p &lt; 0.577 → <b style="color:var(--amber)">INCONCLUSIVE</b></li>
+        <li>p ≥ 0.577 → <b style="color:var(--red)">MANIPULATED</b></li>
+      </ul>
+      <p class="src">paper/config/frozen_audio_config.json, set via <code>verdict_override</code> in audio_pipeline.py.</p>
+    </div>
+  </div>
+
+  <h3>Why a three-way verdict?</h3>
+  <div class="why"><b>Refusing is a feature.</b> Scores near the threshold are where detectors make most of their mistakes. Returning INCONCLUSIVE there, and for inputs whose evidence was destroyed (screenshots, missing detectors), is more honest than forcing a binary answer. "No manipulation detected" never means "proven authentic".</div>
+
+  <h3>Fields every result carries</h3>
+  <table class="avoid">
+    <thead><tr><th style="width:28%">Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>fake_probability</code></td><td>The pipeline's final probability (for audio, the calibrated LCNN probability alone).</td></tr>
+      <tr><td><code>verdict</code>, <code>confidence</code></td><td>Three-way verdict and its confidence.</td></tr>
+      <tr><td><code>model_name</code>, <code>model_version</code>, <code>weights_status</code></td><td>Which model produced the score. <code>untrained-backbone</code> is shown everywhere if weights were missing.</td></tr>
+      <tr><td><code>experimental</code>, <code>experimental_reason</code></td><td>True when no trained, evaluated model made the verdict. The UI shows an "Experimental" badge.</td></tr>
+      <tr><td><code>disclaimer</code></td><td>"Automated assessment only. Not forensic or legal evidence…"</td></tr>
+      <tr><td><code>evidence.*</code></td><td>Media-specific: <code>frame_scores</code>, <code>segment_scores</code>, <code>segment_timeline</code>, <code>pipeline_modules</code>, <code>notes</code>, <code>*_file</code> evidence images.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================================================== 10 API -->
+<section>
+  <h2><span class="num">10</span>API endpoint reference</h2>
+  <p>Base path <code>/api</code> (<code>API_V1_PREFIX</code>). Interactive docs at <code>/docs</code>, schema at <code>/openapi.json</code>. Authentication is the <code>deepsentinel_session</code> httpOnly cookie or <code>Authorization: Bearer</code>. Guests can upload and read their own jobs. Every error body includes a <code>request_id</code>.</p>
+  <table>
+    <thead><tr><th style="width:9%">Method</th><th style="width:31%">Path</th><th style="width:14%">Auth</th><th>Purpose / response</th></tr></thead>
+    <tbody>
+      <tr><td colspan="4" style="background:#e8efff;font-weight:700;">Health</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/health</code></td><td>None</td><td><code>HealthOut</code>: status, version, queue_enabled, model descriptions. Never loads a model.</td></tr>
+      <tr><td colspan="4" style="background:#e8efff;font-weight:700;">Auth (/api/auth)</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/auth/register</code></td><td>None</td><td>201 <code>Token</code>. Sets the session cookie. Password 8–128 characters.</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/auth/login</code></td><td>None</td><td><code>Token</code> (access_token, expires_in, user). Sets the cookie.</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/auth/logout</code></td><td>Cookie</td><td>204. Clears the cookie.</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/auth/me</code></td><td>User</td><td><code>UserOut</code>.</td></tr>
+      <tr><td colspan="4" style="background:#e8efff;font-weight:700;">Upload</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/upload</code></td><td>User or guest</td><td>202 <code>JobCreated</code>. 413 too large · 403 type disabled · 400 too long · 429 rate limit.</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/upload/limits</code></td><td>None</td><td>Allowed extensions, size limit, enabled types, max durations, guest retention hours.</td></tr>
+      <tr><td colspan="4" style="background:#e8efff;font-weight:700;">Jobs (/api/jobs)</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/jobs/{id}/status</code></td><td>Owner / guest job</td><td><code>JobStatusOut</code>: status, timestamps, error_message.</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/jobs/{id}/links</code></td><td>Owner / guest job</td><td><code>JobLinksOut</code>: signed <code>report_url</code>, <code>ws_url</code>, <code>expires_at</code> (TTL 300 s).</td></tr>
+      <tr><td><span class="m WS">WS</span></td><td><code>/api/jobs/{id}/ws</code></td><td>Signed URL / cookie</td><td>Live status push until done or failed.</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/jobs/{id}/result</code></td><td>Owner / guest job</td><td><code>JobResultOut</code>: verdict, probability, model, evidence, experimental, disclaimer.</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/jobs/{id}/evidence/{kind}</code></td><td>Owner / guest job</td><td>Evidence PNG (heatmap, spectrogram, timeline, optical flow, …).</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/jobs/{id}/report</code></td><td>Owner / guest job</td><td>201 <code>ReportOut</code>: report_reference, sha256, download_url.</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/jobs/{id}/report</code></td><td>Signed URL / cookie</td><td>PDF stream with an <code>X-Report-SHA256</code> header.</td></tr>
+      <tr><td colspan="4" style="background:#e8efff;font-weight:700;">History</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/history</code></td><td>User</td><td><code>HistoryPage</code> (items, total, limit, offset).</td></tr>
+      <tr><td><span class="m DELETE">DELETE</span></td><td><code>/api/history/{id}</code></td><td>Owner</td><td>204. Deletes the upload, all evidence files, report PDFs and rows.</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/reports/{ref}/verify</code></td><td>None</td><td>Checks a report reference against the stored hash.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Example: upload and fetch a result</h3>
+  <div class="card avoid" style="font-family:Consolas,monospace;font-size:8pt;white-space:pre;line-height:1.45;background:#0f1a33;color:#dbe6ff;border:none;">curl -X POST http://localhost:8000/api/upload -F "file=@clip.wav"
+→ 202 {"id":"9f3c…","case_reference":"…","media_type":"audio","status":"queued","sha256":"…"}
+
+curl http://localhost:8000/api/jobs/9f3c…/result
+→ 200 {"status":"done","verdict":"INCONCLUSIVE","fake_probability":0.51,
+       "model_name":"LCNN (LFCC), ASVspoof 2019 LA","experimental":false,
+       "evidence":{"segment_scores":[{"start_s":0,"end_s":4,"fake_probability":…,"status":"…"}], …},
+       "disclaimer":"Automated assessment only. Not forensic or legal evidence. …"}</div>
+  <p class="src">The values in this example are illustrative placeholders, not measured results.</p>
+</section>
+
+<!-- ======================================================== 11 DATA -->
+<section>
+  <h2><span class="num">11</span>Data model</h2>
+  <div class="diagram avoid">
+    <div class="lane" style="align-items:flex-start;">
+      <div class="node blue" style="text-align:left;min-width:40mm;"><b>users</b><small>id (pk, uuid hex)</small><small>email (unique)</small><small>full_name</small><small>hashed_password</small><small>is_active · created_at</small></div>
+      <div class="arrow">1 → *</div>
+      <div class="node green" style="text-align:left;min-width:56mm;"><b>jobs</b><small>id · case_reference (unique) · user_id (fk, null = guest)</small><small>original_filename · stored_path · media_type · content_type</small><small>file_size_bytes · sha256 · uploaded_at</small><small>status · started_at · finished_at · error_message</small><small>verdict · fake_probability · confidence</small><small>model_name · model_version · weights_status</small><small>processing_ms · evidence (JSON)</small></div>
+      <div class="arrow">1 → *</div>
+      <div class="node amber" style="text-align:left;min-width:40mm;"><b>reports</b><small>id · job_id (fk)</small><small>report_reference (unique)</small><small>file_path · sha256</small><small>generated_at</small></div>
+    </div>
+    <div class="lane" style="margin-top:4mm;"><div class="node gray" style="text-align:left;"><b>upload_events</b><small>id · user_id · client_ip · created_at: upload audit trail and rate-limit counter</small></div></div>
+    <div class="cap">Figure 5: ORM schema (app/models.py). Deleting a user or job cascades to its jobs and reports. A <code>SafeEnum</code> type maps legacy enum strings.</div>
+  </div>
+  <div class="why"><b>Why store evidence as JSON?</b> Each media type produces a different evidence shape (frame scores, window scores, pipeline stages). One JSON column keeps the schema stable while pipelines change. The API contract for each field is documented in <code>docs/API_CHANGES.md</code>.</div>
+</section>
+
+<!-- ======================================================== 12 FRONTEND -->
+<section>
+  <h2><span class="num">12</span>Frontend architecture</h2>
+  <div class="grid2">
+    <div>
+      <h3 style="margin-top:0;">Pages (src/pages)</h3>
+      <table>
+        <thead><tr><th>Page</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td>Landing</td><td>Product overview</td></tr>
+          <tr><td>Upload</td><td>Drag-and-drop, limits from <code>/upload/limits</code>, privacy link</td></tr>
+          <tr><td>Result</td><td>Verdict, disclaimer banner, per-media forensics view</td></tr>
+          <tr><td>Report</td><td>PDF generation and signed download</td></tr>
+          <tr><td>History</td><td>Past jobs, delete</td></tr>
+          <tr><td>Login</td><td>Register / sign in (cookie session)</td></tr>
+          <tr><td>HowItWorks</td><td>Method explainer (vendor claims removed)</td></tr>
+          <tr><td>Privacy</td><td>What is stored, 72 h guest retention, deletion, no legal standing</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="margin-top:0;">Result views (src/components)</h3>
+      <table>
+        <thead><tr><th>Component</th><th>Shows</th></tr></thead>
+        <tbody>
+          <tr><td>ImageForensicsView</td><td>Scene / face scores, heatmaps, forensic modules</td></tr>
+          <tr><td>AudioForensicsView</td><td>LCNN score + per-window timeline as the main result. "Supporting signals (unvalidated)" below it</td></tr>
+          <tr><td>VideoForensicsView</td><td>Per-track face-swap scores, segment timeline, 11 stages with heuristics labelled unvalidated, no-face notice</td></tr>
+          <tr><td>*PipelineVisualizer</td><td>Stage-by-stage audit trail from <code>pipeline_modules</code></td></tr>
+          <tr><td>AuthedImage</td><td>Loads evidence images with credentials</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <h3>API client (src/lib/api.js)</h3>
+  <ul>
+    <li>Every request uses <code>credentials: 'include'</code>. <b>No token in localStorage</b>; the httpOnly cookie carries the session.</li>
+    <li>Report downloads and the WebSocket use the signed URLs from <code>POST /jobs/{id}/links</code> and request fresh ones when they expire.</li>
+    <li>In development, Vite proxies <code>/api</code> (and WebSockets) to <code>localhost:8000</code>. In production, nginx does the same.</li>
+  </ul>
+  <h3>Testing</h3>
+  <p>Vitest + Testing Library. Fixtures in <code>src/components/__tests__/fixtures/</code> are JSON exported from real analysis jobs (<code>real_audio_result.json</code>, <code>real_video_faceswap_result.json</code>, <code>real_video_faceswap_deepfake.json</code>, <code>real_video_noface_result.json</code>). Last run on this branch: 8 test files, 46 tests passed.</p>
+</section>
+
+<!-- ======================================================== 13 SECURITY & DEPLOY -->
+<section>
+  <h2><span class="num">13</span>Security, privacy and deployment</h2>
+  <div class="grid2">
+    <div class="card avoid">
+      <h4>Authentication &amp; links</h4>
+      <ul>
+        <li>JWT in an httpOnly cookie: <code>SameSite=Lax</code>, <code>Path=/api</code>, Secure in production.</li>
+        <li>No <code>?token=</code> query parameters. Reports and the WebSocket use HMAC-signed URLs with <code>exp</code> and <code>sig</code>, scoped to one job, 5-minute TTL.</li>
+        <li>Production boot fails with the placeholder or a short JWT secret (minimum 32 characters).</li>
+      </ul>
+    </div>
+    <div class="card avoid">
+      <h4>Abuse controls</h4>
+      <ul>
+        <li>Upload rate limits per user and per IP (Compose defaults: 20/h users, 3/h guests).</li>
+        <li><code>X-Forwarded-For</code> is never trusted. <code>X-Real-IP</code> is trusted only from <code>TRUSTED_PROXIES</code>.</li>
+        <li>Early 413 on <code>Content-Length</code>. Duration and media-type limits.</li>
+        <li>Security headers middleware. HSTS in production.</li>
+      </ul>
+    </div>
+    <div class="card avoid">
+      <h4>Privacy &amp; retention</h4>
+      <ul>
+        <li>Stored: the upload, its SHA-256, evidence images, the result and reports.</li>
+        <li>Guest jobs are deleted with all files after 72 h by the hourly <code>beat</code> purge.</li>
+        <li>Registered users' jobs are kept until deleted. Deletion removes every derived file.</li>
+      </ul>
+    </div>
+    <div class="card avoid">
+      <h4>Error hygiene &amp; observability</h4>
+      <ul>
+        <li>Unhandled errors return an opaque message plus a <code>request_id</code>. The full traceback goes to server logs only.</li>
+        <li>Validation errors never echo the raw body back.</li>
+        <li>JSON logs in production, with a request-ID header on every response.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Deployment topologies</h3>
+  <table class="avoid">
+    <thead><tr><th style="width:22%">Mode</th><th style="width:30%">How</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Local development (eager)</td><td><code>uvicorn app.main:app</code> + <code>npm run dev</code></td><td>SQLite, no broker. The API warms up models in GPU memory at startup. Frontend on :3000, API on :8000.</td></tr>
+      <tr><td>Full stack (queued)</td><td><code>docker compose up --build</code></td><td>Postgres, Redis, API, worker (concurrency 1, scene detectors preloaded), beat, nginx on :8080. Migrations run with <code>alembic upgrade head</code> before serving.</td></tr>
+      <tr><td>Image-only public beta</td><td><code>deploy/docker-compose.prod.yml</code> + Caddy or Cloudflare Tunnel</td><td><code>ENABLED_MEDIA_TYPES=image</code>, nightly <code>pg_dump</code> kept 7 days, disk alert at 80%, uptime check on <code>/api/health</code>. Steps in <code>deploy/README.md</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================================================== 14 LIMITATIONS -->
+<section>
+  <h2><span class="num">14</span>Limitations and open items</h2>
+  <h3>Model-level</h3>
+  <ul>
+    <li><b>Audio</b> is evaluated only on ASVspoof 2019 LA (studio English read speech). It is weak on attack A17 (26.90% EER). Untested on phone, real-world or non-English audio.</li>
+    <li><b>Image</b> ensemble selection numbers live in a code comment, not a results file. The served ensemble is third-party; new generators may evade it.</li>
+    <li><b>Image face model</b> is excluded from verdicts (21% / 15% flag rates on real / AI faces). Its 99.98% validation accuracy is in-distribution only.</li>
+    <li><b>Video</b> verdict uses hand-set fusion weights with no labelled-video evaluation. Stages 1, 4–9 and 11 are unvalidated heuristics. Sampling at 1 fps (max 32 frames) can miss manipulated segments.</li>
+    <li><b>Face-swap model</b> is not on this branch. No metric is claimed.</li>
+  </ul>
+  <h3>Input-level (from docs/LIMITATIONS.md)</h3>
+  <ul>
+    <li>Heavy JPEG compression, social-media re-encoding and screenshots destroy forensic signals.</li>
+    <li>Low-bitrate (&lt; 64 kbps), very short (&lt; 2 s) or noisy audio reduces reliability. ENF needs audible mains hum.</li>
+    <li>Metadata can be stripped or forged and is treated only as supporting evidence.</li>
+    <li>SHA-256 proves a file hasn't changed since hashing. It does not prove the content is genuine.</li>
+  </ul>
+  <h3>Open engineering items</h3>
+  <table class="avoid">
+    <thead><tr><th style="width:40%">Item</th><th>Suggested resolution</th></tr></thead>
+    <tbody>
+      <tr><td>Image ensemble numbers not in a results file</td><td>Run <code>ml/evaluation/eval_image_detectors.py</code>, commit its output, add rows to <code>paper_results/INDEX.md</code>.</td></tr>
+      <tr><td>Image model version mismatch (configured v3.0.0 vs checkpoint v2.1.0)</td><td>Align <code>IMAGE_MODEL_VERSION</code> with the checkpoint metadata, or replace the checkpoint.</td></tr>
+      <tr><td>Video fusion unvalidated</td><td>Merge <code>ml/faceswap-wire</code>, evaluate on the FF++ / Celeb-DF test splits, and let the trained model drive the video verdict.</td></tr>
+      <tr><td>Frontend lint debt</td><td><code>npm run lint</code> reports pre-existing unused-import errors in files outside the video work.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================================================== APPENDIX A -->
+<section>
+  <h2><span class="num">A</span>Appendix A: Provenance of every number</h2>
+  <p>Per the project rules, every number above must trace to a file written by a script in the repository. Numbers marked <span class="badge b-unval">comment</span> come from source-code comments only and should be regenerated into a results file before citing them.</p>
+  <table>
+    <thead><tr><th style="width:36%">Number(s)</th><th style="width:34%">File</th><th>Key / location</th></tr></thead>
+    <tbody>
+      <tr><td>Audio EER 4.78%, AUC 0.9865, min t-DCF 0.1025, threshold 0.497, 7,355 / 63,882</td><td><code>results/audio_eval.json</code></td><td><code>asvspoof2019_la_eval.*</code>, <code>model.decision_threshold_from_dev</code></td></tr>
+      <tr><td>Audio 3-seed EER 5.26 ± 0.65%, AUC 0.9831, min t-DCF 0.1104 ± 0.0142</td><td><code>paper_results/audio_asvspoof2019la/metrics.json</code></td><td><code>summary.*</code> (via INDEX.md)</td></tr>
+      <tr><td>Per-attack EER A07–A19 (incl. A17 26.90%)</td><td><code>paper_results/audio_asvspoof2019la/metrics.json</code></td><td><code>summary.per_attack_eer_percent.*.mean</code></td></tr>
+      <tr><td>Published baselines B01 9.57%, B02 8.09%</td><td><code>paper_results/audio_asvspoof2019la/baselines.json</code></td><td><code>eval.B0x_*.eer_percent</code></td></tr>
+      <tr><td>Dataset sizes (train 25,380 / dev 24,844 / eval 71,237)</td><td><code>paper_results/audio_asvspoof2019la/dataset_summary.json</code></td><td><code>splits.*</code></td></tr>
+      <tr><td>Heuristic dev AUCs, 0.6 inclusion rule, legacy verdict rates</td><td><code>paper_results/audio_heuristics_dev/signal_auc.json</code>; <code>paper/config/frozen_audio_config.json</code></td><td><code>signals.*</code>, <code>heuristics_rule</code></td></tr>
+      <tr><td>Audio checkpoint SHA-256 <code>7ca31fd0…</code></td><td><code>paper/config/audio_calibration.json</code></td><td><code>checkpoint_sha256</code></td></tr>
+      <tr><td>Audio band 0.417 / 0.577</td><td><code>docs/API_CHANGES.md</code> (ml/audio-wire)</td><td>derived from the frozen config</td></tr>
+      <tr><td>Face model validation metrics, 936,009 / 164,000, v2.1.0</td><td><code>checkpoints/image_detector.summary.json</code></td><td><code>best_val_metrics.*</code></td></tr>
+      <tr><td>Scene ensemble AUCs (0.973 / 0.984 / 0.836 / 0.469), 560 images <span class="badge b-unval">comment</span></td><td><code>backend/app/ml/image_pipeline.py</code></td><td>comment above <code>SCENE_DETECTORS</code></td></tr>
+      <tr><td>Face model 21% / 15% flag rates <span class="badge b-unval">comment</span></td><td><code>backend/app/config.py</code></td><td>comment above <code>face_model_in_verdict</code></td></tr>
+      <tr><td>Face-seam 9 of 30 (30%); CFA absent in 196 real JPEGs <span class="badge b-unval">comment</span></td><td><code>backend/app/ml/image_pipeline.py</code></td><td>section 5 comments</td></tr>
+      <tr><td>Thresholds 0.5 / 0.08, limits (100 MB, 600 s, 300 s, 72 h, 300 s TTL), 1 fps / 32 frames</td><td><code>backend/app/config.py</code>, <code>docker-compose.yml</code></td><td><code>Settings</code> defaults</td></tr>
+      <tr><td>Frontend tests 8 files / 46 tests</td><td><code>npm test -- --run</code> output, 24 Oct 2026</td><td>console summary</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================================================== APPENDIX B -->
+<section>
+  <h2><span class="num">B</span>Appendix B: Running the project</h2>
+  <h3>Local development (Windows, as used on this machine)</h3>
+  <div class="card" style="font-family:Consolas,monospace;font-size:8.4pt;white-space:pre;background:#0f1a33;color:#dbe6ff;border:none;line-height:1.55;"># Backend API (eager mode, SQLite, models warmed into GPU)
+cd backend
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+# Frontend (Vite dev server with /api proxy)
+cd frontend
+npm run dev            # http://localhost:3000
+
+# Tests
+cd backend  &amp;&amp; python -m pytest -q
+cd frontend &amp;&amp; npm test -- --run
+cd frontend &amp;&amp; npm run lint</div>
+
+  <h3>Full stack with Docker</h3>
+  <div class="card" style="font-family:Consolas,monospace;font-size:8.4pt;white-space:pre;background:#0f1a33;color:#dbe6ff;border:none;line-height:1.55;">cp .env.example .env    # set JWT_SECRET_KEY (≥ 32 chars) and POSTGRES_PASSWORD
+docker compose up --build
+# Frontend  http://localhost:8080
+# API docs  http://localhost:8000/docs</div>
+
+  <h3>Key environment variables</h3>
+  <table>
+    <thead><tr><th style="width:32%">Variable</th><th style="width:22%">Default</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>CELERY_BROKER_URL</code></td><td>empty</td><td>Empty: eager mode, API loads models. Set: queued mode, only the worker loads models.</td></tr>
+      <tr><td><code>ENABLED_MEDIA_TYPES</code></td><td>image,audio,video</td><td>Disabled types get 403.</td></tr>
+      <tr><td><code>AUDIO_MODEL_SOURCE</code></td><td>lcnn_asvspoof</td><td><code>legacy</code> = hand-set rules, results marked experimental.</td></tr>
+      <tr><td><code>FACE_MODEL_IN_VERDICT</code></td><td>false</td><td>Keep false until a validated face model exists.</td></tr>
+      <tr><td><code>FAKE_THRESHOLD</code> / <code>UNCERTAIN_BAND</code></td><td>0.5 / 0.08</td><td>Image and video verdict band.</td></tr>
+      <tr><td><code>VIDEO_SAMPLE_FPS</code> / <code>VIDEO_MAX_FRAMES</code></td><td>1.0 / 32</td><td>Video sampling density.</td></tr>
+      <tr><td><code>RETENTION_HOURS</code></td><td>72</td><td>Guest job lifetime.</td></tr>
+      <tr><td><code>SIGNED_URL_TTL_SECONDS</code></td><td>300</td><td>Lifetime of report and WebSocket links.</td></tr>
+      <tr><td><code>MAX_UPLOAD_MB</code></td><td>100</td><td>Must match nginx <code>client_max_body_size</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout crit avoid" style="margin-top:6mm;"><b>Disclaimer</b>DeepSentinel AI gives an automated technical assessment only. It is not forensic or legal evidence and makes no claim of compliance with any forensic or legal standard. Automated detectors make mistakes in both directions; treat every result as a lead, not as proof.</div>
+</section>
+
+</body>
+</html>

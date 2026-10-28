@@ -57,14 +57,17 @@ async def lifespan(_app: FastAPI):
         "celery" if settings.queue_enabled else "inline/eager",
     )
     # Pre-warm detection models into GPU VRAM for instantaneous inference
-    try:
-        from app.ml.registry import warm_up
-        warm_up()
-        from app.ml.image_pipeline import get_scene_detector
-        get_scene_detector()
-        logger.info("Inference acceleration: All neural models pre-warmed in GPU VRAM.")
-    except Exception as exc:
-        logger.warning("Model warm-up deferred: %s", exc)
+    if not settings.celery_broker_url:
+        try:
+            from app.ml.registry import warm_up
+            warm_up()
+            from app.ml.image_pipeline import get_scene_detector
+            get_scene_detector()
+            logger.info("Inference acceleration: All neural models pre-warmed in GPU VRAM.")
+        except Exception as exc:
+            logger.warning("Model warm-up deferred: %s", exc)
+    else:
+        logger.info("Celery broker set; skipping model warm-up in API process.")
     yield
 
 

@@ -1,10 +1,10 @@
-import React, { useState, Fragment } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { Card, SplitLoupeOverlay } from './ui'
 import AuthedImage from './AuthedImage'
 import {
-  Activity, Alert, Check, CheckCircle, Cpu, Eye, FileText,
-  Hash, Info, ShieldAlert, ShieldCheck, Video as VideoIcon, Zap,
+  Activity, Alert, CheckCircle, Cpu, Eye, FileText,
+  Info, ShieldAlert, ShieldCheck, Video as VideoIcon, Zap,
 } from './ui/Icons'
 import { percent } from '../lib/format'
 import VideoPipelineVisualizer from './VideoPipelineVisualizer'
@@ -14,13 +14,13 @@ export const VIDEO_PIPELINE_STAGES = [
   { id: 2,  stage: 2,  name: 'Scene & Shot Boundary Segmentation',      desc: 'Bhattacharyya color/edge delta boundary segmentation for independent scene evaluation' },
   { id: 3,  stage: 3,  name: 'Spatial Neural & Generative AI Backbone', desc: 'Running neural facial detector and ViT full-scene generative artifact backbones' },
   { id: 4,  stage: 4,  name: '28-Module Image Forensic Engine',         desc: 'Evaluated CFA Bayer periodicity, Fourier radial slope alpha, ELA, and synthetic background matte voids on keyframes' },
-  { id: 5,  stage: 5,  name: 'Temporal Jitter & Facial Dynamics',       desc: 'Measuring bounding box acceleration, facial landmark trajectory, and ocular blink synchrony' },
-  { id: 6,  stage: 6,  name: 'Remote Photoplethysmography (rPPG)',       desc: 'Cardiovascular Blood Volume Pulse (BVP) extraction from capillary reflectance (0.75-2.5 Hz)' },
-  { id: 7,  stage: 7,  name: 'Spatio-Temporal 4D Tensor Dynamics',      desc: 'TimeSformer divided space-time patch variance, latent denoise jumps, and SlowFast boundary vibration' },
-  { id: 8,  stage: 8,  name: 'LipForensics Articulatory Kinematics',    desc: 'Oral kinematic velocity, 2nd-derivative articulatory jerk, and phonetic coarticulation smoothness' },
-  { id: 9,  stage: 9,  name: 'Optical Flow Motion Decomposition',       desc: 'Farneback dense optical flow computing motion vector divergence at composition seams' },
+  { id: 5,  stage: 5,  name: 'Temporal Jitter & Facial Dynamics (unvalidated)',       desc: 'Measuring bounding box acceleration, facial landmark trajectory, and ocular blink synchrony (unvalidated heuristic)' },
+  { id: 6,  stage: 6,  name: 'Remote Photoplethysmography (rPPG) (unvalidated)',       desc: 'Cardiovascular Blood Volume Pulse (BVP) extraction from capillary reflectance (0.75-2.5 Hz) (unvalidated heuristic)' },
+  { id: 7,  stage: 7,  name: 'Spatio-Temporal 4D Tensor Dynamics (unvalidated)',      desc: 'TimeSformer divided space-time patch variance, latent denoise jumps, and SlowFast boundary vibration (unvalidated heuristic)' },
+  { id: 8,  stage: 8,  name: 'LipForensics Articulatory Kinematics (unvalidated)',    desc: 'Oral kinematic velocity, 2nd-derivative articulatory jerk, and phonetic coarticulation smoothness (unvalidated heuristic)' },
+  { id: 9,  stage: 9,  name: 'Optical Flow Motion Decomposition (unvalidated)',       desc: 'Farneback dense optical flow computing motion vector divergence at composition seams (unvalidated heuristic)' },
   { id: 10, stage: 10, name: 'Acoustic Speech & Cross-Modal Lip-Sync',  desc: 'Audio demuxing, LCNN Voice AI, glottal IAIF flow physics, and speech-to-lip aperture correlation' },
-  { id: 11, stage: 11, name: 'AI Generator Attribution Engine',         desc: 'Intrinsic physical & latent diffusion matching (Sora, Gemini/Veo, Kling, Runway, Luma) without watermarks' },
+  { id: 11, stage: 11, name: 'AI Generator Attribution (unvalidated)',         desc: 'Intrinsic physical & latent diffusion matching (unvalidated heuristic: hand-set profiles, not tested on labelled video)' },
 ]
 
 function VideoScoreBar({ value = 0, color = '#ef4444', label, sub }) {
@@ -87,13 +87,17 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
   const rppg = evidence.rppg_biometrics || {}
   const spatiotemporal = evidence.spatiotemporal_forensics || {}
   const lipForensics = evidence.lip_forensics || {}
-  const [zoomTimeline, setZoomTimeline] = useState(false)
-  const [stageFilter, setStageFilter] = useState('all')
-  const [expandedStage, setExpandedStage] = useState(null)
+  const faceTracks = evidence.face_tracks || []
+  const hasFaceTracks = Array.isArray(faceTracks) && faceTracks.length > 0
+  const segmentTimeline = evidence.segment_timeline || []
+  const highestTrackScore = hasFaceTracks
+    ? Math.max(...faceTracks.map(t => (t.score ?? t.fake_probability ?? t.top_25_pct_mean ?? 0)))
+    : null
+
+  const [zoomTimeline] = useState(false)
 
   const currentTab = activeSubTab || 'summary'
 
-  const jitter = temporal.jitter_score ?? 0
   const motion = temporal.motion_anomaly ?? 0
   const compress = temporal.compression_anomaly ?? 0
   const spatialProb = frameScores.length
@@ -116,14 +120,182 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
   const TABS = [
     { id: 'summary',    label: hasThreat ? 'Threat & Summary' : 'Forensic Summary', icon: hasThreat ? ShieldAlert : ShieldCheck },
     { id: 'pipeline',   label: 'Pipeline Stages (11)',      icon: Cpu },
-    { id: 'origin',     label: 'AI Generator & Diffusion',  icon: Zap },
-    { id: 'biometrics', label: 'Biometrics & 4D Tensor',     icon: Activity },
+    { id: 'origin',     label: 'AI Generator (unvalidated)', icon: Zap },
+    { id: 'biometrics', label: 'Biometrics & 4D Tensor (unvalidated)', icon: Activity },
     { id: 'timeline',   label: 'Forensic Timeline',         icon: Activity },
     { id: 'scenes',     label: 'Scenes & Segments',         icon: VideoIcon },
-    { id: 'facial',     label: 'Facial & Motion Dynamics',  icon: Eye },
+    { id: 'facial',     label: 'Facial & Motion Dynamics (unvalidated)', icon: Eye },
     { id: 'container',  label: 'Container & Bitstream',     icon: FileText },
     { id: 'lipsync',    label: 'Cross-Modal Lip-Sync',      icon: Zap },
   ]
+
+  const renderFaceSwapForensics = () => {
+    return (
+      <Card
+        title="Trained Face-Swap Model Forensics"
+        subtitle={
+          hasFaceTracks
+            ? "Per-track scores derived from mean of top 25% frame scores; video score is the highest track score."
+            : "Facial detection & face-swap temporal track verification"
+        }
+        action={
+          hasFaceTracks ? (
+            <span className="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-accent/15 text-accent border border-accent/30">
+              Trained Model (Face-Swap)
+            </span>
+          ) : null
+        }
+      >
+        {!hasFaceTracks ? (
+          <div className="mt-3 p-4 rounded-xl border bg-surface-2 flex items-center gap-3" style={{ borderColor: 'var(--border-subtle)' }}>
+            <Info size={18} className="text-ink-muted shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-ink-primary">
+                No face found: face-swap check not applicable.
+              </p>
+              <p className="text-xs text-ink-muted mt-0.5">
+                Face-swap verification requires detected facial bounding boxes. Full-scene generative detection and bitstream checks remain operational.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-3 space-y-4">
+            {/* Metric summary 4-grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <VideoMetricBadge
+                label="Highest Track Score"
+                value={percent(highestTrackScore)}
+                color={highestTrackScore >= 0.50 ? 'var(--status-critical)' : 'var(--status-good)'}
+              />
+              <VideoMetricBadge
+                label="Face Tracks"
+                value={faceTracks.length}
+                color="var(--accent)"
+              />
+              <VideoMetricBadge
+                label="Track Aggregation"
+                value="Top 25% Mean"
+                color="var(--ink-secondary)"
+              />
+              <VideoMetricBadge
+                label="Model Decision"
+                value={highestTrackScore >= 0.50 ? 'FLAGGED' : 'AUTHENTIC'}
+                color={highestTrackScore >= 0.50 ? 'var(--status-critical)' : 'var(--status-good)'}
+              />
+            </div>
+
+            {/* Per-Track Scores Breakdown */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[0.6875rem] font-bold uppercase tracking-wider text-ink-muted">
+                  Per-Track Scores ({faceTracks.length} {faceTracks.length === 1 ? 'Track' : 'Tracks'})
+                </span>
+                <span className="text-[0.625rem] text-ink-muted font-mono">
+                  Rule: Mean of top 25% frame scores
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {faceTracks.map((track, idx) => {
+                  const tId = track.track_id ?? track.id ?? idx
+                  const score = track.score ?? track.fake_probability ?? track.top_25_pct_mean ?? 0
+                  const pct = Math.round(score * 100)
+                  const isFlagged = score >= 0.50
+                  const color = isFlagged ? '#ef4444' : '#22c55e'
+                  const frames = track.frames_analyzed ?? track.frame_count ?? track.frames_tracked ?? track.frames?.length ?? '–'
+                  const timeRange = (track.start_s != null && track.end_s != null)
+                    ? `t=${track.start_s.toFixed(2)}s – ${track.end_s.toFixed(2)}s`
+                    : (track.time_range || 'Entire duration')
+
+                  return (
+                    <div
+                      key={tId}
+                      className="p-3.5 rounded-xl border bg-surface-2 flex flex-col justify-between gap-2.5"
+                      style={{ borderColor: isFlagged ? 'rgba(239,68,68,0.35)' : 'var(--border-subtle)' }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-black bg-surface-3 text-ink-primary">
+                            #{tId}
+                          </span>
+                          <div>
+                            <span className="text-xs font-black text-ink-primary">Face Track #{tId}</span>
+                            <span className="text-[0.625rem] text-ink-muted block">{timeRange} • {frames} frames</span>
+                          </div>
+                        </div>
+                        <span
+                          className="px-2 py-0.5 rounded text-[0.625rem] font-black uppercase mono border"
+                          style={{
+                            background: isFlagged ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)',
+                            color,
+                            borderColor: isFlagged ? 'rgba(239,68,68,0.3)' : 'rgba(34,197,94,0.3)',
+                          }}
+                        >
+                          {track.status || (isFlagged ? 'FLAGGED' : 'AUTHENTIC')}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex items-baseline justify-between text-xs">
+                          <span className="text-[0.625rem] uppercase font-bold text-ink-muted">Track Score (Top 25% Mean)</span>
+                          <span className="mono font-black" style={{ color }}>{pct}%</span>
+                        </div>
+                        <div className="h-2 w-full bg-surface-3 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Segment Timeline from the new response */}
+            {segmentTimeline.length > 0 && (
+              <div className="pt-3 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[0.6875rem] font-bold uppercase tracking-wider text-ink-muted">
+                    Temporal Segment Timeline (from model response)
+                  </span>
+                  <span className="text-[0.625rem] text-ink-muted">
+                    Track-calibrated timeline
+                  </span>
+                </div>
+                <div className="overflow-x-auto rounded-xl border max-h-60" style={{ borderColor: 'var(--border-subtle)' }}>
+                  <table className="w-full text-[0.6875rem]" style={{ borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: 'var(--surface-3)', borderBottom: '1px solid var(--border-subtle)' }}>
+                        {['Time Window', 'Face-Swap Score', 'Manipulation Class', 'Indicators', 'Source Match'].map(h => (
+                          <th key={h} className="px-3 py-2 text-left font-bold uppercase tracking-wider text-ink-muted">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {segmentTimeline.map((seg, idx) => {
+                        const isHigh = seg.ai_probability >= 0.50
+                        return (
+                          <tr key={idx} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                            <td className="px-3 py-2 mono font-bold text-ink-primary">{seg.time_window}</td>
+                            <td className="px-3 py-2">
+                              <span className={`font-black tnum ${isHigh ? 'text-red-500' : 'text-green-500'}`}>
+                                {seg.ai_percentage ?? percent(seg.ai_probability)}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 mono font-semibold text-ink-secondary">{seg.manipulation_type}</td>
+                            <td className="px-3 py-2 text-ink-muted">{seg.indicators}</td>
+                            <td className="px-3 py-2 mono text-accent">{seg.source_match}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -146,6 +318,9 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
       {/* ── TAB 1: Threat & Summary ───────────────────────────────────────── */}
       {currentTab === 'summary' && (
         <div className="space-y-6">
+          {/* Main Face-Swap Model Forensics (Per-track scores & timeline, or not applicable message) */}
+          {renderFaceSwapForensics()}
+
           {/* Forensic Threat Attribution Banner - only rendered if a manipulation threat is detected */}
           {hasThreat && (
             <div className="p-5 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm"
@@ -176,24 +351,24 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
             </div>
           )}
 
-          {/* AI Generator Origin Card (No-Watermark Detection) */}
-          <Card title="AI Generator Attribution & Origin Discovery" subtitle="Intrinsic diffusion latent and spectral matching — operating without watermarks or metadata labels">
+          {/* AI Generator Origin Card (unvalidated heuristic) */}
+          <Card title="AI Generator Attribution (unvalidated)" subtitle="unvalidated heuristic: hand-set profiles, not tested on labelled video">
             <div className="mt-3 p-4 rounded-xl border bg-surface-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style={{ borderColor: 'var(--border-subtle)' }}>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2 py-0.5 rounded text-[0.625rem] font-black uppercase bg-accent/15 text-accent border border-accent/30 mono">
-                    INTRINSIC NO-WATERMARK ATTRIBUTION
+                  <span className="px-2 py-0.5 rounded text-[0.625rem] font-black uppercase bg-amber-500/15 text-amber-500 border border-amber-500/30 mono">
+                    UNVALIDATED HEURISTIC
                   </span>
                 </div>
                 <h3 className="text-base font-black text-ink-primary mt-1">
-                  {attribution.predicted_platform || 'Authentic Camera / No Synthetic Traces'}
+                  {attribution.predicted_platform ? `${attribution.predicted_platform} (unvalidated)` : 'Authentic Camera / No Synthetic Traces'}
                 </h3>
                 <p className="text-xs text-ink-secondary mt-1 leading-relaxed max-w-2xl">
-                  {attribution.explanation || 'Analyzed physical camera sensor noise, Fourier azimuthal energy decay, and spatio-temporal texture morphing rate.'}
+                  {attribution.explanation || 'Analyzed physical camera sensor noise, Fourier azimuthal energy decay, and spatio-temporal texture morphing rate.'} (unvalidated heuristic)
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-[0.625rem] font-bold uppercase text-ink-muted">Attribution Confidence</span>
+                <span className="text-[0.625rem] font-bold uppercase text-ink-muted">Attribution Confidence (unvalidated)</span>
                 <p className="text-xl font-black mono text-accent">
                   {Math.round((attribution.attribution_confidence || 0.12) * 100)}%
                 </p>
@@ -267,8 +442,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
               {/* 3. Temporal Video Forensics */}
               <div className="p-3.5 rounded-xl border bg-surface-2 space-y-2" style={{ borderColor: 'var(--border-subtle)' }}>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-ink-primary">Temporal Video Dynamics</span>
-                  <span className="text-[0.625rem] font-bold uppercase mono text-accent">Farneback Flow</span>
+                  <span className="text-xs font-black text-ink-primary">Temporal Video Dynamics (unvalidated)</span>
+                  <span className="text-[0.625rem] font-bold uppercase mono text-accent">Farneback Flow (unvalidated)</span>
                 </div>
                 <p className="text-[0.6875rem] text-ink-muted">Motion boundary vectors & genealogy</p>
                 <div className="pt-2 border-t space-y-1 text-xs" style={{ borderColor: 'var(--border-subtle)' }}>
@@ -407,7 +582,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
       {currentTab === 'origin' && (
         <div className="space-y-6">
           {/* Generator Candidate Likelihoods */}
-          <Card title="Candidate AI Generator Attribution" subtitle="Mathematical distance match against known generative AI video synthesis pipelines">
+          <Card title="Candidate AI Generator Attribution (unvalidated)" subtitle="unvalidated heuristic: hand-set profiles, not tested on labelled video">
             <div className="mt-3 space-y-3">
               {attribution.generator_scores && Object.entries(attribution.generator_scores).map(([k, score]) => {
                 const isWinner = score === Math.max(...Object.values(attribution.generator_scores))
@@ -417,8 +592,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-black text-ink-primary">{k.replace(/_/g, ' ')}</span>
                         {isWinner && (
-                          <span className="px-2 py-0.5 rounded text-[0.625rem] font-bold uppercase bg-accent text-white">
-                            Predicted Match
+                          <span className="px-2 py-0.5 rounded text-[0.625rem] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            Predicted Match (unvalidated)
                           </span>
                         )}
                       </div>
@@ -433,8 +608,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
             </div>
           </Card>
 
-          {/* Intrinsic Latent Metrics (No-Watermark Physical Proof) */}
-          <Card title="Intrinsic Latent Diffusion Signatures (No-Watermark Detection)" subtitle="Physical optical and spectral traits demonstrating synthetic generation without relying on visual watermarks">
+          {/* Intrinsic Latent Metrics (unvalidated heuristic) */}
+          <Card title="Intrinsic Latent Diffusion Signatures (unvalidated heuristic)" subtitle="Physical optical and spectral traits demonstrating synthetic generation (unvalidated heuristic; not tested on labelled video)">
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <VideoMetricBadge
                 label="Sensor Shot Noise (std)"
@@ -480,10 +655,10 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
       {/* ── TAB: Biometrics & 4D Tensor Dynamics ────────────────────────── */}
       {currentTab === 'biometrics' && (
         <div className="space-y-6">
-          {/* 1. rPPG Cardiovascular Blood Volume Pulse Monitor */}
+          {/* 1. rPPG Cardiovascular Blood Volume Pulse Monitor (unvalidated) */}
           <Card
-            title="Remote Photoplethysmography (rPPG) Cardiovascular Biometrics"
-            subtitle="Capillary micro-vascular perfusion analysis — detecting natural cardiac pulse rhythms (0.75 Hz – 2.50 Hz / 45 – 150 BPM) vs synthetic biometric voids"
+            title="Remote Photoplethysmography (rPPG) Cardiovascular Biometrics (unvalidated)"
+            subtitle="Capillary micro-vascular perfusion analysis (unvalidated heuristic) — detecting natural cardiac pulse rhythms (0.75 Hz – 2.50 Hz / 45 – 150 BPM) vs synthetic biometric voids"
           >
             <div className="mt-3 p-4 rounded-xl border bg-surface-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style={{ borderColor: 'var(--border-subtle)' }}>
               <div>
@@ -614,10 +789,10 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
             )}
           </Card>
 
-          {/* 2. Spatio-Temporal 4D Tensor Dynamics */}
+          {/* 2. Spatio-Temporal 4D Tensor Dynamics (unvalidated) */}
           <Card
-            title="Spatio-Temporal 4D Tensor Forensics (TimeSformer / SlowFast)"
-            subtitle="Analyzes video volume tensors (T, C, H, W) for divided space-time patch correlation, latent diffusion denoise steps, and SlowFast boundary edge vibration"
+            title="Spatio-Temporal 4D Tensor Forensics (unvalidated)"
+            subtitle="Analyzes video volume tensors (unvalidated heuristic) (T, C, H, W) for divided space-time patch correlation, latent diffusion denoise steps, and SlowFast boundary edge vibration"
           >
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <VideoMetricBadge
@@ -660,10 +835,10 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
             )}
           </Card>
 
-          {/* 3. LipForensics Phonetic Articulatory Kinematics */}
+          {/* 3. LipForensics Phonetic Articulatory Kinematics (unvalidated) */}
           <Card
-            title="LipForensics & Phonetic Articulatory Dynamics"
-            subtitle="Deep kinematic tracking of mouth aspect ratio (MAR) trajectories, articulatory jerk, and phonetic transition smoothness"
+            title="LipForensics & Phonetic Articulatory Dynamics (unvalidated)"
+            subtitle="Deep kinematic tracking of mouth aspect ratio (MAR) trajectories (unvalidated heuristic), articulatory jerk, and phonetic transition smoothness"
           >
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <VideoMetricBadge
@@ -717,6 +892,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
       {/* ── TAB 4: Forensic Timeline ──────────────────────────────────────── */}
       {currentTab === 'timeline' && (
         <div className="space-y-6">
+          {renderFaceSwapForensics()}
+
           {evidence.timeline_url && (
             <Card title="High-Resolution Temporal Confidence Curve" subtitle="Frame-by-frame manipulation confidence with annotated worst-frame peak">
               <div className="mt-3 overflow-hidden rounded-xl border" style={{ borderColor: 'var(--border-subtle)' }}>
@@ -828,7 +1005,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
       {/* ── TAB 6: Facial & Motion Dynamics ───────────────────────────────── */}
       {currentTab === 'facial' && (
         <div className="space-y-6">
-          <Card title="Facial Dynamics & Ocular Blink Analysis" subtitle="Tracking facial biometric consistency, landmark acceleration, and blink plausibility">
+          <Card title="Facial Dynamics & Ocular Blink Analysis (unvalidated)" subtitle="Tracking facial biometric consistency, landmark acceleration, and blink plausibility (unvalidated heuristic)">
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <VideoMetricBadge label="Landmark Jitter" value={facial.landmark_jitter_score?.toFixed(2) ?? '0.00'} color={facial.landmark_jitter_score >= 0.35 ? 'var(--status-critical)' : 'var(--status-good)'} mono />
               <VideoMetricBadge label="Blinks Detected" value={facial.blink_analysis?.blinks_detected ?? 0} color="var(--accent)" mono />
@@ -837,14 +1014,14 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
             </div>
             <div className="mt-4 p-3 rounded-xl border bg-surface-2 flex items-center justify-between" style={{ borderColor: 'var(--border-subtle)' }}>
               <div>
-                <span className="text-[0.625rem] font-bold uppercase text-ink-muted">Blink Plausibility Assessment</span>
+                <span className="text-[0.625rem] font-bold uppercase text-ink-muted">Blink Plausibility Assessment (unvalidated)</span>
                 <p className="text-xs font-bold text-ink-primary mt-0.5">{facial.blink_analysis?.blink_regularity?.replace(/_/g, ' ') || 'NORMAL'}</p>
               </div>
               <span className="text-xs text-ink-secondary">Mouth Interior Texture Variance: {facial.mouth_interior_texture_variance ?? 0.0}</span>
             </div>
           </Card>
 
-          <Card title="Optical Flow Motion Boundary Decomposition" subtitle="Farneback dense motion field vectors at composition seams">
+          <Card title="Optical Flow Motion Boundary Decomposition (unvalidated)" subtitle="Farneback dense motion field vectors at composition seams (unvalidated heuristic)">
             <div className="mt-3 space-y-4">
               <VideoScoreBar
                 value={motion}

@@ -147,6 +147,20 @@ export const ArrowRight = (p) => (
   </Svg>
 )
 
+export const ArrowLeft = (p) => (
+  <Svg {...p}>
+    <path d="M19.5 12h-15M10.5 18l-6-6 6-6" />
+  </Svg>
+)
+
+export const Database = (p) => (
+  <Svg {...p}>
+    <ellipse cx="12" cy="5" rx="9" ry="3" />
+    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+  </Svg>
+)
+
 export const Alert = (p) => (
   <Svg {...p}>
     <path d="M12 4.5l8.5 15h-17z" />

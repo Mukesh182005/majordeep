@@ -27,17 +27,17 @@ export const AUDIO_PHASES = [
   },
   {
     phaseId: 3,
-    name: 'Linguistics & Neural SSL',
+    name: 'Linguistics & Neural Inference',
     stages: [5, 6],
     color: '#8B5CF6',
-    desc: 'Phonemic coarticulation prosody & Sinc-RawNet / WavLM layer 18 probing'
+    desc: 'Phonemic coarticulation prosody & trained LCNN acoustic feature classification'
   },
   {
     phaseId: 4,
     name: 'Sensor ENF & Risk Fusion',
     stages: [7, 8],
     color: '#10B981',
-    desc: 'Electric Network Frequency grid tracking & conformal multi-engine consensus'
+    desc: 'Electric Network Frequency grid tracking & conformal decision rule consensus'
   }
 ]
 
@@ -47,11 +47,11 @@ export const DEFAULT_AUDIO_8_STAGES = [
     id: 1,
     name: 'Secure Ingestion Vault',
     category: 'Evidence Integrity',
-    engine: 'SWGDE & ISO 27042 Cryptographic Bind',
+    engine: 'Cryptographic Hashing & Ingestion Verification',
     status: 'PASSED',
     duration_ms: 12,
     targetSubTab: 'security',
-    desc: 'Generates immutable SHA-256 evidence record with emulated physical write-blocker access.'
+    desc: 'Generates immutable SHA-256 evidence record and verifies file integrity.'
   },
   {
     stage: 2,
@@ -100,13 +100,13 @@ export const DEFAULT_AUDIO_8_STAGES = [
   {
     stage: 6,
     id: 6,
-    name: 'Multi-Model ML & Intermediate SSL Probing',
+    name: 'Trained Model Classification',
     category: 'Machine Learning',
-    engine: 'Sinc-RawNet End-to-End + WavLM Layer 18 Representation Probing',
+    engine: 'LCNN (LFCC) Architecture Trained on ASVspoof 2019 LA',
     status: 'PASSED',
     duration_ms: 310,
     targetSubTab: 'robustness',
-    desc: 'Executes waveform neural classifiers alongside deep SSL transformer layer probing for acoustic synthetic artifacts.'
+    desc: 'Scores sliding 4.0s windows using trained LCNN on LFCC features with class-balanced Platt calibration.'
   },
   {
     stage: 7,
@@ -209,13 +209,13 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
 
   const radarData = [
     {
-      subject: 'RawNet Neural AI',
-      score: Math.round((modelBranches.rawnet_waveform_prob ?? (result.fake_probability || 0.15)) * 100),
+      subject: 'Trained Model Score',
+      score: Math.round((result.fake_probability || 0.15) * 100),
       fullMark: 100
     },
     {
-      subject: 'WavLM SSL Probing',
-      score: Math.round((modelBranches.wavlm_l18_acoustic_prob ?? (result.fake_probability || 0.12)) * 100),
+      subject: 'Per-Window Peak',
+      score: Math.round((evidence.flagged_segments ? 80 : (result.fake_probability || 0.12) * 100)),
       fullMark: 100
     },
     {

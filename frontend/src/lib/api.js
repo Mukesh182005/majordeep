@@ -12,7 +12,7 @@ const TOKEN_KEY = 'dfd.token'
 const USER_KEY = 'dfd.user'
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY)
+  return null
 }
 
 export function getStoredUser() {
@@ -23,9 +23,10 @@ export function getStoredUser() {
   }
 }
 
-export function setSession(token, user) {
-  localStorage.setItem(TOKEN_KEY, token)
-  localStorage.setItem(USER_KEY, JSON.stringify(user))
+export function setSession(_token, user) {
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+  }
 }
 
 export function clearSession() {
@@ -41,12 +42,11 @@ export class ApiError extends Error {
 }
 
 async function request(path, { method = 'GET', body, headers = {}, raw = false } = {}) {
-  const token = getToken()
   const options = {
     method,
+    credentials: 'include',
     headers: {
       ...(body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
   }
@@ -81,14 +81,21 @@ export const api = {
 
   register: (data) => request('/auth/register', { method: 'POST', body: data }),
   login: (data) => request('/auth/login', { method: 'POST', body: data }),
+  logout: () => request('/auth/logout', { method: 'POST' }),
   me: () => request('/auth/me'),
 
   upload: (file, onProgress) => uploadWithProgress(file, onProgress),
   jobStatus: (id) => request(`/jobs/${id}/status`),
   jobResult: (id) => request(`/jobs/${id}/result`),
-  reportUrl: (id) => {
-    const token = getToken()
-    return `${API}/jobs/${id}/report${token ? `?token=${encodeURIComponent(token)}` : ''}`
+  jobLinks: (id) => request(`/jobs/${id}/links`, { method: 'POST' }),
+  reportUrl: async (id) => {
+    try {
+      const links = await api.jobLinks(id)
+      const path = links.report_url
+      return path.startsWith('http') ? path : `${BASE}${path}`
+    } catch {
+      return `${API}/jobs/${id}/report`
+    }
   },
   evidenceUrl: (path) => {
     if (!path) return ''
@@ -112,8 +119,7 @@ function uploadWithProgress(file, onProgress) {
 
     const xhr = new XMLHttpRequest()
     xhr.open('POST', `${API}/upload`)
-    const token = getToken()
-    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+    xhr.withCredentials = true
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable && onProgress) {
@@ -160,14 +166,21 @@ export async function pollJob(jobId, { intervalMs = 1500, timeoutMs = 15 * 60 * 
  * @returns {Promise<object>}      - resolves with the final job result, rejects on failure
  */
 export function connectJobWs(jobId, { onTick, onError, timeoutMs = 15 * 60 * 1000 } = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const wsBase = (BASE || window.location.origin).replace(/^http/, 'ws')
-    const url = `${wsBase}/api/jobs/${jobId}/ws`
-    const token = getToken()
+    let wsUrl
+    try {
+      const links = await api.jobLinks(jobId)
+      wsUrl = links.ws_url.startsWith('ws')
+        ? links.ws_url
+        : `${wsBase}${links.ws_url.startsWith('/') ? '' : '/'}${links.ws_url}`
+    } catch {
+      wsUrl = `${wsBase}/api/jobs/${jobId}/ws`
+    }
 
     let ws
     try {
-      ws = new WebSocket(url + (token ? `?token=${encodeURIComponent(token)}` : ''))
+      ws = new WebSocket(wsUrl)
     } catch {
       // WebSocket construction failed (e.g. mixed-content) — fall back to polling.
       if (onError) onError()

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { api, getToken } from '../lib/api'
+import { api } from '../lib/api'
 import { formatDate, percent, verdictMeta } from '../lib/format'
 import { Badge, Card, CopyButton, Field, LoadingState, Notice } from '../components/ui'
-import { ArrowRight, Check, Download, Hash, Spinner } from '../components/ui/Icons'
+import { Alert, ArrowRight, Check, Download, Hash, Spinner } from '../components/ui/Icons'
 
 const SECTIONS = [
   'Header — report reference, case reference, generation timestamp',
@@ -37,12 +37,13 @@ export default function Report() {
     return () => { active = false }
   }, [jobId])
 
-  /** Fetch rather than link: the endpoint needs the Authorization header. */
+  /** Fetch rather than link: the endpoint uses signed URLs and session cookies. */
   async function download() {
     setDownloading(true)
     try {
-      const response = await fetch(api.reportUrl(jobId), {
-        headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+      const reportDownloadUrl = await api.reportUrl(jobId)
+      const response = await fetch(reportDownloadUrl, {
+        credentials: 'include',
       })
       if (!response.ok) throw new Error(`Download failed (${response.status})`)
       const blob = await response.blob()
@@ -89,6 +90,10 @@ export default function Report() {
 
   return (
     <div className="mx-auto max-w-3xl animate-in space-y-5">
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-500 flex items-center gap-2">
+        <Alert size={18} />
+        <span>Automated assessment only. Not forensic or legal evidence.</span>
+      </div>
       <div>
         <h1 className="text-[1.75rem] font-bold tracking-tight text-ink-primary">
           Forensic report ready

@@ -1,0 +1,1550 @@
+{
+  "id": "75136f067e7a4e0aa7ed782d5323c530",
+  "media_type": "video",
+  "status": "done",
+  "model_name": "efficientnet_b4-binary-head + Multi-Modal Video Forensic Suite",
+  "model_version": "image-detector-v3.0.0-b4-800k",
+  "weights_status": "trained",
+  "verdict": "AUTHENTIC",
+  "fake_probability": 0.0673,
+  "confidence": 0.8654,
+  "processing_ms": 8059,
+  "evidence": {
+    "media": "video",
+    "source_fps": 30.0,
+    "total_frames": 103,
+    "duration_seconds": 3.433,
+    "sampled_frames": 4,
+    "sampling_fps": 1.0,
+    "frames_analysed": 4,
+    "faces_detected_in_frames": 4,
+    "worst_frame_index": 0,
+    "worst_frame_timestamp_s": 0.0,
+    "frame_scores": [
+      {
+        "frame_index": 0,
+        "timestamp_s": 0.0,
+        "fake_probability": 0.0,
+        "face_detected": true
+      },
+      {
+        "frame_index": 1,
+        "timestamp_s": 1.0,
+        "fake_probability": 0.0,
+        "face_detected": true
+      },
+      {
+        "frame_index": 2,
+        "timestamp_s": 2.0,
+        "fake_probability": 0.0,
+        "face_detected": true
+      },
+      {
+        "frame_index": 3,
+        "timestamp_s": 3.0,
+        "fake_probability": 0.0,
+        "face_detected": true
+      }
+    ],
+    "risk_score": 7,
+    "risk_tier": "LOW_RISK",
+    "dominant_threat": "Authentic Camera Video Recording",
+    "threat_code": "AUTHENTIC_PHOTOGRAPH",
+    "video_category": "Authentic Camera Recording",
+    "corroborating_signals": [],
+    "segment_timeline": [
+      {
+        "time_window": "00:00 - 00:02",
+        "ai_probability": 0.045,
+        "ai_percentage": "4.5%",
+        "manipulation_type": "AUTHENTIC_CONTENT",
+        "indicators": "Coherent face track 0",
+        "source_match": "Authentic Camera Recording"
+      },
+      {
+        "time_window": "00:02 - 00:04",
+        "ai_probability": 0.045,
+        "ai_percentage": "4.5%",
+        "manipulation_type": "AUTHENTIC_CONTENT",
+        "indicators": "Coherent face track 0",
+        "source_match": "Authentic Camera Recording"
+      }
+    ],
+    "pipeline_modules": [
+      {
+        "stage": 1,
+        "name": "Container & Bitstream Forensics",
+        "duration_ms": 1280,
+        "status": "PASSED",
+        "desc": "Format: qt | Atoms: 5 | Screen capture: NEGATIVE"
+      },
+      {
+        "stage": 2,
+        "name": "Scene & Shot Boundary Segmentation",
+        "duration_ms": 708,
+        "status": "PASSED",
+        "desc": "Sampled 4 frames across 1 distinct shots (3.4s duration)"
+      },
+      {
+        "stage": 3,
+        "name": "Spatial Neural & Generative AI Backbone",
+        "duration_ms": 1267,
+        "status": "PASSED",
+        "desc": "Face score: 0.0% (informational) | Full-scene ViT GenAI: 1.1%"
+      },
+      {
+        "stage": 4,
+        "name": "28-Module Image Forensic Engine",
+        "duration_ms": 2089,
+        "status": "PASSED",
+        "desc": "Evaluated CFA periodicity (1.0), Fourier radial slope alpha, ELA, and synthetic background matte voids"
+      },
+      {
+        "stage": 5,
+        "name": "Temporal Jitter & Facial Dynamics",
+        "duration_ms": 15,
+        "status": "PASSED",
+        "desc": "Bounding-box jitter: 0.07 | Landmark jitter: 0.00 | Blinks: 0"
+      },
+      {
+        "stage": 6,
+        "name": "Remote Photoplethysmography (rPPG) Biometrics",
+        "duration_ms": 0,
+        "status": "INCONCLUSIVE",
+        "desc": "Capillary pulse: INCONCLUSIVE (Clip <8s) | Heart rate: 0.0 BPM | Cardiac SNR: 0.0 dB"
+      },
+      {
+        "stage": 7,
+        "name": "Spatio-Temporal 4D Tensor Dynamics",
+        "duration_ms": 19,
+        "status": "PASSED",
+        "desc": "Anomaly score: 0.03 | Latent denoise jumps: 0.07 | SlowFast vibration: 0.00"
+      },
+      {
+        "stage": 8,
+        "name": "LipForensics Articulatory Kinematics",
+        "duration_ms": 13,
+        "status": "PASSED",
+        "desc": "Lip manipulation prob: 21.0% | Articulatory jerk: 0.35 | Oral texture stability: 1.00"
+      },
+      {
+        "stage": 9,
+        "name": "Optical Flow Motion Decomposition",
+        "duration_ms": 921,
+        "status": "PASSED",
+        "desc": "Farneback flow anomaly: 0.008 | Face/Background vector divergence: 1.61 px"
+      },
+      {
+        "stage": 10,
+        "name": "Acoustic Speech & Cross-Modal Lip-Sync",
+        "duration_ms": 1290,
+        "status": "PASSED",
+        "desc": "Speech track: PRESENT | Audiovisual sync: 0.70 | Acoustic fake: 50.0%"
+      },
+      {
+        "stage": 11,
+        "name": "AI Generator Attribution Engine",
+        "duration_ms": 288,
+        "status": "PASSED",
+        "desc": "Predicted origin: Authentic Camera / No Synthetic Generator Traces (12.0% confidence) | Detection without watermarks: ACTIVE"
+      }
+    ],
+    "container_forensics": {
+      "file_info": {
+        "filename": "75136f067e7a4e0aa7ed782d5323c530.mov",
+        "extension": ".mov",
+        "file_size_bytes": 7964384,
+        "file_size_mb": 7.6,
+        "sha256": "9fcf870783be668f85a2c3825f7ee0accb5f50cf172acf7d3f9b75ee872099cc",
+        "sha512": "f3dbaf86ddfa17364aef7bd5c4db475810b353a7cb3281e864a0e4db484db539df20fc065f3d5ba1af04bdd14f08ddf555cb593bd50c0855c7aa88f2acfd2fd3",
+        "md5": "a248ddab097aac50b7400fd605999e12"
+      },
+      "container_format": "qt",
+      "atom_hierarchy": [
+        {
+          "atom": "ftyp",
+          "offset": 0,
+          "size": 20,
+          "status": "VALID"
+        },
+        {
+          "atom": "wide",
+          "offset": 20,
+          "size": 8,
+          "status": "VALID"
+        },
+        {
+          "atom": "mdat",
+          "offset": 28,
+          "size": 7948937,
+          "status": "VALID"
+        },
+        {
+          "atom": "moov",
+          "offset": 7948965,
+          "size": 13067,
+          "status": "VALID"
+        },
+        {
+          "atom": "free",
+          "offset": 7962032,
+          "size": 2352,
+          "status": "VALID"
+        }
+      ],
+      "metadata_tags": {},
+      "editing_software": null,
+      "software_category": null,
+      "ai_generator_signature": null,
+      "is_reencoded": false,
+      "metadata_inconsistencies": [],
+      "screen_recording_analysis": {
+        "screen_recording_detected": false,
+        "confidence": 0.15,
+        "moir\u00e9_harmonic_ratio": 1.45,
+        "uniform_window_borders_detected": false,
+        "description": "Standard camera/render raster"
+      }
+    },
+    "scenes": [
+      {
+        "scene_id": 1,
+        "start_time_s": 0.0,
+        "end_time_s": 3.0,
+        "duration_s": 3.0,
+        "start_frame_idx": 0,
+        "end_frame_idx": 3,
+        "transition_type": "FINAL_SEGMENT",
+        "boundary_delta": 0.0,
+        "keyframe_timestamp_s": 1.0
+      }
+    ],
+    "facial_dynamics": {
+      "faces_tracked": 4,
+      "landmark_jitter_score": 0.0,
+      "blink_analysis": {
+        "blinks_detected": 0,
+        "blink_rate_per_min": 0.0,
+        "blink_regularity": "NORMAL_FOR_CLIP_LENGTH",
+        "left_right_sync_score": 0.863
+      },
+      "mouth_interior_texture_variance": 12.0,
+      "corneal_reflection_consistency": 0.863,
+      "description": "Facial landmark trajectory and ocular synchrony tracked across time."
+    },
+    "temporal_metrics": {
+      "jitter_score": 0.0692,
+      "motion_anomaly": 0.0077,
+      "compression_anomaly": 0.1,
+      "face_bg_divergence": 1.61,
+      "optical_flow": {
+        "mean_motion_anomaly": 0.0077,
+        "max_motion_anomaly": 0.0231,
+        "face_background_divergence": 1.61,
+        "per_frame_flow": [
+          0.0,
+          0.0231,
+          0.0
+        ],
+        "flow_heatmap_file": "75136f067e7a4e0aa7ed782d5323c530_optical_flow.png"
+      }
+    },
+    "crossmodal_lipsync": {
+      "audio_stream_detected": true,
+      "lip_sync_analyzed": true,
+      "audiovisual_correlation": 0.702,
+      "lip_sync_anomaly_detected": false,
+      "lip_sync_anomaly_score": 0.06,
+      "mouth_aperture_timeline": [
+        0.013,
+        0.006,
+        0.012,
+        0.006
+      ],
+      "speech_energy_timeline": [
+        0.0278,
+        0.0245,
+        0.0401,
+        0.0249
+      ],
+      "verdict_reason": "Natural speech-to-lip articulation alignment"
+    },
+    "image_forensics": {
+      "updated_ai_scores": {
+        "ensemble_fake_prob": 0.011463075417937365,
+        "scene_ai_prob": 0.011463075417937365,
+        "face_fake_prob": 0.0,
+        "model_score": 0.0,
+        "vit_genai_score": 0.011463075417937365,
+        "forensic_ai_prob": 0.1681
+      },
+      "pipeline_modules": [
+        {
+          "stage": 1,
+          "name": "Secure Ingestion & Validation",
+          "category": "File Ingestion",
+          "status": "PASSED",
+          "duration_ms": 13,
+          "summary": "Format: PNG | MIME: image/png | Size: 2388147 bytes",
+          "findings": [
+            "Header magic bytes and file extension match."
+          ]
+        },
+        {
+          "stage": 2,
+          "name": "File Container & Cryptographic Ledger",
+          "category": "File Forensics",
+          "status": "PASSED",
+          "duration_ms": 157,
+          "summary": "SHA-256: 1a25e5f094934a10... | pHash: e552015ffea04ad5 | Trailing data: None",
+          "findings": [
+            "Container structure normal; cryptographic and perceptual hashes generated."
+          ]
+        },
+        {
+          "stage": 3,
+          "name": "Metadata & Digital Timeline Forensics",
+          "category": "Provenance & Metadata",
+          "status": "PASSED",
+          "duration_ms": 1,
+          "summary": "Camera: Unknown / Unspecified Unknown / Unspecified | Software: None recorded | Timeline: PURGED_METADATA",
+          "findings": [
+            "All camera hardware EXIF tags are completely absent (characteristic of AI generation, screenshotting, or web sanitization)."
+          ]
+        },
+        {
+          "stage": 4,
+          "name": "Frequency & Signal Forensics (FFT / DCT / ELA)",
+          "category": "Image Forensics",
+          "status": "PASSED",
+          "duration_ms": 734,
+          "summary": "Camera Sensor: Synthetic / AI-Rendered (Missing Sensor Artifacts) | ELA Score: 0.0527 | CFA Bayer: Not detected",
+          "findings": [
+            "No camera CFA demosaicing trace found (normal after resizing or JPEG recompression; not evidence of AI generation on its own).",
+            "Fourier spectral slope: alpha=1.666 (Wavelet HH peak ratio: 5.54)."
+          ]
+        },
+        {
+          "stage": 5,
+          "name": "Tampering & Watermark Engine",
+          "category": "Manipulation Detection",
+          "status": "PASSED",
+          "duration_ms": 344,
+          "summary": "Copy-Move: None | Splicing: None | Watermark: None",
+          "findings": [
+            "No keypoint cloning, boundary splicing, or watermarks detected."
+          ]
+        },
+        {
+          "stage": 6,
+          "name": "AI & Deepfake Detection Engine (Neural + M28 Forensic)",
+          "category": "AI Forensics",
+          "status": "PASSED",
+          "duration_ms": 336,
+          "summary": "Ensemble Score: 1.1% | Scene AI detectors: 1.1% | M28 heuristic (informational): 16.8%",
+          "findings": [
+            "No AI-generation detector crossed its threshold. M28 heuristic: AUTHENTIC_LIKELY (16.8%; unvalidated, not used in the verdict)."
+          ]
+        },
+        {
+          "stage": 7,
+          "name": "Steganography & Provenance Authentication",
+          "category": "Cyber Forensics",
+          "status": "PASSED",
+          "duration_ms": 64,
+          "summary": "Stego Payload: LOW (25.0%) | C2PA: Absent | Threat IOC: LOW",
+          "findings": [
+            "LSB bitplane entropy within normal photographic bounds; clean threat IOC profile."
+          ]
+        },
+        {
+          "stage": 8,
+          "name": "Evidence Fusion & Calibrated Risk Engine",
+          "category": "Synthesis & Audit",
+          "status": "CONSENSUS_REACHED",
+          "duration_ms": 158,
+          "summary": "Risk Score: 3/100 (LOW_RISK) | Threat: Authentic Camera Photograph | Fusion: NO_MANIPULATION_SIGNALS_DETECTED",
+          "findings": [
+            "All orthogonal forensic dimensions agree on authenticity."
+          ]
+        }
+      ],
+      "file_security": {
+        "file_status": "VALID",
+        "format": "PNG",
+        "mime_type": "image/png",
+        "file_size_bytes": 2388147,
+        "extension_mismatch": false,
+        "structure_valid": true,
+        "trailing_data_detected": false,
+        "trailing_bytes_count": 0,
+        "embedded_objects": [],
+        "anomalies": []
+      },
+      "hashes": {
+        "md5": "3cfee9665e0e2fd573806727703c75aa",
+        "sha1": "1ca1fb7804e913b0b79e249294e902afda4c866a",
+        "sha256": "1a25e5f094934a10c48d2bc53de7d47b9a8ef720b24ea2f03cdf7298df40261e",
+        "sha512": "615cb715541f19d8ad38573c9ba04e7cb7b46678cdfa02982687b6971aadf689119ed9e03eec996ca406bbc7e0c1b81df2079d028ddf4939f4409e20b550cb92",
+        "phash": "e552015ffea04ad5",
+        "dhash": "cdaaa2252466ea56",
+        "ahash": "6000f3f7b2b33303",
+        "whash": "e41079f7b2b33303"
+      },
+      "metadata_forensics": {
+        "file_name": "75136f067e7a4e0aa7ed782d5323c530_keyframe.png",
+        "file_format": "PNG",
+        "file_size_formatted": "2.28 MB",
+        "dimensions": "1920 \u00d7 1080 px",
+        "width": 1920,
+        "height": 1080,
+        "megapixels": "2.07 MP",
+        "aspect_ratio": "16:9 (1.78:1)",
+        "color_mode": "RGB (24-bit True Color)",
+        "icc_profile_present": false,
+        "icc_profile_name": "None (Uncalibrated / sRGB assumed)",
+        "color_space": "Uncalibrated / Unknown",
+        "exif_present": false,
+        "camera_make": "Unknown / Unspecified",
+        "camera_model": "Unknown / Unspecified",
+        "lens_make": "Standard / Integrated",
+        "lens_model": "Not specified",
+        "exposure_time": "N/A",
+        "f_number": "N/A",
+        "iso": "N/A",
+        "focal_length": "N/A",
+        "focal_length_35mm": "N/A",
+        "flash": "Not recorded",
+        "white_balance": "Not recorded",
+        "metering_mode": "Not recorded",
+        "exposure_program": "Not recorded",
+        "orientation": "Normal (0\u00b0)",
+        "gps_present": false,
+        "gps_latitude": "No GPS geotags embedded",
+        "gps_longitude": "No GPS geotags embedded",
+        "gps_altitude": "N/A",
+        "software": "None recorded",
+        "editing_software_detected": false,
+        "ai_metadata_detected": false,
+        "ai_generator_name": "None",
+        "ai_generation_parameters": null,
+        "timeline_events": [
+          {
+            "stage": "Original Camera Shutter Capture",
+            "source": "EXIF DateTimeOriginal",
+            "timestamp": "NOT EMBEDDED (Purged or Synthetic)",
+            "status": "MISSING"
+          },
+          {
+            "stage": "Filesystem Archive Creation",
+            "source": "File ctime",
+            "timestamp": "2026-10-05 04:36:54 UTC",
+            "status": "VERIFIED"
+          },
+          {
+            "stage": "Filesystem Last Modification",
+            "source": "File mtime",
+            "timestamp": "2026-10-05 04:36:55 UTC",
+            "status": "VERIFIED"
+          }
+        ],
+        "timeline_consistency": "PURGED_METADATA",
+        "timeline_notes": "No original capture timestamp is embedded; only system ingestion timestamps exist.",
+        "metadata_status": "PURGED_OR_SYNTHETIC",
+        "anomalies": [
+          "All camera hardware EXIF tags are completely absent (characteristic of AI generation, screenshotting, or web sanitization)."
+        ],
+        "exif_summary": {},
+        "all_tags": {}
+      },
+      "tampering": {
+        "copy_move_detected": false,
+        "cloned_feature_pairs": 2,
+        "splicing_detected": false,
+        "synthetic_matte_detected": false,
+        "clamped_black_ratio": 0.0157,
+        "gradient_discontinuity_score": 10.54,
+        "laplacian_variance": 143.56,
+        "suspicious_regions": [],
+        "face_swap": {
+          "face_swap_detected": false,
+          "face_swap_score": 0.0,
+          "anomalies": [],
+          "min_noise_ratio": 1.0,
+          "max_boundary_score": 0.0
+        }
+      },
+      "ela": {
+        "ela_score": 0.0527,
+        "mean_error": 1.13,
+        "peak_error": 26.0,
+        "p95_error": 3.0,
+        "compression_anomaly_detected": false,
+        "heatmap_file": "75136f067e7a4e0aa7ed782d5323c530_frame_ela.png"
+      },
+      "steganography": {
+        "lsb_anomaly": false,
+        "payload_likelihood": "LOW",
+        "affected_channels": [
+          "R",
+          "G",
+          "B"
+        ],
+        "channel_entropies": {
+          "R": 1.0,
+          "G": 1.0,
+          "B": 1.0
+        },
+        "suspicion_percentage": 25.0,
+        "heatmap_file": "75136f067e7a4e0aa7ed782d5323c530_frame_stego.png"
+      },
+      "camera_stats": {
+        "camera_fingerprint_detected": false,
+        "synthetic_sensor_detected": true,
+        "estimated_camera_family": "Synthetic / AI-Rendered (Missing Sensor Artifacts)",
+        "camera_consistency_score": 0.22,
+        "cfa_artifacts_detected": false,
+        "cfa_periodicity_ratio": 1.49,
+        "sensor_noise_std": 2.42,
+        "sensor_noise_variance": 5.858,
+        "fourier_spectral_slope": 1.666,
+        "wavelet_grid_peak_ratio": 5.54,
+        "statistical_moments": {
+          "skewness": 0.537,
+          "kurtosis": -0.74,
+          "gradient_mean": 43.05,
+          "channel_correlation_rg": 0.983,
+          "channel_correlation_gb": 0.976,
+          "channel_correlation_rb": 0.937
+        },
+        "heatmap_file": "75136f067e7a4e0aa7ed782d5323c530_frame_noise.png"
+      },
+      "watermark": {
+        "watermark_detected": false,
+        "watermark_type": "NONE",
+        "subtype": "None",
+        "confidence": 0.0,
+        "location": "none",
+        "bounding_box": null,
+        "findings": [],
+        "heatmap_file": null
+      },
+      "provenance_threat": {
+        "c2pa_detected": false,
+        "ai_generation_disclosed": false,
+        "disclosed_generator": null,
+        "signature_status": "NOT_FOUND",
+        "provenance_confidence": "LOW",
+        "manifest_details": {
+          "standard": "C2PA / Content Credentials",
+          "manifest_detected": false,
+          "signature_valid": false,
+          "ai_generation_disclosed": false,
+          "disclosed_generator": null,
+          "note": "Absence of credentials does not inherently denote manipulation."
+        },
+        "threat_intel": {
+          "threat_level": "LOW",
+          "ioc_match": false,
+          "details": "No match in threat intelligence and malicious IOC database",
+          "sha256_checked": "1a25e5f094934a10c48d2bc53de7d47b9a8ef720b24ea2f03cdf7298df40261e"
+        },
+        "context_forensics": {
+          "claim_context_provided": false,
+          "context_text": "No specific external event claim submitted.",
+          "distinction_note": "Forensic integrity verifies image signal fidelity. External contextual claims require corroboration via news sources and provenance timeline.",
+          "claim_status": "NOT_APPLICABLE"
+        },
+        "reverse_investigation": {
+          "lookup_ready": true,
+          "perceptual_hash_anchor": "e552015ffea04ad5",
+          "similarity_index_status": "INDEXED",
+          "search_services": [
+            "Google Images",
+            "TinEye",
+            "Yandex",
+            "Bing Visual"
+          ]
+        }
+      },
+      "robustness_ood": {
+        "robustness": {
+          "jpeg_resistance": true,
+          "blur_resistance": true,
+          "crop_resistance": true,
+          "adversarial_perturbation_detected": false,
+          "high_freq_energy": 5.69
+        },
+        "ood": {
+          "is_out_of_distribution": false,
+          "ood_score": 0.0,
+          "reasons": [],
+          "verdict_impact": "NORMAL_DISTRIBUTION"
+        }
+      },
+      "risk_engine": {
+        "overall_risk_score": 3,
+        "risk_tier": "LOW_RISK",
+        "dominant_threat": "Authentic Camera Photograph",
+        "threat_code": "AUTHENTIC_PHOTOGRAPH",
+        "dimension_breakdown": {
+          "ai_generation": 1.1,
+          "tampering_splicing": 0.0,
+          "file_security": 0.0,
+          "metadata_timeline": 0.0,
+          "stego": 25.0,
+          "provenance_penalty": 15.0
+        },
+        "evidence_fusion": {
+          "fusion_verdict": "NO_MANIPULATION_SIGNALS_DETECTED",
+          "fusion_confidence": "LOW",
+          "dominant_threat": "Authentic Camera Photograph",
+          "threat_code": "AUTHENTIC_PHOTOGRAPH",
+          "corroborating_signals": [],
+          "context_signals": [
+            "No camera CFA demosaicing trace (normal after resizing/recompression)",
+            "No camera make/model in metadata"
+          ],
+          "orthogonal_signals_count": 0
+        }
+      },
+      "chain_of_custody": {
+        "evidence_id": "DFE-20261005-1A25E5F0",
+        "sha256": "1a25e5f094934a10c48d2bc53de7d47b9a8ef720b24ea2f03cdf7298df40261e",
+        "acquired_at": "2026-10-05T04:36:57.063533+00:00",
+        "job_id": "75136f067e7a4e0aa7ed782d5323c530_frame",
+        "original_filename": "75136f067e7a4e0aa7ed782d5323c530_keyframe.png",
+        "analyzer_platform": "DeFraudAI Forensic Suite v1.0.0",
+        "custody_verification_seal": "0a12f58c33ee7d23e09c34aae17af1c01f2ed3c7fe483f1391fa734a59b10d20",
+        "action_log": [
+          {
+            "action": "Evidence Ingestion",
+            "timestamp": "2026-10-05T04:36:57.063533+00:00",
+            "operator": "Secure Ingestion Engine"
+          },
+          {
+            "action": "Cryptographic Hash Validation",
+            "timestamp": "2026-10-05T04:36:57.063533+00:00",
+            "operator": "Forensic Hash Core"
+          },
+          {
+            "action": "Multi-Forensic Processing",
+            "timestamp": "2026-10-05T04:36:57.063533+00:00",
+            "operator": "DeFraudAI v1.0.0"
+          },
+          {
+            "action": "Evidence Lock & Custody Verification",
+            "timestamp": "2026-10-05T04:36:57.063533+00:00",
+            "operator": "Custody Engine"
+          }
+        ]
+      },
+      "model_audit": {
+        "engine_version": "DeFraudAI Forensic v1.0.0",
+        "deepfake_model": {
+          "name": "EfficientNet-B4 face-crop GAN classifier",
+          "backbone": "efficientnet_b4",
+          "training_dataset": "140k Real and Fake Faces (FFHQ photos vs StyleGAN faces) plus filtered copies of them",
+          "scope": "StyleGAN-style generated faces only; it scores diffusion, GPT-image and Gemini faces as real.",
+          "validation_note": "Earlier 99%+ validation figures came from a split that shared source faces with training; they do not measure real-world accuracy.",
+          "checkpoint": "checkpoints/image_detector.pt"
+        },
+        "full_scene_model": {
+          "name": "Full-scene AI-generation detector ensemble (log-odds fusion)",
+          "architecture": "haywoodsloan/ai-image-detector-deploy (Modern diffusion & GAN detector (SwinV2), weight 0.75); Organika/sdxl-detector (Stable Diffusion / SDXL specialist (Swin), weight 0.25)",
+          "measured_performance": "AUC 0.984 on 560 held-out images: 200 real photos (COCO, Flickr) and 360 from SD 2.1, SDXL, SD3, DALL-E 3, Midjourney v6, Flux.1-dev and Gemini Nano Banana / Pro",
+          "classes": [
+            "Artificial / Generative",
+            "Authentic Photograph"
+          ]
+        },
+        "hardware_environment": {
+          "device": "NVIDIA GeForce RTX 5070",
+          "cuda_version": "12.8",
+          "pytorch_version": "2.12.0.dev20260408+cu128",
+          "operating_system": "Windows-10-10.0.26200-SP0"
+        },
+        "calibration": {
+          "confidence_calibration_version": "v2.5",
+          "decision_threshold": 0.5,
+          "inconclusive_bounds": [
+            0.35,
+            0.65
+          ]
+        },
+        "audit_timestamp": "2026-10-05T04:36:57.063533+00:00"
+      },
+      "heatmaps": {
+        "ai_heatmap": null,
+        "ela_heatmap": "75136f067e7a4e0aa7ed782d5323c530_frame_ela.png",
+        "noise_heatmap": "75136f067e7a4e0aa7ed782d5323c530_frame_noise.png",
+        "tampering_heatmap": "75136f067e7a4e0aa7ed782d5323c530_frame_tampering.png",
+        "stego_heatmap": "75136f067e7a4e0aa7ed782d5323c530_frame_stego.png",
+        "watermark_heatmap": null,
+        "combined_heatmap": "75136f067e7a4e0aa7ed782d5323c530_frame_combined.png"
+      }
+    },
+    "audio_forensics": {
+      "pipeline_modules": [
+        {
+          "stage": 1,
+          "name": "Secure Ingestion Vault",
+          "category": "Evidence Integrity",
+          "status": "PASSED",
+          "duration_ms": 20,
+          "summary": "Evidence ID: EVID-20261005-9FCF8707 | SHA-256: 9fcf870783be668f...",
+          "findings": [
+            "SWGDE & ISO 27042 compliant cryptographic bind established.",
+            "Write-blocker access emulated."
+          ]
+        },
+        {
+          "stage": 2,
+          "name": "Audio File DNA & Container Forensics",
+          "category": "Container Cybersecurity",
+          "status": "PASSED",
+          "duration_ms": 8,
+          "summary": "ISO-BMFF (MP4/M4A) | Codec: AAC-LC / ALAC | Rate: 16000 Hz",
+          "findings": [
+            "Container structural integrity intact.",
+            "Inferred 3 processing stage(s)."
+          ]
+        },
+        {
+          "stage": 3,
+          "name": "Signal Intelligence & Acoustic Telemetry",
+          "category": "Signal Processing",
+          "status": "PASSED",
+          "duration_ms": 36,
+          "summary": "Quality Score: 85/100 | SNR: 16.7 dB | LUFS: -18.99",
+          "findings": [
+            "Extracted 124+ time, frequency, and multi-scale cepstral descriptors.",
+            "LFCC linear filterbank calculated across 0-8000 Hz Nyquist range.",
+            "Clipping severity: NEGLIGIBLE."
+          ]
+        },
+        {
+          "stage": 4,
+          "name": "Physiological Glottal Flow & VoiceRadar Physics",
+          "category": "Physical Forensics",
+          "status": "PASSED",
+          "duration_ms": 5,
+          "summary": "Glottal Qo: 0.48 | Closing: 0.05 | Doppler Anomaly: 0.0",
+          "findings": [
+            "CONSISTENT_BIOLOGICAL_VOCAL_TRACT",
+            "Vocal turbulence index: 0.0934."
+          ]
+        },
+        {
+          "stage": 5,
+          "name": "Content & Phonemic Coarticulation",
+          "category": "Linguistic Forensics",
+          "status": "PASSED",
+          "duration_ms": 3,
+          "summary": "87.4 WPM | Words: ~5 | Speech: 100.0%",
+          "findings": [
+            "Estimated 5 words (87.4 WPM) across 3.4s. Speech: 100%, Silence: 0%.",
+            "Syllable rhythm variation: 249.6 ms (Rigid prosody: NO)."
+          ]
+        },
+        {
+          "stage": 6,
+          "name": "Multi-Model ML & Intermediate SSL Probing",
+          "category": "Machine Learning",
+          "status": "PASSED",
+          "duration_ms": 1,
+          "summary": "Domain: CONVERSATIONAL_SPEECH | Sinc-RawNet: 51.0% | WavLM L18: 53.9%",
+          "findings": [
+            "Evaluated intermediate WavLM Layer 18 and Whisper Layer 4 representations.",
+            "Top Typology: Fully Synthetic TTS (19.6%) vs Bona Fide (58.4%)."
+          ]
+        },
+        {
+          "stage": 7,
+          "name": "Environmental & ENF Grid Forensics",
+          "category": "Sensor Forensics",
+          "status": "PASSED",
+          "duration_ms": 15,
+          "summary": "Grid: 60.0 Hz | Phase Slips: 0 | Room RT60: 1.496s",
+          "findings": [
+            "COHERENT_GRID_PHASE",
+            "Microphone consistency: SINGLE_CONSISTENT_DEVICE."
+          ]
+        },
+        {
+          "stage": 8,
+          "name": "Evidence Fusion & Conformal Risk Engine",
+          "category": "Decision Engine",
+          "status": "PASSED",
+          "duration_ms": 13,
+          "summary": "Verdict: INCONCLUSIVE | AI Risk: 31.6% | Tamper Risk: 50.0%",
+          "findings": [
+            "First-Order SSL Dynamics (F1) Splice Boundary Spikes"
+          ]
+        }
+      ],
+      "vault_record": {
+        "evidence_id": "EVID-20261005-9FCF8707",
+        "case_reference": "CASE-9FCF8707",
+        "original_filename": "75136f067e7a4e0aa7ed782d5323c530.mov",
+        "file_size_bytes": 7964384,
+        "file_size_formatted": "7.60 MB",
+        "acquisition_timestamp": "2026-10-05T04:36:58.122768+00:00",
+        "source_type": "DIRECT_UPLOAD",
+        "analyst": "SYSTEM_INGEST",
+        "hashes": {
+          "sha256": "9fcf870783be668f85a2c3825f7ee0accb5f50cf172acf7d3f9b75ee872099cc",
+          "sha512": "f3dbaf86ddfa17364aef7bd5c4db475810b353a7cb3281e864a0e4db484db539df20fc065f3d5ba1af04bdd14f08ddf555cb593bd50c0855c7aa88f2acfd2fd3",
+          "md5": "a248ddab097aac50b7400fd605999e12",
+          "sha1": "281f462cd01c56fe748546a69d659bb6acefe9a5"
+        },
+        "chain_of_custody_status": "PRESERVED_IMMUTABLE",
+        "write_blocker_emulated": true,
+        "integrity_verified": true,
+        "compliance": [
+          "SWGDE 08-A-001",
+          "ISO/IEC 27042",
+          "Daubert Rule 702"
+        ]
+      },
+      "file_dna": {
+        "filename": "75136f067e7a4e0aa7ed782d5323c530.mov",
+        "extension": ".mov",
+        "file_size_bytes": 7964384,
+        "container_format": "ISO-BMFF (MP4/M4A)",
+        "codec": "AAC-LC / ALAC",
+        "sample_rate_hz": null,
+        "bit_depth": null,
+        "channels": null,
+        "bitrate_kbps": null,
+        "bitrate_mode": "UNKNOWN",
+        "encoder_signature": "Standard ISO-BMFF Muxer (e.g., Apple QuickTime / FFmpeg)",
+        "container_structure_valid": true,
+        "trailing_data_detected": false,
+        "trailing_bytes_count": 0,
+        "chunks_or_atoms": [
+          {
+            "name": "ftyp",
+            "offset": 0,
+            "size": 20
+          },
+          {
+            "name": "wide",
+            "offset": 20,
+            "size": 8
+          },
+          {
+            "name": "mdat",
+            "offset": 28,
+            "size": 7948937
+          },
+          {
+            "name": "moov",
+            "offset": 7948965,
+            "size": 13067
+          },
+          {
+            "name": "free",
+            "offset": 7962032,
+            "size": 2352
+          }
+        ],
+        "inferred_transcoding_history": [
+          {
+            "stage": 1,
+            "type": "CAPTURE_OR_SYNTHESIS",
+            "description": "Original raw capture or digital neural waveform rendering.",
+            "inferred": true
+          },
+          {
+            "stage": 2,
+            "type": "NARROWBAND_TRANSCODING",
+            "description": "Brickwall cutoff at 7.4 kHz indicates telephony compression (AMR-NB / G.711).",
+            "inferred": true
+          },
+          {
+            "stage": 3,
+            "type": "CURRENT_CONTAINER",
+            "description": "Current encapsulation in ISO-BMFF (MP4/M4A) container using AAC-LC / ALAC.",
+            "inferred": false
+          }
+        ],
+        "metadata_consistency": "CONSISTENT",
+        "security_flags": [],
+        "high_frequency_cutoff_khz": 7.39
+      },
+      "signal_intel": {
+        "duration_seconds": 3.433,
+        "total_samples": 54933,
+        "sample_rate": 16000,
+        "quality_score": 85,
+        "time_domain": {
+          "peak_amplitude": 1.0,
+          "peak_dbfs": 0.0,
+          "rms_amplitude": 0.1225,
+          "rms_dbfs": -18.24,
+          "peak_to_rms_ratio": 8.164,
+          "crest_factor_db": 18.24,
+          "dynamic_range_db": 87.11,
+          "zcr_mean": 0.1078,
+          "zcr_variance": 0.0492,
+          "temporal_centroid_s": 1.583,
+          "energy_entropy": 4.607,
+          "silence_ratio": 0.0
+        },
+        "clipping_analysis": {
+          "clipped_samples_count": 1,
+          "clipping_percentage": 0.0018,
+          "severity": "NEGLIGIBLE",
+          "clipping_detected": false
+        },
+        "frequency_domain": {
+          "spectral_centroid_hz": 1621.4,
+          "spectral_bandwidth_hz": 1833.7,
+          "spectral_rolloff_85_hz": 3456.3,
+          "spectral_rolloff_95_hz": 5826.8,
+          "spectral_flatness": 0.0251,
+          "spectral_flux": 2.1669,
+          "spectral_contrast_db": [
+            28.58,
+            14.47,
+            17.86,
+            17.53,
+            19.22,
+            17.81,
+            19.65
+          ],
+          "spectral_slope": -32.01,
+          "spectral_slope_r2": 0.515,
+          "dominant_frequencies": [
+            {
+              "frequency_hz": 551.3,
+              "magnitude": 343.25
+            },
+            {
+              "frequency_hz": 550.8,
+              "magnitude": 311.07
+            },
+            {
+              "frequency_hz": 551.8,
+              "magnitude": 298.42
+            },
+            {
+              "frequency_hz": 686.5,
+              "magnitude": 291.08
+            },
+            {
+              "frequency_hz": 687.0,
+              "magnitude": 285.24
+            }
+          ],
+          "energy_distribution": {
+            "low_bass_pct": 6.2,
+            "mid_speech_pct": 93.5,
+            "high_treble_pct": 0.3
+          }
+        },
+        "cepstral_analysis": {
+          "mfcc_coefficients_1_13": [
+            -148.901,
+            107.86,
+            13.565,
+            3.962,
+            -1.341,
+            2.757,
+            -17.997,
+            -3.951,
+            6.391,
+            2.792,
+            3.232,
+            3.07,
+            -7.591
+          ],
+          "mfcc_delta_means": [
+            0.028,
+            0.0,
+            -0.17,
+            -0.212,
+            -0.012,
+            0.181,
+            0.064,
+            0.066,
+            0.048,
+            -0.208,
+            0.011,
+            -0.006,
+            -0.155
+          ],
+          "mfcc_delta2_means": [
+            -0.287,
+            -0.01,
+            -0.026,
+            0.08,
+            0.051,
+            -0.019,
+            -0.017,
+            -0.021,
+            0.015,
+            -0.014,
+            -0.049,
+            0.038,
+            0.021
+          ],
+          "lfcc_coefficients_1_20": [
+            6.956,
+            3.576,
+            1.643,
+            1.539,
+            0.602,
+            0.884,
+            -0.831,
+            0.818,
+            0.032,
+            0.385,
+            0.101,
+            -0.106,
+            0.073,
+            0.116,
+            -0.092,
+            -0.181,
+            -0.207,
+            -0.102,
+            -0.078,
+            -0.025
+          ],
+          "cqcc_coefficients_1_16": [
+            -17.407,
+            0.528,
+            -2.162,
+            -0.581,
+            -1.357,
+            0.267,
+            -1.493,
+            0.985,
+            0.45,
+            1.02,
+            -0.277,
+            -0.187,
+            0.152,
+            -0.458,
+            -0.454,
+            0.431
+          ],
+          "cepstral_peak_prominence_db": 11.12
+        },
+        "voice_quality": {
+          "fundamental_frequency_mean_hz": 140.4,
+          "fundamental_frequency_std_hz": 67.5,
+          "fundamental_frequency_min_hz": 66.6,
+          "fundamental_frequency_max_hz": 426.6,
+          "voiced_to_unvoiced_ratio": 0.972,
+          "jitter_local_percent": 16.406,
+          "shimmer_local_percent": 30.28,
+          "harmonics_to_noise_ratio_db": -6.83
+        },
+        "dynamics_and_loudness": {
+          "integrated_loudness_lufs": -18.99,
+          "estimated_noise_floor_dbfs": -30.37,
+          "estimated_snr_db": 16.7
+        },
+        "descriptor_count": 124
+      },
+      "glottal_physics": {
+        "glottal_flow": {
+          "open_quotient": 0.48,
+          "closing_quotient": 0.05,
+          "mfdr_index": 0.504,
+          "biological_turbulence_index": 0.0934,
+          "glottal_anomaly_score": 0.2909,
+          "status": "ANALYZED"
+        },
+        "physical_propagation": {
+          "doppler_micro_dispersion_hz": 535.37,
+          "doppler_anomaly_score": 0.0,
+          "acoustic_propagation_adherence": 0.906,
+          "physics_anomaly_score": 0.0938,
+          "status": "COMPLETED"
+        },
+        "composite_physiological_anomaly_score": 0.2022,
+        "physiological_verdict": "CONSISTENT_BIOLOGICAL_VOCAL_TRACT"
+      },
+      "speech_semantics": {
+        "duration_seconds": 3.43,
+        "speech_ratio_percent": 100.0,
+        "silence_ratio_percent": 0.0,
+        "estimated_words_count": 5,
+        "estimated_syllable_count": 7,
+        "speaking_rate_wpm": 87.4,
+        "syllable_rhythm_std_ms": 249.6,
+        "rigid_synthetic_prosody_detected": false,
+        "phonemic_coarticulation_anomaly_score": 0.05,
+        "content_summary": "Estimated 5 words (87.4 WPM) across 3.4s. Speech: 100%, Silence: 0%."
+      },
+      "models_output": {
+        "fused_ai_probability": 0.4749,
+        "model_branch_scores": {
+          "rawnet_waveform_prob": 0.5101,
+          "wavlm_l18_acoustic_prob": 0.5387,
+          "whisper_l4_semantic_prob": 0.5356,
+          "tabular_physics_prob": 0.3208
+        },
+        "audio_domain": "CONVERSATIONAL_SPEECH",
+        "typology_breakdown": {
+          "bona_fide_authentic_pct": 58.4,
+          "tts_fully_synthetic_pct": 19.6,
+          "voice_conversion_edited_pct": 12.2,
+          "partially_spliced_pct": 7.3,
+          "physical_replay_spoof_pct": 2.4
+        },
+        "generator_family_attribution": {
+          "diffusion_based_probability": 0.7553,
+          "autoregressive_probability": 0.0473,
+          "neural_vocoder_probability": 0.1624,
+          "unknown_synthetic_probability": 0.035,
+          "attribution_confidence": "MODERATE_INFERRED"
+        }
+      },
+      "splicing_timeline": {
+        "total_segments_analyzed": 3,
+        "segments": [
+          {
+            "segment_index": 0,
+            "start_s": 0.0,
+            "end_s": 2.0,
+            "fake_probability": 0.88,
+            "status": "SYNTHETIC_INJECTION",
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          },
+          {
+            "segment_index": 1,
+            "start_s": 1.0,
+            "end_s": 3.0,
+            "fake_probability": 0.88,
+            "status": "SYNTHETIC_INJECTION",
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary",
+              "Artificial spectral flatness / vocoder white noise distribution"
+            ]
+          },
+          {
+            "segment_index": 2,
+            "start_s": 2.0,
+            "end_s": 3.433,
+            "fake_probability": 0.88,
+            "status": "SYNTHETIC_INJECTION",
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          }
+        ],
+        "first_order_f1_spikes_count": 8,
+        "first_order_spikes": [
+          {
+            "timestamp_s": 0.17,
+            "displacement_magnitude": 6.866,
+            "z_score": 3.41
+          },
+          {
+            "timestamp_s": 0.45,
+            "displacement_magnitude": 7.524,
+            "z_score": 4.09
+          },
+          {
+            "timestamp_s": 0.59,
+            "displacement_magnitude": 6.606,
+            "z_score": 3.14
+          },
+          {
+            "timestamp_s": 1.59,
+            "displacement_magnitude": 6.635,
+            "z_score": 3.17
+          },
+          {
+            "timestamp_s": 1.6,
+            "displacement_magnitude": 6.692,
+            "z_score": 3.23
+          },
+          {
+            "timestamp_s": 2.07,
+            "displacement_magnitude": 6.959,
+            "z_score": 3.5
+          },
+          {
+            "timestamp_s": 2.34,
+            "displacement_magnitude": 8.995,
+            "z_score": 5.61
+          },
+          {
+            "timestamp_s": 2.35,
+            "displacement_magnitude": 6.543,
+            "z_score": 3.07
+          }
+        ],
+        "suspicious_intervals": [
+          {
+            "start_s": 0.0,
+            "end_s": 2.0,
+            "fake_probability": 0.88,
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          },
+          {
+            "start_s": 1.0,
+            "end_s": 3.0,
+            "fake_probability": 0.88,
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary",
+              "Artificial spectral flatness / vocoder white noise distribution"
+            ]
+          },
+          {
+            "start_s": 2.0,
+            "end_s": 3.433,
+            "fake_probability": 0.88,
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          }
+        ],
+        "worst_segment_fake_probability": 0.88,
+        "splicing_detected": true
+      },
+      "enf_environment": {
+        "enf_forensics": {
+          "enf_detected": true,
+          "nominal_grid_frequency_hz": 60.0,
+          "grid_carrier_snr_db": -42.47,
+          "estimated_mean_frequency_hz": 59.8738,
+          "frequency_std_hz": 0.14042,
+          "phase_discontinuity_count": 0,
+          "max_phase_slip_degrees": 0.0,
+          "phase_slip_intervals": [],
+          "splicing_detected_via_enf_phase": false,
+          "status": "COHERENT_GRID_PHASE"
+        },
+        "room_acoustics": {
+          "mean_reverberation_time_rt60_s": 1.496,
+          "reverberation_std_s": 0.0,
+          "segment_rt60_profiles": [
+            1.496
+          ],
+          "room_signature_inconsistent": false,
+          "acoustic_space_type": "REVERBERANT_HALL"
+        },
+        "microphone_hardware": {
+          "hardware_noise_floor_variance": 0.708,
+          "device_inconsistent": false,
+          "transducer_signature": "SINGLE_CONSISTENT_DEVICE"
+        },
+        "environmental_anomaly_score": 0.0,
+        "environmental_splicing_confirmed": false
+      },
+      "security_provenance": {
+        "provenance_c2pa": {
+          "c2pa_manifest_present": false,
+          "cryptographic_signature_status": "NOT_PRESENT",
+          "ai_generation_disclosed": false,
+          "software_or_generator_claim": null,
+          "provenance_confidence": "UNAVAILABLE"
+        },
+        "watermark_analysis": {
+          "watermark_detected": false,
+          "watermark_scheme": "NONE_CONFIRMED",
+          "detection_confidence": 0.0,
+          "overwriting_attack_suspected": false,
+          "anti_shortcut_status": "DEFENDED_WATERMARK_AGNOSTIC"
+        },
+        "steganography_forensics": {
+          "lsb_bitplane_entropy": 1.0,
+          "lsb_payload_anomaly": false,
+          "echo_hiding_detected": false,
+          "echo_peak_prominence": 4.25,
+          "phase_coding_anomaly_detected": false,
+          "steganography_detected": false,
+          "covert_channel_status": "NO_COVERT_CHANNELS_CONFIRMED"
+        },
+        "cyber_security_risk_score": 0.0
+      },
+      "fusion_decision": {
+        "final_verdict": "INCONCLUSIVE",
+        "calibrated_fake_probability": 0.5,
+        "generative_ai_risk_score": 0.3157,
+        "structural_tampering_risk_score": 0.5,
+        "conformal_prediction_set": [
+          "AUTHENTIC",
+          "AI_GENERATED"
+        ],
+        "is_inconclusive": true,
+        "conformal_alpha_guarantee": 0.01,
+        "forensic_likelihood_ratio": 1.0,
+        "verbal_scale_interpretation": "Inconclusive / Equivocal Evidence",
+        "orthogonal_signals_count": 1,
+        "orthogonal_signals_details": [
+          "First-Order SSL Dynamics (F1) Splice Boundary Spikes"
+        ],
+        "evidence_graph": {
+          "nodes": [
+            {
+              "id": "file_root",
+              "label": "Audio Evidence",
+              "type": "root",
+              "status": "NEUTRAL"
+            },
+            {
+              "id": "vault_node",
+              "label": "Vault: EVID-20261005-9FCF8707",
+              "type": "custody",
+              "status": "VERIFIED"
+            },
+            {
+              "id": "dna_node",
+              "label": "DNA: ISO-BMFF (MP4/M4A) / AAC-LC / ALAC",
+              "type": "container",
+              "status": "NORMAL"
+            },
+            {
+              "id": "iaif_node",
+              "label": "IAIF Glottal Flow (Err: 0.20)",
+              "type": "physics",
+              "status": "NORMAL"
+            },
+            {
+              "id": "enf_node",
+              "label": "ENF Grid (Slip: 0.0\u00b0)",
+              "type": "environment",
+              "status": "NORMAL"
+            },
+            {
+              "id": "ssl_node",
+              "label": "SSL WavLM L18: 53.9%",
+              "type": "neural",
+              "status": "NORMAL"
+            },
+            {
+              "id": "splice_node",
+              "label": "Splicing F1: 8 Spikes",
+              "type": "temporal",
+              "status": "ALERT"
+            },
+            {
+              "id": "verdict_node",
+              "label": "Verdict: INCONCLUSIVE",
+              "type": "verdict",
+              "status": "INCONCLUSIVE"
+            }
+          ],
+          "edges": [
+            {
+              "source": "file_root",
+              "target": "vault_node",
+              "label": "cryptographic bind"
+            },
+            {
+              "source": "file_root",
+              "target": "dna_node",
+              "label": "container inspection"
+            },
+            {
+              "source": "file_root",
+              "target": "iaif_node",
+              "label": "inverse filter"
+            },
+            {
+              "source": "file_root",
+              "target": "enf_node",
+              "label": "grid analysis"
+            },
+            {
+              "source": "file_root",
+              "target": "ssl_node",
+              "label": "intermediate probing"
+            },
+            {
+              "source": "file_root",
+              "target": "splice_node",
+              "label": "F1 dynamics"
+            },
+            {
+              "source": "dna_node",
+              "target": "verdict_node",
+              "weight": 0.25
+            },
+            {
+              "source": "iaif_node",
+              "target": "verdict_node",
+              "weight": 0.35
+            },
+            {
+              "source": "enf_node",
+              "target": "verdict_node",
+              "weight": 0.35
+            },
+            {
+              "source": "ssl_node",
+              "target": "verdict_node",
+              "weight": 0.45
+            },
+            {
+              "source": "splice_node",
+              "target": "verdict_node",
+              "weight": 0.4
+            }
+          ]
+        }
+      },
+      "visual_evidence": {
+        "spectrogram_file": "75136f067e7a4e0aa7ed782d5323c530_audio_spectrogram.png",
+        "lfcc_scalogram_file": "75136f067e7a4e0aa7ed782d5323c530_audio_lfcc_scalogram.png",
+        "cqt_scalogram_file": "75136f067e7a4e0aa7ed782d5323c530_audio_cqt_scalogram.png",
+        "waveform_file": "75136f067e7a4e0aa7ed782d5323c530_audio_waveform_profile.png",
+        "multi_resolution_plate_file": "75136f067e7a4e0aa7ed782d5323c530_audio_multi_resolution_plate.png",
+        "gradcam_heatmap_file": "75136f067e7a4e0aa7ed782d5323c530_audio_gradcam_heatmap.png",
+        "apex_prototypes": {
+          "time_based_prototypes": {
+            "prototype_type": "TEMPORAL_RHYTHMIC",
+            "coarticulation_timing_rigidity": "NATURAL_BIOLOGICAL",
+            "prosodic_inflection_score": 0.88,
+            "explanation": "Isolates rigid prosodic delivery and unvarying syllable pacing typical of Voice Conversion models."
+          },
+          "frequency_based_prototypes": {
+            "prototype_type": "SPECTRAL_TIMBRAL",
+            "vocoder_harmonic_inconsistency": "CLEAN_HARMONIC_STRUCTURE",
+            "phase_smearing_prominence": "NEGLIGIBLE",
+            "explanation": "Isolates stationary harmonic distortion bands characteristic of deep generative neural vocoders."
+          },
+          "phoneme_discretized_saliency": [
+            {
+              "phonetic_class": "General Speech",
+              "saliency_share": "100%",
+              "finding": "Normal biological coarticulation distribution"
+            }
+          ]
+        }
+      }
+    },
+    "generator_attribution": {
+      "is_ai_generated": false,
+      "predicted_platform": "Authentic Camera / No Synthetic Generator Traces",
+      "attribution_confidence": 0.12,
+      "no_watermark_detection": true,
+      "intrinsic_metrics": {
+        "sensor_noise_std": 1.733,
+        "fourier_slope_alpha": 1.666,
+        "wavelet_peak_ratio": 578.79,
+        "morphing_rate": 0.14
+      },
+      "detected_signatures": [
+        "Synthetic periodic grid energy in 2D Wavelet HH subband (ratio: 578.79)"
+      ],
+      "generator_scores": {
+        "OPENAI_SORA_CHATGPT": 0.19,
+        "GOOGLE_GEMINI_VEO": 0.33,
+        "KLING_AI": 0.19,
+        "RUNWAY_GEN3": 0.19,
+        "LUMA_DREAM_MACHINE": 0.19,
+        "PIKA_LABS": 0.19,
+        "STABLE_VIDEO_DIFFUSION": 0.19,
+        "HAIPER_AI": 0.19,
+        "VIDU_AI": 0.19,
+        "MINIMAX_HAILUO": 0.19,
+        "HEDRA_CHARACTER": 0.19,
+        "LIVEPORTRAIT_SADTALKER": 0.19,
+        "WAV2LIP_SYNTHESIA": 0.19,
+        "ASTRA_AI_SYNTHETIC": 0.19
+      },
+      "explanation": "Video retains physical optical sensor shot noise and natural continuous motion dynamics without diffusion morphing."
+    },
+    "rppg_biometrics": {
+      "biometric_pulse_detected": false,
+      "estimated_heart_rate_bpm": 0.0,
+      "cardiac_snr_db": 0.0,
+      "biological_plausibility_score": 0.5,
+      "pulse_waveform": [],
+      "status": "INSUFFICIENT_FACE_SAMPLES",
+      "findings": [
+        "Insufficient face frames to extract continuous capillary photoplethysmography waveform."
+      ],
+      "is_synthetic_biometric_void": false
+    },
+    "spatiotemporal_forensics": {
+      "spatiotemporal_anomaly_score": 0.0316,
+      "latent_noise_jump_rate": 0.0702,
+      "slowfast_boundary_vibration": 0.0,
+      "temporal_drift_index": 0.0,
+      "status": "PASSED",
+      "findings": [
+        "Spatio-temporal patch dynamics exhibit natural Newtonian motion continuity and physical velocity conservation."
+      ]
+    },
+    "lip_forensics": {
+      "lip_manipulation_probability": 0.21,
+      "articulatory_jerk_anomaly": 0.35,
+      "phonetic_transition_smoothness": 0.65,
+      "oral_cavity_texture_stability": 1.0,
+      "status": "PASSED",
+      "findings": [
+        "Lip articulatory velocity curves align with natural biological phoneme coarticulation dynamics."
+      ]
+    },
+    "vit_genai_prob": 0.0115,
+    "heatmap_file": "75136f067e7a4e0aa7ed782d5323c530_heatmap.png",
+    "timeline_file": "75136f067e7a4e0aa7ed782d5323c530_timeline.png",
+    "optical_flow_file": "75136f067e7a4e0aa7ed782d5323c530_optical_flow.png",
+    "backbone": "efficientnet_b4 + FrameAggregator + ImageForensics + AudioSentinel",
+    "input_size": 224,
+    "notes": [
+      "Forensic Threat Attribution: Authentic Camera Video Recording [AUTHENTIC_PHOTOGRAPH]",
+      "Multi-modal fusion: spatial=0.000, vit_genai=0.011, audio_fake=0.500, flow=0.008, jitter=0.069 \u2192 final=0.067"
+    ],
+    "processing_ms": 8048,
+    "mopci": {
+      "provenance": {
+        "c2pa_present": false,
+        "manifest_status": "Not Detected",
+        "signer": "N/A",
+        "ai_assertion": false,
+        "editing_history": 0
+      },
+      "generation_attribution": {
+        "likely_origin": "Authentic / Camera",
+        "generator_family": "Unknown",
+        "confidence": 0.07,
+        "evidence": [
+          "Consistent physical sensor noise (PRNU)",
+          "Standard codec signature"
+        ]
+      },
+      "source_discovery": {
+        "status": "NOT_AVAILABLE",
+        "note": "Internet-scale reverse media search requires external API integration (e.g., Google Vision, TinEye). No source candidates were queried."
+      },
+      "physical_world_consistency": {
+        "lighting_shadows": "Consistent",
+        "perspective_geometry": "Consistent",
+        "temporal_motion": "Consistent"
+      }
+    },
+    "face_tracks": [
+      {
+        "track_id": 0,
+        "score": 0.045,
+        "top_25_pct_mean": 0.045,
+        "frames_analyzed": 4,
+        "start_s": 0.0,
+        "end_s": 3.0,
+        "status": "AUTHENTIC",
+        "box": [
+          120,
+          80,
+          240,
+          200
+        ]
+      }
+    ],
+    "face_model_in_verdict": true,
+    "face_swap_score": 0.045
+  }
+}

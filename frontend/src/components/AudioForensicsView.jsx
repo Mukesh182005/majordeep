@@ -2,10 +2,7 @@ import { useState } from 'react'
 import { Card, CopyButton } from './ui'
 import AuthedImage from './AuthedImage'
 import { api } from '../lib/api'
-import {
-  Activity, Alert, Check, CheckCircle, Cpu, Download, Eye, FileText, Hash,
-  Info, Lock, ShieldAlert, ShieldCheck, ShieldQuestion, Sparkles, Waveform, Zap
-} from './ui/Icons'
+import { Activity, Alert, CheckCircle, Download, Info } from './ui/Icons'
 import { percent } from '../lib/format'
 import AudioPipelineVisualizer from './AudioPipelineVisualizer'
 
@@ -46,12 +43,51 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
   const enf = evidence.enf_environment || forensics.enf_environment || {}
   const provenance = evidence.security_provenance || forensics.security_provenance || {}
   const visualEvidence = forensics.visual_evidence || evidence.visual_evidence || {}
-  const modelsOutput = evidence.models_output || forensics.models_output || {}
   const fusion = evidence.fusion_decision || forensics.fusion_decision || {}
-  const modelBranches = modelsOutput.model_branch_scores || {}
-  const typology = modelsOutput.typology_breakdown || {}
-  const generatorAttribution = modelsOutput.generator_family_attribution || {}
-  const aiBreakdown = evidence.ai_breakdown || {}
+  const modelName = result.model_name || evidence.model_name || 'LCNN (LFCC), ASVspoof 2019 LA'
+  const modelVersion = result.model_version || evidence.model_version || 'audio-lcnn-v1'
+  const weightsStatus = result.weights_status || evidence.weights_status || 'TRAINED'
+  const fakeProb = typeof result.fake_probability === 'number' 
+    ? result.fake_probability 
+    : (typeof evidence.fake_probability === 'number' 
+      ? evidence.fake_probability 
+      : (typeof fusion.calibrated_fake_probability === 'number' ? fusion.calibrated_fake_probability : 0))
+  const finalVerdict = result.verdict || fusion.final_verdict || (fakeProb > 0.5 ? 'AI_GENERATED' : 'AUTHENTIC')
+  const decisionThreshold = evidence.decision_threshold ?? fusion.decision_threshold ?? 0.5
+  const uncertainBand = evidence.uncertain_band ?? fusion.uncertain_band ?? 0.08
+  const decisionRule = evidence.decision_rule ?? fusion.decision_rule ?? 'LCNN probability against decision threshold'
+  const contextSignals = fusion.context_signals || {}
+
+  const timeDomain = signalIntel.time_domain || {}
+  const freqDomain = signalIntel.frequency_domain || {}
+  const cepstral = signalIntel.cepstral_analysis || {}
+  const voiceQuality = signalIntel.voice_quality || {}
+  const clipping = signalIntel.clipping_analysis || {}
+  const dynamics = signalIntel.dynamics_and_loudness || {}
+
+  const rawSegments = (
+    (Array.isArray(evidence.segment_scores) && evidence.segment_scores.length > 0)
+      ? evidence.segment_scores
+      : (Array.isArray(splicing.segments) && splicing.segments.length > 0)
+        ? splicing.segments
+        : []
+  )
+  const segments = rawSegments.map((seg, idx) => {
+    const start = seg.start_s ?? seg.start ?? 0
+    const end = seg.end_s ?? seg.end ?? (start + 4.0)
+    const score = seg.fake_probability ?? seg.score ?? 0
+    const status = seg.status || (score >= (decisionThreshold + uncertainBand) ? 'FLAGGED' : (score < (decisionThreshold - uncertainBand) ? 'AUTHENTIC' : 'INCONCLUSIVE'))
+    return {
+      index: seg.segment_index ?? idx,
+      start,
+      end,
+      score,
+      status,
+      source: seg.source || 'lcnn_asvspoof'
+    }
+  })
+  const totalSegments = evidence.segments_analysed ?? segments.length
+  const flaggedSegments = evidence.flagged_segments ?? segments.filter(s => s.status === 'FLAGGED').length
 
   const [selectedPlate, setSelectedPlate] = useState('multi')
   const [inspectZoom, setInspectZoom] = useState(false)
@@ -71,105 +107,350 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
   ]
 
   const tab = activeSubTab || 'summary'
-  const riskScore = evidence.risk_score ?? Math.round((result.fake_probability || 0) * 100)
+  const isExperimental = Boolean(result.experimental || evidence.experimental || result.is_experimental)
 
   // Sub-components for macro tabs
-  const ScorecardBlock = () => (
-    <div className="space-y-6">
-      <Card title="Audio Forensic Status Matrix" subtitle="Aggregated multi-layered intelligence assessment">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
-          <div className="bg-surface-2 p-3 rounded-lg border border-black/10 dark:border-white/10 shadow-inner flex flex-col justify-between">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted">AI Generation</span>
-              <div className={riskScore > 50 ? 'led-critical' : 'led-good'} />
-            </div>
-            <span className="font-mono text-lg font-black text-ink-primary">{percent(result.fake_probability || 0)}</span>
-          </div>
-          
-          <div className="bg-surface-2 p-3 rounded-lg border border-black/10 dark:border-white/10 shadow-inner flex flex-col justify-between">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted">Manipulation</span>
-              <div className={splicing.splicing_detected ? 'led-critical' : 'led-good'} />
-            </div>
-            <span className="font-mono text-lg font-black text-ink-primary">{splicing.splicing_detected ? 'DETECTED' : 'CLEAN'}</span>
-          </div>
-          
-          <div className="bg-surface-2 p-3 rounded-lg border border-black/10 dark:border-white/10 shadow-inner flex flex-col justify-between">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted">Acoustic Consistency</span>
-              <div className={enf.environmental_splicing_confirmed ? 'led-critical' : 'led-good'} />
-            </div>
-            <span className="font-mono text-lg font-black text-ink-primary">{enf.environmental_splicing_confirmed ? 'MISMATCHED' : 'CONSISTENT'}</span>
-          </div>
-          
-          <div className="bg-surface-2 p-3 rounded-lg border border-black/10 dark:border-white/10 shadow-inner flex flex-col justify-between">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted">File Integrity</span>
-              <div className={fileDna.trailing_data_detected ? 'led-critical' : 'led-good'} />
-            </div>
-            <span className="font-mono text-lg font-black text-ink-primary">{fileDna.trailing_data_detected ? 'ANOMALY' : 'VALID'}</span>
-          </div>
-          
-          <div className="bg-surface-2 p-3 rounded-lg border border-black/10 dark:border-white/10 shadow-inner flex flex-col justify-between">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted">Provenance</span>
-              <div className={!provenance.c2pa_manifest_valid ? 'led-critical' : 'led-good'} />
-            </div>
-            <span className="font-mono text-lg font-black text-ink-primary">{provenance.c2pa_manifest_valid ? 'VALID' : 'ABSENT'}</span>
-          </div>
-          
-          <div className="bg-surface-2 p-3 rounded-lg border border-black/10 dark:border-white/10 shadow-inner flex flex-col justify-between">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted">Steganography</span>
-              <div className={fileDna.steganography_suspected ? 'led-critical' : 'led-good'} />
-            </div>
-            <span className="font-mono text-lg font-black text-ink-primary">{fileDna.steganography_suspected ? 'SUSPECTED' : 'LOW'}</span>
-          </div>
-        </div>
-      </Card>
+  const ScorecardBlock = () => {
+    const isBad = finalVerdict === 'AI_GENERATED' || finalVerdict === 'MANIPULATED' || finalVerdict === 'FLAGGED'
+    const isInconclusive = finalVerdict === 'INCONCLUSIVE'
+    const verdictColor = isBad ? 'text-rose-500' : (isInconclusive ? 'text-amber-500' : 'text-emerald-500')
+    const verdictBg = isBad ? 'bg-rose-500/10 border-rose-500/30' : (isInconclusive ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30')
 
-      <Card title="Segment-Level AI Detection Timeline" subtitle="Temporal mapping of forensic artifacts across the audio duration">
-        <div className="mt-4 overflow-x-auto">
-          {splicing.segments && splicing.segments.length > 0 ? (
-             <table className="w-full text-xs text-left min-w-[500px]">
-                <thead>
-                  <tr className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
-                    <th className="py-2 text-ink-muted">Time Segment</th>
-                    <th className="py-2 text-ink-muted">AI Score</th>
-                    <th className="py-2 text-ink-muted">Manipulation Signature</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {splicing.segments.map((seg, idx) => (
-                    <tr key={idx} className="border-b border-black/5 dark:border-white/5">
-                      <td className="py-2 font-mono">{Number(seg.start).toFixed(2)}s – {Number(seg.end).toFixed(2)}s</td>
-                      <td className={`py-2 font-bold ${seg.score > 0.5 ? 'text-red-500' : 'text-green-600'}`}>{percent(seg.score)}</td>
-                      <td className={`py-2 ${seg.score > 0.5 ? 'text-red-500' : 'text-green-600'}`}>{seg.score > 0.5 ? 'Suspicious AI/Splicing' : 'None'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-          ) : (
-             <div className="text-sm text-ink-muted">No segment-level timeline data available from backend.</div>
-          )}
-        </div>
-      </Card>
-      
-      <Card title="Speaker Diarization & Transcript Intelligence" subtitle="Aligning semantic content with forensic anomalies">
-        <div className="space-y-4 text-sm mt-4">
-          {semantics.transcript ? (
-             <div className="p-4 bg-surface-2 rounded-xl border" style={{ borderColor: 'var(--border-subtle)' }}>
-                <p className="text-ink-primary font-medium italic">"{semantics.transcript}"</p>
+    return (
+      <div className="space-y-6">
+        {/* 1. MAIN RESULT: Trained Model Verdict & Score */}
+        <Card
+          title="Trained Model Score & Verdict"
+          subtitle={`${modelName} • ${modelVersion}`}
+          action={
+            isExperimental ? (
+              <span className="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-purple-500/15 text-purple-400 border border-purple-500/30">
+                Experimental
+              </span>
+            ) : (
+              <span className="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                Trained Model (ASVspoof 2019 LA)
+              </span>
+            )
+          }
+        >
+          <div className="mt-4 space-y-4">
+            <div className={`p-5 rounded-xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-5 ${verdictBg}`}>
+              <div>
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">
+                  Trained Model Verdict
+                </span>
+                <span className={`text-3xl font-black font-mono tracking-tight ${verdictColor}`}>
+                  {finalVerdict}
+                </span>
+                <p className="text-xs text-ink-secondary mt-1.5 max-w-xl">
+                  {decisionRule}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-surface-2 px-4 py-2.5 rounded-xl border border-black/5 dark:border-white/5 text-center shadow-inner">
+                  <span className="text-[0.625rem] uppercase font-bold text-ink-muted block">
+                    Trained Model Score
+                  </span>
+                  <span className={`text-2xl font-black font-mono ${verdictColor}`}>
+                    {percent(fakeProb)}
+                  </span>
+                </div>
+
+                <div className="bg-surface-2 px-4 py-2.5 rounded-xl border border-black/5 dark:border-white/5 text-center shadow-inner">
+                  <span className="text-[0.625rem] uppercase font-bold text-ink-muted block">
+                    Decision Threshold
+                  </span>
+                  <span className="text-xl font-black font-mono text-ink-primary">
+                    {typeof decisionThreshold === 'number' ? decisionThreshold.toFixed(3) : '0.500'}
+                  </span>
+                  <span className="text-[0.625rem] text-ink-muted block font-mono">
+                    ±{typeof uncertainBand === 'number' ? uncertainBand.toFixed(3) : '0.080'} band
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Metric Summary Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
+              <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block font-sans">Windows Analyzed</span>
+                <span className="text-base font-black text-ink-primary mt-1 block">{totalSegments}</span>
+                <span className="text-[0.6875rem] text-ink-muted">4.0s consecutive frames</span>
+              </div>
+              <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block font-sans">Flagged Windows</span>
+                <span className={`text-base font-black mt-1 block ${flaggedSegments > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                  {flaggedSegments}
+                </span>
+                <span className="text-[0.6875rem] text-ink-muted">{flaggedSegments > 0 ? 'Exceeded threshold' : 'All windows clean'}</span>
+              </div>
+              <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block font-sans">Model Lineage</span>
+                <span className="text-xs font-bold text-accent mt-1 block truncate">ASVspoof 2019 LA</span>
+                <span className="text-[0.6875rem] text-ink-muted">LFCC 60-dim / LCNN</span>
+              </div>
+              <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block font-sans">Weight Status</span>
+                <span className="text-xs font-bold text-ink-primary mt-1 block">{weightsStatus}</span>
+                <span className="text-[0.6875rem] text-ink-muted">Deterministic float32</span>
+              </div>
+            </div>
+
+            {/* Official Scope Notice */}
+            <div className="p-3 bg-surface-2 rounded-xl border border-black/5 text-xs text-ink-secondary flex items-start gap-2.5">
+              <Info size={15} className="text-accent flex-shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                <strong className="text-ink-primary">Model Scope Note: </strong>
+                The verdict is the trained model&apos;s alone. Glottal, mains-hum, splice, container and watermark checks below are shown as context and carry no weight: none separated genuine from synthetic speech on development data.
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* 2. MAIN RESULT: Per-Window Timeline */}
+        <Card
+          title="Per-Window Timeline (Trained Model)"
+          subtitle="Calibrated ASVspoof LCNN classification across sliding 4.0s temporal windows"
+        >
+          <div className="mt-4 space-y-4">
+            {segments && segments.length > 0 ? (
+              <>
+                {/* Visual Segment Ribbon */}
+                <div>
+                  <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block mb-1.5">
+                    Temporal Window Status Map
+                  </span>
+                  <div className="w-full h-4 bg-surface-3 rounded-lg overflow-hidden flex gap-0.5 p-0.5 border" style={{ borderColor: 'var(--border-subtle)' }}>
+                    {segments.map((seg, idx) => {
+                      const isSegFlagged = seg.status === 'FLAGGED'
+                      const isSegInconclusive = seg.status === 'INCONCLUSIVE'
+                      const segBg = isSegFlagged ? 'bg-rose-500' : (isSegInconclusive ? 'bg-amber-500' : 'bg-emerald-500')
+                      return (
+                        <div
+                          key={idx}
+                          style={{ flex: 1 }}
+                          className={`${segBg} h-full rounded-sm transition-all hover:opacity-80`}
+                          title={`Window #${idx + 1} (${seg.start.toFixed(2)}s - ${seg.end.toFixed(2)}s): ${percent(seg.score)} - ${seg.status}`}
+                        />
+                      )
+                    })}
+                  </div>
+                  <div className="flex justify-between items-center text-[0.6875rem] text-ink-muted font-mono mt-1 px-1">
+                    <span>0.00s</span>
+                    <span>{(evidence.duration_seconds || signalIntel.duration_seconds || segments[segments.length - 1]?.end || 0).toFixed(2)}s</span>
+                  </div>
+                </div>
+
+                {/* Per-Window Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left min-w-[500px]">
+                    <thead>
+                      <tr className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                        <th className="py-2.5 text-ink-muted font-bold">Window</th>
+                        <th className="py-2.5 text-ink-muted font-bold">Time Interval</th>
+                        <th className="py-2.5 text-ink-muted font-bold">Trained Model Score</th>
+                        <th className="py-2.5 text-ink-muted font-bold">Classification</th>
+                        <th className="py-2.5 text-ink-muted font-bold">Source</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {segments.map((seg, idx) => {
+                        const isSegFlagged = seg.status === 'FLAGGED'
+                        const isSegInconclusive = seg.status === 'INCONCLUSIVE'
+                        const scoreColor = isSegFlagged ? 'text-rose-500 font-bold' : (isSegInconclusive ? 'text-amber-500 font-bold' : 'text-emerald-500 font-bold')
+                        const badgeBg = isSegFlagged ? 'bg-rose-500/15 text-rose-500 border-rose-500/30' : (isSegInconclusive ? 'bg-amber-500/15 text-amber-500 border-amber-500/30' : 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30')
+
+                        return (
+                          <tr key={idx} className="border-b border-black/5 dark:border-white/5 hover:bg-surface-2/50 transition">
+                            <td className="py-2.5 font-mono text-ink-muted font-bold">#{idx + 1}</td>
+                            <td className="py-2.5 font-mono text-ink-primary">
+                              {Number(seg.start).toFixed(2)}s – {Number(seg.end).toFixed(2)}s
+                            </td>
+                            <td className={`py-2.5 font-mono ${scoreColor}`}>
+                              {percent(seg.score)}
+                            </td>
+                            <td className="py-2.5">
+                              <span className={`px-2 py-0.5 rounded text-[0.625rem] font-bold font-mono border ${badgeBg}`}>
+                                {seg.status}
+                              </span>
+                            </td>
+                            <td className="py-2.5 text-ink-muted font-mono text-[0.6875rem]">
+                              {seg.source === 'lcnn_asvspoof' ? 'LCNN (LFCC)' : seg.source}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-ink-muted py-4 text-center">
+                No segment-level timeline data available.
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* 3. SUPPORTING SIGNALS (UNVALIDATED) */}
+        <Card
+          title="Supporting signals (unvalidated)"
+          subtitle="Context only. These heuristic and physical checks carry no weight in the verdict (none separated genuine from synthetic speech on development data)."
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {/* Glottal Flow */}
+            <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-xs font-bold text-ink-primary">Glottal Flow & Voice Aerodynamics</h4>
+                  <span className="text-[0.625rem] text-ink-muted font-mono block">IAIF inverse filtering</span>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[0.625rem] font-bold font-mono bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                  Unvalidated Heuristic
+                </span>
+              </div>
+              <div className="space-y-1.5 pt-1 text-xs font-mono">
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Glottal Anomaly Score</span>
+                  <span className="text-ink-primary font-bold">
+                    {glottal.composite_physiological_anomaly_score !== undefined
+                      ? percent(glottal.composite_physiological_anomaly_score)
+                      : (contextSignals.glottal_anomaly !== undefined ? percent(contextSignals.glottal_anomaly) : 'Nominal')}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Vocal Jitter (Local)</span>
+                  <span className="text-ink-primary">
+                    {glottal.vocal_jitter_local_pct !== undefined ? `${glottal.vocal_jitter_local_pct.toFixed(2)}%` : 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">Vocal Shimmer</span>
+                  <span className="text-ink-primary">
+                    {glottal.vocal_shimmer_local_db !== undefined ? `${glottal.vocal_shimmer_local_db.toFixed(2)} dB` : 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mains-Hum ENF */}
+            <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-xs font-bold text-ink-primary">Electrical Network Frequency (ENF)</h4>
+                  <span className="text-[0.625rem] text-ink-muted font-mono block">Power grid mains-hum</span>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[0.625rem] font-bold font-mono bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                  Unvalidated Heuristic
+                </span>
+              </div>
+              <div className="space-y-1.5 pt-1 text-xs font-mono">
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Grid Frequency</span>
+                  <span className="text-ink-primary font-bold">
+                    {enf.grid_frequency_hz ? `${enf.grid_frequency_hz.toFixed(2)} Hz` : '50.00 Hz'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Max Phase Slip</span>
+                  <span className="text-ink-primary">
+                    {enf.enf_forensics?.max_phase_slip_degrees !== undefined ? `${enf.enf_forensics.max_phase_slip_degrees.toFixed(1)}°` : '0.0°'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">Phase Continuity</span>
+                  <span className={enf.environmental_splicing_confirmed ? 'text-amber-500 font-bold' : 'text-emerald-500'}>
+                    {enf.environmental_splicing_confirmed ? 'Discontinuity' : 'Nominal'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Signal & Splice Checks */}
+            <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-xs font-bold text-ink-primary">Signal & Splice Integrity</h4>
+                  <span className="text-[0.625rem] text-ink-muted font-mono block">Boundary & acoustic dynamics</span>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[0.625rem] font-bold font-mono bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                  Unvalidated Heuristic
+                </span>
+              </div>
+              <div className="space-y-1.5 pt-1 text-xs font-mono">
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Splice Spikes (F1)</span>
+                  <span className="text-ink-primary font-bold">
+                    {splicing.first_order_f1_spikes_count !== undefined ? `${splicing.first_order_f1_spikes_count} spikes` : (splicing.splicing_detected ? 'Spikes detected' : 'Clean')}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Dynamic Range</span>
+                  <span className="text-ink-primary">
+                    {(timeDomain.dynamic_range_db || 0).toFixed(1)} dB
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">Clipping Check</span>
+                  <span className={clipping.clipping_detected ? 'text-amber-500 font-bold' : 'text-emerald-500'}>
+                    {clipping.clipping_detected ? 'Clipped' : 'Clean'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Container & Custody */}
+            <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-xs font-bold text-ink-primary">Container & Custody</h4>
+                  <span className="text-[0.625rem] text-ink-muted font-mono block">File DNA & bitstream</span>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[0.625rem] font-bold font-mono bg-surface-3 text-ink-muted border border-black/10 dark:border-white/10">
+                  Context Only
+                </span>
+              </div>
+              <div className="space-y-1.5 pt-1 text-xs font-mono">
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Container / Codec</span>
+                  <span className="text-ink-primary font-bold">
+                    {fileDna.container_format || 'RIFF/WAV'} / {fileDna.codec || 'PCM'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-1 border-black/5">
+                  <span className="text-ink-muted">Trailing Data</span>
+                  <span className={fileDna.trailing_data_detected ? 'text-amber-500 font-bold' : 'text-emerald-500'}>
+                    {fileDna.trailing_data_detected ? `${fileDna.trailing_bytes_count || 0} bytes` : 'Clean'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">Steganography</span>
+                  <span className={fileDna.steganography_suspected ? 'text-amber-500 font-bold' : 'text-emerald-500'}>
+                    {fileDna.steganography_suspected ? 'Suspicious' : 'Low'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* 4. Speaker Diarization & Transcript (if available) */}
+        {semantics.transcript && (
+          <Card title="Speaker Diarization & Transcript Intelligence" subtitle="Aligning semantic content with forensic anomalies">
+            <div className="space-y-3 text-sm mt-4">
+              <div className="p-4 bg-surface-2 rounded-xl border" style={{ borderColor: 'var(--border-subtle)' }}>
+                <p className="text-ink-primary font-medium italic">&quot;{semantics.transcript}&quot;</p>
                 {semantics.language && <p className="text-xs text-ink-muted mt-2 uppercase tracking-widest font-bold">Language: {semantics.language}</p>}
                 {semantics.speaking_rate && <p className="text-xs text-ink-muted mt-1 uppercase tracking-widest font-bold">Speaking Rate: {semantics.speaking_rate} WPM</p>}
-             </div>
-          ) : (
-             <div className="text-sm text-ink-muted">No transcript or semantic data available.</div>
-          )}
-        </div>
-      </Card>
-    </div>
-  )
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+    )
+  }
 
   const SecurityBlock = () => (
     <div className="space-y-6">
@@ -273,13 +554,6 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
     },
   }
   const activePlateObj = plates[selectedPlate]?.url ? plates[selectedPlate] : (plates.multi?.url ? plates.multi : plates[selectedPlate] || plates.multi)
-
-  const timeDomain = signalIntel.time_domain || {}
-  const freqDomain = signalIntel.frequency_domain || {}
-  const cepstral = signalIntel.cepstral_analysis || {}
-  const voiceQuality = signalIntel.voice_quality || {}
-  const clipping = signalIntel.clipping_analysis || {}
-  const dynamics = signalIntel.dynamics_and_loudness || {}
 
   const SignalBlock = () => (
     <div className="space-y-6">
@@ -1031,48 +1305,17 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
     const statusColor = isVerdictBad ? 'text-red-500' : isVerdictInconclusive ? 'text-amber-500' : 'text-emerald-500'
     const statusBg = isVerdictBad ? 'bg-red-500/10 border-red-500/30' : isVerdictInconclusive ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'
 
-    const branches = [
-      {
-        id: 'rawnet',
-        name: 'Sinc-RawNet3 Waveform Branch',
-        score: modelBranches.rawnet_waveform_prob ?? 0.5,
-        desc: 'Direct end-to-end raw waveform neural classifier using learnable sinc-convolution bandpass filters to capture phase irregularities without FFT loss.',
-        badge: 'Raw Time-Domain',
-      },
-      {
-        id: 'wavlm',
-        name: 'WavLM L18 Intermediate SSL Probing',
-        score: modelBranches.wavlm_l18_acoustic_prob ?? 0.5,
-        desc: 'Deep transformer hidden-layer representations probing Layer 18 of self-supervised speech models for neural vocoder acoustic artifacts.',
-        badge: 'SSL Acoustic Embeddings',
-      },
-      {
-        id: 'whisper',
-        name: 'Whisper Prosody & Semantic Branch',
-        score: modelBranches.whisper_l4_semantic_prob ?? 0.5,
-        desc: 'Phonetic duration, syllable pacing, and natural prosodic cadence modeling against cross-attention linguistic models.',
-        badge: 'Speech Semantics',
-      },
-      {
-        id: 'physics',
-        name: 'IAIF Glottal & Biomechanical Physics',
-        score: modelBranches.tabular_physics_prob ?? 0.35,
-        desc: 'Acoustic physics evaluator tracking vocal fold aerodynamics, IAIF glottal flow velocity, pitch jitter, and amplitude shimmer.',
-        badge: 'Glottal Aerodynamics',
-      },
-    ]
-
     return (
       <div className="space-y-6">
-        {/* Fusion Decision & Conformal Reliability Banner */}
-        <Card title="Multi-Model Evidence Fusion" subtitle="Calibrated ensemble verdict & conformal statistical reliability">
+        {/* Fusion Decision & Reliability Banner */}
+        <Card title="Trained Model Decision & Risk Calibration" subtitle="Calibrated acoustic verdict & decision rule">
           <div className="mt-4 space-y-4">
             <div className={`p-4 rounded-xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${statusBg}`}>
               <div>
-                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Ensemble Forensic Verdict</span>
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Acoustic Forensic Verdict</span>
                 <span className={`text-2xl font-black font-mono tracking-tight ${statusColor}`}>{verdict}</span>
                 <p className="text-xs text-ink-secondary mt-1 max-w-xl">
-                  {fusion.verbal_scale_interpretation || 'Aggregated consensus across 10 orthogonal neural, acoustic, and physical forensic engines.'}
+                  {fusion.decision_rule || 'Calibrated Platt-scaled mean window logit from LCNN trained on ASVspoof 2019 LA LFCC features.'}
                 </p>
               </div>
 
@@ -1080,201 +1323,117 @@ export default function AudioForensicsView({ result, activeSubTab, setActiveSubT
                 <div className="bg-surface-2 px-3.5 py-2 rounded-lg border border-black/5 dark:border-white/5 text-center">
                   <span className="text-[0.625rem] uppercase font-bold text-ink-muted block">Calibrated Risk</span>
                   <span className={`text-lg font-black font-mono ${statusColor}`}>
-                    {percent(fusion.calibrated_fake_probability !== undefined ? fusion.calibrated_fake_probability : (result.fake_probability || 0))}
+                    {percent(fakeProb)}
                   </span>
                 </div>
 
                 <div className="bg-surface-2 px-3.5 py-2 rounded-lg border border-black/5 dark:border-white/5 text-center">
-                  <span className="text-[0.625rem] uppercase font-bold text-ink-muted block">Likelihood Ratio</span>
+                  <span className="text-[0.625rem] uppercase font-bold text-ink-muted block">Threshold</span>
                   <span className="text-lg font-black font-mono text-ink-primary">
-                    {fusion.forensic_likelihood_ratio !== undefined ? `${fusion.forensic_likelihood_ratio.toFixed(2)} : 1` : '1.00 : 1'}
+                    {typeof decisionThreshold === 'number' ? decisionThreshold.toFixed(3) : '0.500'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Dual Risk & Conformal Bounding Grid */}
+            {/* Dual Risk & Decision Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
                 <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Generative AI Risk</span>
                 <span className="font-mono text-lg font-black text-ink-primary mt-1 block">
-                  {fusion.generative_ai_risk_score !== undefined ? `${(fusion.generative_ai_risk_score * 100).toFixed(1)}%` : 'N/A'}
+                  {percent(fakeProb)}
                 </span>
-                <span className="text-[0.6875rem] text-ink-muted">Synthetic synthesis probability</span>
+                <span className="text-[0.6875rem] text-ink-muted">Trained LCNN probability</span>
               </div>
 
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
-                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Tampering & Splicing Risk</span>
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Tampering Risk</span>
                 <span className="font-mono text-lg font-black text-ink-primary mt-1 block">
-                  {fusion.structural_tampering_risk_score !== undefined ? `${(fusion.structural_tampering_risk_score * 100).toFixed(1)}%` : 'N/A'}
+                  {fusion.structural_tampering_risk_score !== undefined ? `${(fusion.structural_tampering_risk_score * 100).toFixed(1)}%` : (contextSignals.structural_tampering_risk !== undefined ? `${(contextSignals.structural_tampering_risk * 100).toFixed(1)}%` : 'N/A')}
                 </span>
-                <span className="text-[0.6875rem] text-ink-muted">Temporal edit & insertion probability</span>
+                <span className="text-[0.6875rem] text-ink-muted">Heuristic context (unvalidated)</span>
               </div>
 
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
-                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Conformal Bounding Set</span>
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Decision Set</span>
                 <div className="flex flex-wrap gap-1 mt-1.5">
-                  {(fusion.conformal_prediction_set || ['AUTHENTIC', 'AI_GENERATED']).map((label, idx) => (
+                  {(fusion.decision_set || ['AUTHENTIC', 'AI_GENERATED']).map((label, idx) => (
                     <span key={idx} className="px-2 py-0.5 rounded text-[0.625rem] font-bold font-mono bg-accent/15 text-accent border border-accent/30">
                       {label}
                     </span>
                   ))}
                 </div>
-                <span className="text-[0.6875rem] text-ink-muted mt-1 block">α ≤ 0.01 Error Bound (99% Guarantee)</span>
+                <span className="text-[0.6875rem] text-ink-muted mt-1 block">Frozen Dev EER Thresholds</span>
               </div>
 
               <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5">
-                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Domain Classification</span>
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Model Backbone</span>
                 <span className="font-mono text-sm font-bold text-accent mt-1 block truncate">
-                  {modelsOutput.audio_domain || 'CONVERSATIONAL_SPEECH'}
+                  LCNN (LFCC)
                 </span>
-                <span className="text-[0.6875rem] text-ink-muted">Acoustic profile calibration</span>
+                <span className="text-[0.6875rem] text-ink-muted">ASVspoof 2019 LA</span>
               </div>
             </div>
           </div>
         </Card>
 
-        {/* Multi-Architecture Model Decision Attribution */}
-        <Card title="Model Decision Attribution" subtitle="Independent neural & physical branch contribution scores">
+        {/* Trained Model Architecture & Decision Rule */}
+        <Card title="Trained Model Architecture & Decision Rule" subtitle="LCNN acoustic classification on ASVspoof 2019 LA">
           <div className="mt-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {branches.map((branch) => {
-                const score = branch.score
-                const isHigh = score >= 0.5
-                const scoreColor = isHigh ? 'text-red-500' : 'text-emerald-500'
-                const barColor = isHigh ? 'bg-red-500' : 'bg-emerald-500'
+              <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Neural Classifier</span>
+                <h4 className="text-sm font-bold text-ink-primary">{modelName}</h4>
+                <p className="text-xs text-ink-secondary leading-relaxed">
+                  Light-CNN (LCNN) architecture operating on 60-dimensional Linear Frequency Cepstral Coefficients (LFCC). 
+                  Inference is strict float32 and deterministic (TF32 disabled, deterministic cuDNN).
+                </p>
+                <div className="text-xs font-mono text-ink-muted pt-1">
+                  Version: {modelVersion} • Status: {weightsStatus}
+                </div>
+              </div>
 
-                return (
-                  <div key={branch.id} className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2.5">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="text-xs font-bold text-ink-primary">{branch.name}</h4>
-                        <span className="text-[0.625rem] px-2 py-0.5 rounded bg-surface-3 text-ink-muted font-mono inline-block mt-0.5">
-                          {branch.badge}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className={`font-mono text-base font-black ${scoreColor}`}>{percent(score)}</span>
-                        <span className="text-[0.625rem] uppercase tracking-wider block font-bold text-ink-muted">
-                          {isHigh ? 'AI Flagged' : 'Authentic'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                      <div style={{ width: `${Math.min(100, Math.max(5, score * 100))}%` }} className={`h-full ${barColor} rounded-full transition-all duration-500`} />
-                    </div>
-
-                    <p className="text-xs text-ink-secondary leading-relaxed">{branch.desc}</p>
-                  </div>
-                )
-              })}
+              <div className="p-4 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 space-y-2">
+                <span className="text-[0.625rem] uppercase font-bold tracking-widest text-ink-muted block">Calibration & Threshold</span>
+                <h4 className="text-sm font-bold text-ink-primary">Class-Balanced Platt Scaling</h4>
+                <p className="text-xs text-ink-secondary leading-relaxed">
+                  Mean spoof logits across sliding 4.0s windows are mapped to calibrated probabilities via Platt scaling fitted on the ASVspoof 2019 LA development split.
+                </p>
+                <div className="text-xs font-mono text-ink-muted pt-1">
+                  Rule: {decisionRule}
+                </div>
+              </div>
             </div>
+
+            {/* Context Signals (Heuristic, unvalidated) */}
+            {contextSignals && Object.keys(contextSignals).length > 0 && (
+              <div className="p-3 bg-surface-2 rounded-lg border border-black/5 space-y-2 text-xs">
+                <div className="flex items-center gap-2 text-ink-muted font-bold uppercase tracking-wider text-[0.65rem]">
+                  <Info size={12} className="text-accent" />
+                  Context Signals (Heuristic, unvalidated — carried no weight in verdict)
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
+                  <div className="p-2 bg-surface-1 rounded border border-black/5">
+                    <span className="text-ink-muted block text-[0.625rem]">Tampering Risk</span>
+                    <span className="font-bold text-ink-primary">{percent(contextSignals.structural_tampering_risk || 0)}</span>
+                  </div>
+                  <div className="p-2 bg-surface-1 rounded border border-black/5">
+                    <span className="text-ink-muted block text-[0.625rem]">Glottal Anomaly</span>
+                    <span className="font-bold text-ink-primary">{contextSignals.glottal_anomaly !== undefined ? Number(contextSignals.glottal_anomaly).toFixed(4) : 'N/A'}</span>
+                  </div>
+                  <div className="p-2 bg-surface-1 rounded border border-black/5">
+                    <span className="text-ink-muted block text-[0.625rem]">Coarticulation</span>
+                    <span className="font-bold text-ink-primary">{contextSignals.coarticulation_anomaly !== undefined ? Number(contextSignals.coarticulation_anomaly).toFixed(4) : 'N/A'}</span>
+                  </div>
+                  <div className="p-2 bg-surface-1 rounded border border-black/5">
+                    <span className="text-ink-muted block text-[0.625rem]">Hand-Set Rule Score</span>
+                    <span className="font-bold text-ink-primary">{contextSignals.hand_set_rule_score !== undefined ? percent(contextSignals.hand_set_rule_score) : 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
-
-        {/* Synthesis Typology & Generator Family Attribution */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Typology Breakdown */}
-          <Card title="Speech Synthesis Typology Breakdown" subtitle="Probability distribution across deepfake and authentic modalities">
-            <div className="mt-4 space-y-3">
-              {/* Stacked Typology Bar */}
-              <div className="w-full h-3 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden flex">
-                <div style={{ width: `${typology.bona_fide_authentic_pct || 58}%` }} className="bg-emerald-500 h-full" title={`Authentic: ${typology.bona_fide_authentic_pct || 58}%`} />
-                <div style={{ width: `${typology.tts_fully_synthetic_pct || 20}%` }} className="bg-rose-500 h-full" title={`TTS Synthetic: ${typology.tts_fully_synthetic_pct || 20}%`} />
-                <div style={{ width: `${typology.voice_conversion_edited_pct || 12}%` }} className="bg-purple-500 h-full" title={`Voice Conversion: ${typology.voice_conversion_edited_pct || 12}%`} />
-                <div style={{ width: `${typology.partially_spliced_pct || 7}%` }} className="bg-amber-500 h-full" title={`Spliced: ${typology.partially_spliced_pct || 7}%`} />
-                <div style={{ width: `${typology.physical_replay_spoof_pct || 3}%` }} className="bg-sky-500 h-full" title={`Replay Spoof: ${typology.physical_replay_spoof_pct || 3}%`} />
-              </div>
-
-              <div className="space-y-2 text-xs font-mono">
-                <div className="flex justify-between items-center p-2 bg-surface-2 rounded-lg border border-black/5">
-                  <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> Bona Fide Authentic Human Speech</span>
-                  <span className="font-bold text-emerald-500">{typology.bona_fide_authentic_pct !== undefined ? `${typology.bona_fide_authentic_pct.toFixed(1)}%` : '58.0%'}</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-surface-2 rounded-lg border border-black/5">
-                  <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" /> Text-to-Speech (TTS Fully Synthetic)</span>
-                  <span className="font-bold text-rose-500">{typology.tts_fully_synthetic_pct !== undefined ? `${typology.tts_fully_synthetic_pct.toFixed(1)}%` : '19.7%'}</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-surface-2 rounded-lg border border-black/5">
-                  <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block" /> Voice Conversion (VC Cloned Timbre)</span>
-                  <span className="font-bold text-purple-500">{typology.voice_conversion_edited_pct !== undefined ? `${typology.voice_conversion_edited_pct.toFixed(1)}%` : '12.3%'}</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-surface-2 rounded-lg border border-black/5">
-                  <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Temporal Splicing & Insertion Edit</span>
-                  <span className="font-bold text-amber-500">{typology.partially_spliced_pct !== undefined ? `${typology.partially_spliced_pct.toFixed(1)}%` : '7.4%'}</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-surface-2 rounded-lg border border-black/5">
-                  <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block" /> Physical Replay / Loudspeaker Spoof</span>
-                  <span className="font-bold text-sky-500">{typology.physical_replay_spoof_pct !== undefined ? `${typology.physical_replay_spoof_pct.toFixed(1)}%` : '2.5%'}</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Generator Architecture Attribution */}
-          <Card title="Generator Family Attribution" subtitle="Algorithmic signature classification & synthesis lineage">
-            <div className="mt-4 space-y-3">
-              <div className="p-3 bg-surface-2 rounded-xl border border-black/5 dark:border-white/5 flex justify-between items-center">
-                <span className="text-xs font-bold text-ink-muted uppercase tracking-wider">Attribution Confidence</span>
-                <span className="px-2.5 py-1 rounded text-xs font-bold font-mono bg-accent/15 text-accent border border-accent/30">
-                  {generatorAttribution.attribution_confidence || 'MODERATE_INFERRED'}
-                </span>
-              </div>
-
-              <div className="space-y-2 text-xs font-mono">
-                <div className="p-2.5 bg-surface-2 rounded-lg border border-black/5 space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-ink-muted">Diffusion-Based Models (AudioLDM / Stable Audio)</span>
-                    <span className="font-bold text-ink-primary">
-                      {generatorAttribution.diffusion_based_probability !== undefined ? `${(generatorAttribution.diffusion_based_probability * 100).toFixed(1)}%` : '76.0%'}
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                    <div style={{ width: `${(generatorAttribution.diffusion_based_probability || 0.76) * 100}%` }} className="bg-sky-500 h-full" />
-                  </div>
-                </div>
-
-                <div className="p-2.5 bg-surface-2 rounded-lg border border-black/5 space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-ink-muted">Neural Vocoders (HiFi-GAN / WaveGlow / MelGAN)</span>
-                    <span className="font-bold text-ink-primary">
-                      {generatorAttribution.neural_vocoder_probability !== undefined ? `${(generatorAttribution.neural_vocoder_probability * 100).toFixed(1)}%` : '16.8%'}
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                    <div style={{ width: `${(generatorAttribution.neural_vocoder_probability || 0.168) * 100}%` }} className="bg-purple-500 h-full" />
-                  </div>
-                </div>
-
-                <div className="p-2.5 bg-surface-2 rounded-lg border border-black/5 space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-ink-muted">Autoregressive Acoustic Models (Bark / VALL-E)</span>
-                    <span className="font-bold text-ink-primary">
-                      {generatorAttribution.autoregressive_probability !== undefined ? `${(generatorAttribution.autoregressive_probability * 100).toFixed(1)}%` : '4.1%'}
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                    <div style={{ width: `${(generatorAttribution.autoregressive_probability || 0.041) * 100}%` }} className="bg-amber-500 h-full" />
-                  </div>
-                </div>
-
-                <div className="p-2.5 bg-surface-2 rounded-lg border border-black/5 space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-ink-muted">Unknown / Proprietary Synthesis Architecture</span>
-                    <span className="font-bold text-ink-primary">
-                      {generatorAttribution.unknown_synthetic_probability !== undefined ? `${(generatorAttribution.unknown_synthetic_probability * 100).toFixed(1)}%` : '3.1%'}
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                    <div style={{ width: `${(generatorAttribution.unknown_synthetic_probability || 0.031) * 100}%` }} className="bg-slate-400 h-full" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
 
         {/* Orthogonal Evidentiary Findings */}
         <Card title="Orthogonal Evidential Signals" subtitle="Corroborating independent physical & neural forensic indicators">

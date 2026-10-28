@@ -86,13 +86,17 @@ services:
 
   worker:
     build: ./backend
-    command: ["celery", "-A", "app.worker.celery_app.celery_app", "worker",
-              "--loglevel=info", "--concurrency=2"]
-    environment: *backend_env
+    command: >
+      sh -c "python -c 'from app.ml.image_pipeline import get_scene_detector; get_scene_detector()' &&
+             celery -A app.worker.celery_app.celery_app worker --loglevel=info --concurrency=1"
+    environment:
+      <<: *backend_env
+      HF_HOME: /app/.cache/huggingface
     volumes:
       - media:/app/storage
       - ./checkpoints:/app/checkpoints:ro
       - ./paper/config:/app/paper_config:ro
+      - hf_cache:/app/.cache/huggingface
     depends_on:
       db: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -138,3 +142,4 @@ volumes:
   db_data:
   redis_data:
   media:
+  hf_cache:

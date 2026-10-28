@@ -327,8 +327,8 @@ export default function HowItWorks() {
             },
             {
               stage: 3,
-              name: 'Neural Voice Classifier Ensemble',
-              desc: 'Evaluates audio segments using RawNet2, LCNN (Light-CNN), and WavLM self-supervised speech representations to detect cloned TTS.',
+              name: 'Neural Voice Classifier (LCNN)',
+              desc: 'Evaluates audio segments using a trained Light-CNN (LCNN) architecture on LFCC features with class-balanced Platt calibration.',
             },
             {
               stage: 4,

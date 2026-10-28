@@ -1,0 +1,1429 @@
+{
+  "id": "job-audio-real-1",
+  "media_type": "audio",
+  "status": "done",
+  "model_name": "LCNN (LFCC), ASVspoof 2019 LA",
+  "model_version": "audio-lcnn-asvspoof2019la-lfcc-seed2",
+  "weights_status": "trained",
+  "fake_probability": 0.0003,
+  "verdict": "AUTHENTIC",
+  "confidence": 0.95,
+  "evidence": {
+    "media": "audio",
+    "duration_seconds": 3.0,
+    "sample_rate": 16000,
+    "notes": [
+      "Model stage: LCNN trained and evaluated on ASVspoof 2019 LA (studio-quality English read speech). It has not been evaluated on real-world recordings, phone calls or other languages.",
+      "The verdict is the trained model's alone. Glottal, mains-hum, splice, container and watermark checks below are shown as context and carry no weight: none separated genuine from synthetic speech on development data.",
+      "Splice timeline: 2 suspicious interval(s) (heuristic, unvalidated).",
+      "Clip duration (3.0s) is shorter than recommended baseline window (4s)."
+    ],
+    "experimental": false,
+    "experimental_reason": null,
+    "spectrogram_file": "test_job_spectrogram.png",
+    "lfcc_scalogram_file": "test_job_lfcc_scalogram.png",
+    "cqt_scalogram_file": "test_job_cqt_scalogram.png",
+    "waveform_file": "test_job_waveform_profile.png",
+    "multi_resolution_plate_file": "test_job_multi_resolution_plate.png",
+    "heatmap_file": "test_job_gradcam_heatmap.png",
+    "segments_analysed": 1,
+    "flagged_segments": 0,
+    "segment_scores": [
+      {
+        "segment_index": 0,
+        "start_s": 0.0,
+        "end_s": 3.0,
+        "fake_probability": 0.0003,
+        "status": "AUTHENTIC",
+        "source": "lcnn_asvspoof",
+        "reasons": []
+      }
+    ],
+    "segment_scores_source": "lcnn_asvspoof",
+    "splice_segment_scores": [
+      {
+        "segment_index": 0,
+        "start_s": 0.0,
+        "end_s": 2.0,
+        "fake_probability": 0.88,
+        "status": "SYNTHETIC_INJECTION",
+        "reasons": [
+          "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+        ]
+      },
+      {
+        "segment_index": 1,
+        "start_s": 1.0,
+        "end_s": 3.0,
+        "fake_probability": 0.88,
+        "status": "SYNTHETIC_INJECTION",
+        "reasons": [
+          "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+        ]
+      }
+    ],
+    "suspicious_intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 2.0,
+        "fake_probability": 0.88,
+        "reasons": [
+          "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+        ]
+      },
+      {
+        "start_s": 1.0,
+        "end_s": 3.0,
+        "fake_probability": 0.88,
+        "reasons": [
+          "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+        ]
+      }
+    ],
+    "pipeline_modules": [
+      {
+        "stage": 1,
+        "name": "File Hashes",
+        "category": "File Integrity",
+        "status": "PASSED",
+        "duration_ms": 1,
+        "summary": "Evidence ID: EVID-20261022-523A245C | SHA-256: 523a245c90ed7ee5...",
+        "findings": [
+          "SHA-256, SHA-512, MD5 and SHA-1 of the uploaded file recorded."
+        ]
+      },
+      {
+        "stage": 2,
+        "name": "Audio File DNA & Container Forensics",
+        "category": "Container Cybersecurity",
+        "status": "PASSED",
+        "duration_ms": 1,
+        "summary": "RIFF/WAV | Codec: PCM (Uncompressed) | Rate: 16000 Hz",
+        "findings": [
+          "Container structural integrity intact.",
+          "Inferred 3 processing stage(s)."
+        ]
+      },
+      {
+        "stage": 3,
+        "name": "Signal Intelligence & Acoustic Telemetry",
+        "category": "Signal Processing",
+        "status": "PASSED",
+        "duration_ms": 75,
+        "summary": "Quality Score: 30/100 | SNR: 0.0 dB | LUFS: -3.71",
+        "findings": [
+          "Extracted 124+ time, frequency, and multi-scale cepstral descriptors.",
+          "LFCC linear filterbank calculated across 0-8000 Hz Nyquist range.",
+          "Clipping severity: SEVERE."
+        ]
+      },
+      {
+        "stage": 4,
+        "name": "Physiological Glottal Flow & VoiceRadar Physics",
+        "category": "Physical Forensics",
+        "status": "ANOMALY_DETECTED",
+        "duration_ms": 5,
+        "summary": "Glottal Qo: 0.425 | Closing: 0.05 | Doppler Anomaly: 0.9229",
+        "findings": [
+          "CONSISTENT_BIOLOGICAL_VOCAL_TRACT",
+          "Vocal turbulence index: 0.2445."
+        ]
+      },
+      {
+        "stage": 5,
+        "name": "Content & Phonemic Coarticulation",
+        "category": "Linguistic Forensics",
+        "status": "PASSED",
+        "duration_ms": 3,
+        "summary": "20.0 WPM | Words: ~1 | Speech: 100.0%",
+        "findings": [
+          "Estimated 1 words (20.0 WPM) across 3.0s. Speech: 100%, Silence: 0%.",
+          "Syllable rhythm variation: 85.0 ms (Rigid prosody: NO)."
+        ]
+      },
+      {
+        "stage": 6,
+        "name": "Model Stage",
+        "category": "Machine Learning",
+        "status": "PASSED",
+        "duration_ms": 1335,
+        "summary": "Spoof probability: 0.0% (trained model (ASVspoof 2019 LA)) | Domain (heuristic): CONVERSATIONAL_SPEECH",
+        "findings": [
+          "ASVspoof 2019 LA LCNN (audio-lcnn-asvspoof2019la-lfcc-seed2), 1 window(s), calibrated spoof probability 0.0%.",
+          "Hand-set rule score 31.5% shown as context only (heuristic, unvalidated)."
+        ]
+      },
+      {
+        "stage": 7,
+        "name": "Environmental & ENF Grid Forensics",
+        "category": "Sensor Forensics",
+        "status": "PASSED",
+        "duration_ms": 7,
+        "summary": "Grid: 50.0 Hz | Phase Slips: 0 | Room RT60: 2.817s",
+        "findings": [
+          "COHERENT_GRID_PHASE",
+          "Microphone consistency: SUSPECTED_MULTIPLE_MICROPHONES."
+        ]
+      },
+      {
+        "stage": 8,
+        "name": "Risk and Verdict",
+        "category": "Decision Rule",
+        "status": "PASSED",
+        "duration_ms": 3,
+        "summary": "Verdict: AUTHENTIC | AI Risk: 0.0% | Tamper Risk: 50.0%",
+        "findings": [
+          "LCNN spoof probability 0.0% (threshold 0.497, inconclusive band 0.417-0.577)",
+          "Glottal anomaly score at or above 0.60 (heuristic, unvalidated; no weight)",
+          "Splice-timeline boundary spikes (heuristic, unvalidated; no weight)"
+        ]
+      }
+    ],
+    "forensics": {
+      "model_windows": [
+        {
+          "segment_index": 0,
+          "start_s": 0.0,
+          "end_s": 3.0,
+          "fake_probability": 0.0003,
+          "status": "AUTHENTIC",
+          "source": "lcnn_asvspoof",
+          "reasons": []
+        }
+      ],
+      "pipeline_modules": [
+        {
+          "stage": 1,
+          "name": "File Hashes",
+          "category": "File Integrity",
+          "status": "PASSED",
+          "duration_ms": 1,
+          "summary": "Evidence ID: EVID-20261022-523A245C | SHA-256: 523a245c90ed7ee5...",
+          "findings": [
+            "SHA-256, SHA-512, MD5 and SHA-1 of the uploaded file recorded."
+          ]
+        },
+        {
+          "stage": 2,
+          "name": "Audio File DNA & Container Forensics",
+          "category": "Container Cybersecurity",
+          "status": "PASSED",
+          "duration_ms": 1,
+          "summary": "RIFF/WAV | Codec: PCM (Uncompressed) | Rate: 16000 Hz",
+          "findings": [
+            "Container structural integrity intact.",
+            "Inferred 3 processing stage(s)."
+          ]
+        },
+        {
+          "stage": 3,
+          "name": "Signal Intelligence & Acoustic Telemetry",
+          "category": "Signal Processing",
+          "status": "PASSED",
+          "duration_ms": 75,
+          "summary": "Quality Score: 30/100 | SNR: 0.0 dB | LUFS: -3.71",
+          "findings": [
+            "Extracted 124+ time, frequency, and multi-scale cepstral descriptors.",
+            "LFCC linear filterbank calculated across 0-8000 Hz Nyquist range.",
+            "Clipping severity: SEVERE."
+          ]
+        },
+        {
+          "stage": 4,
+          "name": "Physiological Glottal Flow & VoiceRadar Physics",
+          "category": "Physical Forensics",
+          "status": "ANOMALY_DETECTED",
+          "duration_ms": 5,
+          "summary": "Glottal Qo: 0.425 | Closing: 0.05 | Doppler Anomaly: 0.9229",
+          "findings": [
+            "CONSISTENT_BIOLOGICAL_VOCAL_TRACT",
+            "Vocal turbulence index: 0.2445."
+          ]
+        },
+        {
+          "stage": 5,
+          "name": "Content & Phonemic Coarticulation",
+          "category": "Linguistic Forensics",
+          "status": "PASSED",
+          "duration_ms": 3,
+          "summary": "20.0 WPM | Words: ~1 | Speech: 100.0%",
+          "findings": [
+            "Estimated 1 words (20.0 WPM) across 3.0s. Speech: 100%, Silence: 0%.",
+            "Syllable rhythm variation: 85.0 ms (Rigid prosody: NO)."
+          ]
+        },
+        {
+          "stage": 6,
+          "name": "Model Stage",
+          "category": "Machine Learning",
+          "status": "PASSED",
+          "duration_ms": 1335,
+          "summary": "Spoof probability: 0.0% (trained model (ASVspoof 2019 LA)) | Domain (heuristic): CONVERSATIONAL_SPEECH",
+          "findings": [
+            "ASVspoof 2019 LA LCNN (audio-lcnn-asvspoof2019la-lfcc-seed2), 1 window(s), calibrated spoof probability 0.0%.",
+            "Hand-set rule score 31.5% shown as context only (heuristic, unvalidated)."
+          ]
+        },
+        {
+          "stage": 7,
+          "name": "Environmental & ENF Grid Forensics",
+          "category": "Sensor Forensics",
+          "status": "PASSED",
+          "duration_ms": 7,
+          "summary": "Grid: 50.0 Hz | Phase Slips: 0 | Room RT60: 2.817s",
+          "findings": [
+            "COHERENT_GRID_PHASE",
+            "Microphone consistency: SUSPECTED_MULTIPLE_MICROPHONES."
+          ]
+        },
+        {
+          "stage": 8,
+          "name": "Risk and Verdict",
+          "category": "Decision Rule",
+          "status": "PASSED",
+          "duration_ms": 3,
+          "summary": "Verdict: AUTHENTIC | AI Risk: 0.0% | Tamper Risk: 50.0%",
+          "findings": [
+            "LCNN spoof probability 0.0% (threshold 0.497, inconclusive band 0.417-0.577)",
+            "Glottal anomaly score at or above 0.60 (heuristic, unvalidated; no weight)",
+            "Splice-timeline boundary spikes (heuristic, unvalidated; no weight)"
+          ]
+        }
+      ],
+      "vault_record": {
+        "evidence_id": "EVID-20261022-523A245C",
+        "case_reference": "CASE-523A245C",
+        "original_filename": "clip.wav",
+        "file_size_bytes": 96044,
+        "file_size_formatted": "93.79 KB",
+        "acquisition_timestamp": "2026-10-22T07:22:30.597600+00:00",
+        "source_type": "DIRECT_UPLOAD",
+        "analyst": "SYSTEM_INGEST",
+        "hashes": {
+          "sha256": "523a245c90ed7ee5ad2e7390336c8a52a498ca8c687eeb6caa41884c17cc3099",
+          "sha512": "2e31afbe6973fa5c6dd6078d6c30364b91508aeae6536af0085b360933f3ffacc9bd9ef57b5cea38888386c6fd085f025ba02b421a2f0ebe35038ec69432556e",
+          "md5": "0bedf63d3efb7f930e252cded71e7432",
+          "sha1": "ee571589530d6a960bf95cdd600b227f893acb5a"
+        }
+      },
+      "file_dna": {
+        "filename": "clip.wav",
+        "extension": ".wav",
+        "file_size_bytes": 96044,
+        "container_format": "RIFF/WAV",
+        "codec": "PCM (Uncompressed)",
+        "sample_rate_hz": 16000,
+        "bit_depth": 16,
+        "channels": 1,
+        "bitrate_kbps": 256.0,
+        "bitrate_mode": "CBR",
+        "encoder_signature": "UNKNOWN",
+        "container_structure_valid": true,
+        "trailing_data_detected": false,
+        "trailing_bytes_count": 0,
+        "chunks_or_atoms": [
+          {
+            "name": "fmt ",
+            "offset": 12,
+            "size": 16
+          },
+          {
+            "name": "data",
+            "offset": 36,
+            "size": 96000
+          }
+        ],
+        "inferred_transcoding_history": [
+          {
+            "stage": 1,
+            "type": "CAPTURE_OR_SYNTHESIS",
+            "description": "Original raw capture or digital neural waveform rendering.",
+            "inferred": true
+          },
+          {
+            "stage": 2,
+            "type": "NARROWBAND_TRANSCODING",
+            "description": "Brickwall cutoff at 0.4 kHz indicates telephony compression (AMR-NB / G.711).",
+            "inferred": true
+          },
+          {
+            "stage": 3,
+            "type": "CURRENT_CONTAINER",
+            "description": "Current encapsulation in RIFF/WAV container using PCM (Uncompressed).",
+            "inferred": false
+          }
+        ],
+        "metadata_consistency": "CONSISTENT",
+        "security_flags": [],
+        "expected_container_size": 96044,
+        "high_frequency_cutoff_khz": 0.44
+      },
+      "signal_intel": {
+        "duration_seconds": 3.0,
+        "total_samples": 48000,
+        "sample_rate": 16000,
+        "quality_score": 30,
+        "time_domain": {
+          "peak_amplitude": 1.0,
+          "peak_dbfs": 0.0,
+          "rms_amplitude": 0.70706,
+          "rms_dbfs": -3.01,
+          "peak_to_rms_ratio": 1.414,
+          "crest_factor_db": 3.01,
+          "dynamic_range_db": 36.1,
+          "zcr_mean": 0.0543,
+          "zcr_variance": 0.0036,
+          "temporal_centroid_s": 1.5,
+          "energy_entropy": 5.907,
+          "silence_ratio": 0.0
+        },
+        "clipping_analysis": {
+          "clipped_samples_count": 1200,
+          "clipping_percentage": 2.5,
+          "severity": "SEVERE",
+          "clipping_detected": true
+        },
+        "frequency_domain": {
+          "spectral_centroid_hz": 444.8,
+          "spectral_bandwidth_hz": 106.1,
+          "spectral_rolloff_85_hz": 447.8,
+          "spectral_rolloff_95_hz": 473.7,
+          "spectral_flatness": 0.0,
+          "spectral_flux": 1.016,
+          "spectral_contrast_db": [
+            17.65,
+            20.47,
+            54.97,
+            20.44,
+            30.67,
+            30.85,
+            33.62
+          ],
+          "spectral_slope": -22.24,
+          "spectral_slope_r2": 0.644,
+          "dominant_frequencies": [
+            {
+              "frequency_hz": 439.9,
+              "magnitude": 15996.81
+            },
+            {
+              "frequency_hz": 440.4,
+              "magnitude": 2182.4
+            },
+            {
+              "frequency_hz": 439.5,
+              "magnitude": 1713.14
+            },
+            {
+              "frequency_hz": 440.9,
+              "magnitude": 1022.02
+            },
+            {
+              "frequency_hz": 439.0,
+              "magnitude": 904.63
+            }
+          ],
+          "energy_distribution": {
+            "low_bass_pct": 0.0,
+            "mid_speech_pct": 100.0,
+            "high_treble_pct": 0.0
+          }
+        },
+        "cepstral_analysis": {
+          "mfcc_coefficients_1_13": [
+            -401.498,
+            43.533,
+            26.563,
+            9.329,
+            -9.48,
+            -25.751,
+            -36.421,
+            -39.632,
+            -34.901,
+            -23.479,
+            -7.843,
+            8.704,
+            22.795
+          ],
+          "mfcc_delta_means": [
+            -0.62,
+            -0.301,
+            0.109,
+            0.038,
+            -0.021,
+            -0.031,
+            -0.042,
+            -0.029,
+            -0.03,
+            -0.023,
+            -0.008,
+            0.008,
+            0.028
+          ],
+          "mfcc_delta2_means": [
+            1.913,
+            1.291,
+            0.046,
+            0.033,
+            0.001,
+            0.056,
+            0.117,
+            0.155,
+            0.155,
+            0.112,
+            0.039,
+            -0.047,
+            -0.127
+          ],
+          "lfcc_coefficients_1_20": [
+            -15.509,
+            6.401,
+            5.654,
+            5.474,
+            4.85,
+            4.425,
+            3.366,
+            2.254,
+            1.383,
+            0.793,
+            0.388,
+            -0.117,
+            -0.739,
+            -1.037,
+            -1.118,
+            -0.985,
+            -1.095,
+            -0.873,
+            -0.94,
+            0.036
+          ],
+          "cqcc_coefficients_1_16": [
+            -53.413,
+            -14.703,
+            -4.358,
+            4.849,
+            -9.081,
+            8.461,
+            -0.467,
+            0.016,
+            6.658,
+            -4.842,
+            0.902,
+            -0.583,
+            -5.421,
+            -0.472,
+            -3.43,
+            -2.797
+          ],
+          "cepstral_peak_prominence_db": 11.54
+        },
+        "voice_quality": {
+          "fundamental_frequency_mean_hz": 440.3,
+          "fundamental_frequency_std_hz": 0.1,
+          "fundamental_frequency_min_hz": 440.2,
+          "fundamental_frequency_max_hz": 440.8,
+          "voiced_to_unvoiced_ratio": 1.0,
+          "jitter_local_percent": 0.015,
+          "shimmer_local_percent": 0.0,
+          "harmonics_to_noise_ratio_db": 19.62
+        },
+        "dynamics_and_loudness": {
+          "integrated_loudness_lufs": -3.71,
+          "estimated_noise_floor_dbfs": -3.01,
+          "estimated_snr_db": 0.0
+        },
+        "descriptor_count": 124
+      },
+      "glottal_physics": {
+        "glottal_flow": {
+          "open_quotient": 0.425,
+          "closing_quotient": 0.05,
+          "mfdr_index": 8.454,
+          "biological_turbulence_index": 0.2445,
+          "glottal_anomaly_score": 0.3309,
+          "status": "ANALYZED"
+        },
+        "physical_propagation": {
+          "doppler_micro_dispersion_hz": 6.55,
+          "doppler_anomaly_score": 0.9229,
+          "acoustic_propagation_adherence": 0.039,
+          "physics_anomaly_score": 0.9615,
+          "status": "COMPLETED"
+        },
+        "composite_physiological_anomaly_score": 0.6147,
+        "physiological_verdict": "CONSISTENT_BIOLOGICAL_VOCAL_TRACT"
+      },
+      "speech_semantics": {
+        "duration_seconds": 3.0,
+        "speech_ratio_percent": 100.0,
+        "silence_ratio_percent": 0.0,
+        "estimated_words_count": 1,
+        "estimated_syllable_count": 2,
+        "speaking_rate_wpm": 20.0,
+        "syllable_rhythm_std_ms": 85.0,
+        "rigid_synthetic_prosody_detected": false,
+        "phonemic_coarticulation_anomaly_score": 0.1,
+        "content_summary": "Estimated 1 words (20.0 WPM) across 3.0s. Speech: 100%, Silence: 0%."
+      },
+      "models_output": {
+        "fused_ai_probability": 0.0002677881315187627,
+        "model_stage_source": "lcnn_asvspoof",
+        "model_stage_label": "trained model (ASVspoof 2019 LA)",
+        "heuristic_scores": {
+          "tabular_rules_prob": 0.3151
+        },
+        "audio_domain": "CONVERSATIONAL_SPEECH",
+        "audio_domain_label": "heuristic (unvalidated)",
+        "legacy_fused_ai_probability": 0.3151,
+        "lcnn_asvspoof": {
+          "probability": 0.0002677881315187627,
+          "mean_spoof_logit": -3.6334152221679688,
+          "cm_score": 3.6334152221679688,
+          "n_windows": 1,
+          "window_spoof_logits": [
+            -3.6334
+          ],
+          "windows": [
+            {
+              "index": 0,
+              "start_s": 0.0,
+              "end_s": 3.0,
+              "spoof_logit": -3.6334,
+              "probability": 0.0003
+            }
+          ],
+          "model_version": "audio-lcnn-asvspoof2019la-lfcc-seed2",
+          "checkpoint": "audio_lcnn_asvspoof_lfcc_seed2.pt",
+          "checkpoint_sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3",
+          "calibration": {
+            "method": "platt_balanced",
+            "a": 1.4203856014199086,
+            "b": -3.0641959546000512
+          },
+          "input_peak_normalised": false,
+          "resampled_from_hz": null,
+          "inference": "float32, TF32 off, deterministic cuDNN"
+        }
+      },
+      "splicing_timeline": {
+        "total_segments_analyzed": 2,
+        "segments": [
+          {
+            "segment_index": 0,
+            "start_s": 0.0,
+            "end_s": 2.0,
+            "fake_probability": 0.88,
+            "status": "SYNTHETIC_INJECTION",
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          },
+          {
+            "segment_index": 1,
+            "start_s": 1.0,
+            "end_s": 3.0,
+            "fake_probability": 0.88,
+            "status": "SYNTHETIC_INJECTION",
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          }
+        ],
+        "first_order_f1_spikes_count": 4,
+        "first_order_spikes": [
+          {
+            "timestamp_s": 0.0,
+            "displacement_magnitude": 12.697,
+            "z_score": 4.19
+          },
+          {
+            "timestamp_s": 0.01,
+            "displacement_magnitude": 33.426,
+            "z_score": 11.41
+          },
+          {
+            "timestamp_s": 2.98,
+            "displacement_magnitude": 33.484,
+            "z_score": 11.43
+          },
+          {
+            "timestamp_s": 2.99,
+            "displacement_magnitude": 12.698,
+            "z_score": 4.19
+          }
+        ],
+        "suspicious_intervals": [
+          {
+            "start_s": 0.0,
+            "end_s": 2.0,
+            "fake_probability": 0.88,
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          },
+          {
+            "start_s": 1.0,
+            "end_s": 3.0,
+            "fake_probability": 0.88,
+            "reasons": [
+              "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+            ]
+          }
+        ],
+        "worst_segment_fake_probability": 0.88,
+        "splicing_detected": true
+      },
+      "enf_environment": {
+        "enf_forensics": {
+          "enf_detected": true,
+          "nominal_grid_frequency_hz": 50.0,
+          "grid_carrier_snr_db": -57.88,
+          "estimated_mean_frequency_hz": 48.1449,
+          "frequency_std_hz": 3.88092,
+          "phase_discontinuity_count": 0,
+          "max_phase_slip_degrees": 0.0,
+          "phase_slip_intervals": [],
+          "splicing_detected_via_enf_phase": false,
+          "status": "COHERENT_GRID_PHASE"
+        },
+        "room_acoustics": {
+          "mean_reverberation_time_rt60_s": 2.817,
+          "reverberation_std_s": 0.0,
+          "segment_rt60_profiles": [
+            2.817
+          ],
+          "room_signature_inconsistent": false,
+          "acoustic_space_type": "REVERBERANT_HALL"
+        },
+        "microphone_hardware": {
+          "hardware_noise_floor_variance": 4.602,
+          "device_inconsistent": true,
+          "transducer_signature": "SUSPECTED_MULTIPLE_MICROPHONES"
+        },
+        "environmental_anomaly_score": 0.55,
+        "environmental_splicing_confirmed": false
+      },
+      "security_provenance": {
+        "provenance_c2pa": {
+          "c2pa_manifest_present": false,
+          "cryptographic_signature_status": "NOT_PRESENT",
+          "ai_generation_disclosed": false,
+          "software_or_generator_claim": null,
+          "provenance_confidence": "UNAVAILABLE"
+        },
+        "watermark_analysis": {
+          "watermark_detected": false,
+          "watermark_scheme": "NONE_CONFIRMED",
+          "detection_confidence": 0.0,
+          "overwriting_attack_suspected": false,
+          "anti_shortcut_status": "DEFENDED_WATERMARK_AGNOSTIC"
+        },
+        "steganography_forensics": {
+          "lsb_bitplane_entropy": 0.9965,
+          "lsb_payload_anomaly": false,
+          "echo_hiding_detected": false,
+          "echo_peak_prominence": 3.42,
+          "phase_coding_anomaly_detected": false,
+          "steganography_detected": false,
+          "covert_channel_status": "NO_COVERT_CHANNELS_CONFIRMED"
+        },
+        "cyber_security_risk_score": 0.0
+      },
+      "fusion_decision": {
+        "final_verdict": "AUTHENTIC",
+        "calibrated_fake_probability": 0.0003,
+        "generative_ai_risk_score": 0.0003,
+        "structural_tampering_risk_score": 0.5,
+        "decision_set": [
+          "AUTHENTIC"
+        ],
+        "decision_rule": "LCNN spoof probability p: authentic if p < 0.4170, flagged (AI-generated) if p >= 0.5770, inconclusive otherwise; heuristic signals carry no weight",
+        "decision_threshold": 0.49699533116869854,
+        "uncertain_band": 0.08,
+        "is_inconclusive": false,
+        "flagged_signals_count": 2,
+        "flagged_signals": [
+          "LCNN spoof probability 0.0% (threshold 0.497, inconclusive band 0.417-0.577)",
+          "Glottal anomaly score at or above 0.60 (heuristic, unvalidated; no weight)",
+          "Splice-timeline boundary spikes (heuristic, unvalidated; no weight)"
+        ],
+        "context_signals": {
+          "note": "computed and shown, no weight in the verdict (none separated bona fide from spoof on dev)",
+          "structural_tampering_risk": 0.5,
+          "glottal_anomaly": 0.6147,
+          "coarticulation_anomaly": 0.1,
+          "hand_set_rule_score": 0.3151
+        },
+        "verdict_source": "lcnn_asvspoof",
+        "evidence_graph": {
+          "nodes": [
+            {
+              "id": "file_root",
+              "label": "Audio file",
+              "type": "root",
+              "status": "NEUTRAL"
+            },
+            {
+              "id": "vault_node",
+              "label": "File hashes: EVID-20261022-523A245C",
+              "type": "integrity",
+              "status": "RECORDED"
+            },
+            {
+              "id": "dna_node",
+              "label": "Container: RIFF/WAV / PCM (Uncompressed)",
+              "type": "container",
+              "status": "NORMAL"
+            },
+            {
+              "id": "glottal_node",
+              "label": "Glottal anomaly 0.61 (heuristic, unvalidated)",
+              "type": "physics",
+              "status": "ALERT"
+            },
+            {
+              "id": "enf_node",
+              "label": "Mains hum (max slip 0.0 deg; heuristic, unvalidated)",
+              "type": "environment",
+              "status": "NORMAL"
+            },
+            {
+              "id": "model_node",
+              "label": "Model stage 0.0% (trained model (ASVspoof 2019 LA))",
+              "type": "model",
+              "status": "NORMAL"
+            },
+            {
+              "id": "splice_node",
+              "label": "Splice timeline: 4 spikes (heuristic, unvalidated)",
+              "type": "temporal",
+              "status": "ALERT"
+            },
+            {
+              "id": "verdict_node",
+              "label": "Verdict: AUTHENTIC",
+              "type": "verdict",
+              "status": "SECURE"
+            }
+          ],
+          "edges": [
+            {
+              "source": "file_root",
+              "target": "model_node",
+              "label": "model stage"
+            },
+            {
+              "source": "model_node",
+              "target": "verdict_node",
+              "label": "decides the verdict"
+            },
+            {
+              "source": "file_root",
+              "target": "vault_node",
+              "label": "context only"
+            },
+            {
+              "source": "file_root",
+              "target": "dna_node",
+              "label": "context only"
+            },
+            {
+              "source": "file_root",
+              "target": "glottal_node",
+              "label": "context only"
+            },
+            {
+              "source": "file_root",
+              "target": "enf_node",
+              "label": "context only"
+            },
+            {
+              "source": "file_root",
+              "target": "splice_node",
+              "label": "context only"
+            }
+          ]
+        }
+      },
+      "visual_evidence": {
+        "spectrogram_file": "test_job_spectrogram.png",
+        "lfcc_scalogram_file": "test_job_lfcc_scalogram.png",
+        "cqt_scalogram_file": "test_job_cqt_scalogram.png",
+        "waveform_file": "test_job_waveform_profile.png",
+        "multi_resolution_plate_file": "test_job_multi_resolution_plate.png",
+        "gradcam_heatmap_file": "test_job_gradcam_heatmap.png",
+        "apex_prototypes": {
+          "time_based_prototypes": {
+            "prototype_type": "TEMPORAL_RHYTHMIC",
+            "coarticulation_timing_rigidity": "NATURAL_BIOLOGICAL",
+            "prosodic_inflection_score": 0.88,
+            "explanation": "Isolates rigid prosodic delivery and unvarying syllable pacing typical of Voice Conversion models."
+          },
+          "frequency_based_prototypes": {
+            "prototype_type": "SPECTRAL_TIMBRAL",
+            "vocoder_harmonic_inconsistency": "CLEAN_HARMONIC_STRUCTURE",
+            "phase_smearing_prominence": "NEGLIGIBLE",
+            "explanation": "Isolates stationary harmonic distortion bands characteristic of deep generative neural vocoders."
+          },
+          "phoneme_discretized_saliency": [
+            {
+              "phonetic_class": "General Speech",
+              "saliency_share": "100%",
+              "finding": "Normal biological coarticulation distribution"
+            }
+          ]
+        }
+      }
+    },
+    "file_dna": {
+      "filename": "clip.wav",
+      "extension": ".wav",
+      "file_size_bytes": 96044,
+      "container_format": "RIFF/WAV",
+      "codec": "PCM (Uncompressed)",
+      "sample_rate_hz": 16000,
+      "bit_depth": 16,
+      "channels": 1,
+      "bitrate_kbps": 256.0,
+      "bitrate_mode": "CBR",
+      "encoder_signature": "UNKNOWN",
+      "container_structure_valid": true,
+      "trailing_data_detected": false,
+      "trailing_bytes_count": 0,
+      "chunks_or_atoms": [
+        {
+          "name": "fmt ",
+          "offset": 12,
+          "size": 16
+        },
+        {
+          "name": "data",
+          "offset": 36,
+          "size": 96000
+        }
+      ],
+      "inferred_transcoding_history": [
+        {
+          "stage": 1,
+          "type": "CAPTURE_OR_SYNTHESIS",
+          "description": "Original raw capture or digital neural waveform rendering.",
+          "inferred": true
+        },
+        {
+          "stage": 2,
+          "type": "NARROWBAND_TRANSCODING",
+          "description": "Brickwall cutoff at 0.4 kHz indicates telephony compression (AMR-NB / G.711).",
+          "inferred": true
+        },
+        {
+          "stage": 3,
+          "type": "CURRENT_CONTAINER",
+          "description": "Current encapsulation in RIFF/WAV container using PCM (Uncompressed).",
+          "inferred": false
+        }
+      ],
+      "metadata_consistency": "CONSISTENT",
+      "security_flags": [],
+      "expected_container_size": 96044,
+      "high_frequency_cutoff_khz": 0.44
+    },
+    "signal_intel": {
+      "duration_seconds": 3.0,
+      "total_samples": 48000,
+      "sample_rate": 16000,
+      "quality_score": 30,
+      "time_domain": {
+        "peak_amplitude": 1.0,
+        "peak_dbfs": 0.0,
+        "rms_amplitude": 0.70706,
+        "rms_dbfs": -3.01,
+        "peak_to_rms_ratio": 1.414,
+        "crest_factor_db": 3.01,
+        "dynamic_range_db": 36.1,
+        "zcr_mean": 0.0543,
+        "zcr_variance": 0.0036,
+        "temporal_centroid_s": 1.5,
+        "energy_entropy": 5.907,
+        "silence_ratio": 0.0
+      },
+      "clipping_analysis": {
+        "clipped_samples_count": 1200,
+        "clipping_percentage": 2.5,
+        "severity": "SEVERE",
+        "clipping_detected": true
+      },
+      "frequency_domain": {
+        "spectral_centroid_hz": 444.8,
+        "spectral_bandwidth_hz": 106.1,
+        "spectral_rolloff_85_hz": 447.8,
+        "spectral_rolloff_95_hz": 473.7,
+        "spectral_flatness": 0.0,
+        "spectral_flux": 1.016,
+        "spectral_contrast_db": [
+          17.65,
+          20.47,
+          54.97,
+          20.44,
+          30.67,
+          30.85,
+          33.62
+        ],
+        "spectral_slope": -22.24,
+        "spectral_slope_r2": 0.644,
+        "dominant_frequencies": [
+          {
+            "frequency_hz": 439.9,
+            "magnitude": 15996.81
+          },
+          {
+            "frequency_hz": 440.4,
+            "magnitude": 2182.4
+          },
+          {
+            "frequency_hz": 439.5,
+            "magnitude": 1713.14
+          },
+          {
+            "frequency_hz": 440.9,
+            "magnitude": 1022.02
+          },
+          {
+            "frequency_hz": 439.0,
+            "magnitude": 904.63
+          }
+        ],
+        "energy_distribution": {
+          "low_bass_pct": 0.0,
+          "mid_speech_pct": 100.0,
+          "high_treble_pct": 0.0
+        }
+      },
+      "cepstral_analysis": {
+        "mfcc_coefficients_1_13": [
+          -401.498,
+          43.533,
+          26.563,
+          9.329,
+          -9.48,
+          -25.751,
+          -36.421,
+          -39.632,
+          -34.901,
+          -23.479,
+          -7.843,
+          8.704,
+          22.795
+        ],
+        "mfcc_delta_means": [
+          -0.62,
+          -0.301,
+          0.109,
+          0.038,
+          -0.021,
+          -0.031,
+          -0.042,
+          -0.029,
+          -0.03,
+          -0.023,
+          -0.008,
+          0.008,
+          0.028
+        ],
+        "mfcc_delta2_means": [
+          1.913,
+          1.291,
+          0.046,
+          0.033,
+          0.001,
+          0.056,
+          0.117,
+          0.155,
+          0.155,
+          0.112,
+          0.039,
+          -0.047,
+          -0.127
+        ],
+        "lfcc_coefficients_1_20": [
+          -15.509,
+          6.401,
+          5.654,
+          5.474,
+          4.85,
+          4.425,
+          3.366,
+          2.254,
+          1.383,
+          0.793,
+          0.388,
+          -0.117,
+          -0.739,
+          -1.037,
+          -1.118,
+          -0.985,
+          -1.095,
+          -0.873,
+          -0.94,
+          0.036
+        ],
+        "cqcc_coefficients_1_16": [
+          -53.413,
+          -14.703,
+          -4.358,
+          4.849,
+          -9.081,
+          8.461,
+          -0.467,
+          0.016,
+          6.658,
+          -4.842,
+          0.902,
+          -0.583,
+          -5.421,
+          -0.472,
+          -3.43,
+          -2.797
+        ],
+        "cepstral_peak_prominence_db": 11.54
+      },
+      "voice_quality": {
+        "fundamental_frequency_mean_hz": 440.3,
+        "fundamental_frequency_std_hz": 0.1,
+        "fundamental_frequency_min_hz": 440.2,
+        "fundamental_frequency_max_hz": 440.8,
+        "voiced_to_unvoiced_ratio": 1.0,
+        "jitter_local_percent": 0.015,
+        "shimmer_local_percent": 0.0,
+        "harmonics_to_noise_ratio_db": 19.62
+      },
+      "dynamics_and_loudness": {
+        "integrated_loudness_lufs": -3.71,
+        "estimated_noise_floor_dbfs": -3.01,
+        "estimated_snr_db": 0.0
+      },
+      "descriptor_count": 124
+    },
+    "glottal_physics": {
+      "glottal_flow": {
+        "open_quotient": 0.425,
+        "closing_quotient": 0.05,
+        "mfdr_index": 8.454,
+        "biological_turbulence_index": 0.2445,
+        "glottal_anomaly_score": 0.3309,
+        "status": "ANALYZED"
+      },
+      "physical_propagation": {
+        "doppler_micro_dispersion_hz": 6.55,
+        "doppler_anomaly_score": 0.9229,
+        "acoustic_propagation_adherence": 0.039,
+        "physics_anomaly_score": 0.9615,
+        "status": "COMPLETED"
+      },
+      "composite_physiological_anomaly_score": 0.6147,
+      "physiological_verdict": "CONSISTENT_BIOLOGICAL_VOCAL_TRACT"
+    },
+    "speech_semantics": {
+      "duration_seconds": 3.0,
+      "speech_ratio_percent": 100.0,
+      "silence_ratio_percent": 0.0,
+      "estimated_words_count": 1,
+      "estimated_syllable_count": 2,
+      "speaking_rate_wpm": 20.0,
+      "syllable_rhythm_std_ms": 85.0,
+      "rigid_synthetic_prosody_detected": false,
+      "phonemic_coarticulation_anomaly_score": 0.1,
+      "content_summary": "Estimated 1 words (20.0 WPM) across 3.0s. Speech: 100%, Silence: 0%."
+    },
+    "models_output": {
+      "fused_ai_probability": 0.0002677881315187627,
+      "model_stage_source": "lcnn_asvspoof",
+      "model_stage_label": "trained model (ASVspoof 2019 LA)",
+      "heuristic_scores": {
+        "tabular_rules_prob": 0.3151
+      },
+      "audio_domain": "CONVERSATIONAL_SPEECH",
+      "audio_domain_label": "heuristic (unvalidated)",
+      "legacy_fused_ai_probability": 0.3151,
+      "lcnn_asvspoof": {
+        "probability": 0.0002677881315187627,
+        "mean_spoof_logit": -3.6334152221679688,
+        "cm_score": 3.6334152221679688,
+        "n_windows": 1,
+        "window_spoof_logits": [
+          -3.6334
+        ],
+        "windows": [
+          {
+            "index": 0,
+            "start_s": 0.0,
+            "end_s": 3.0,
+            "spoof_logit": -3.6334,
+            "probability": 0.0003
+          }
+        ],
+        "model_version": "audio-lcnn-asvspoof2019la-lfcc-seed2",
+        "checkpoint": "audio_lcnn_asvspoof_lfcc_seed2.pt",
+        "checkpoint_sha256": "7ca31fd0f02094de56eab9fc90fa4aa1c1e39ef24ac7b4d93669feca685757a3",
+        "calibration": {
+          "method": "platt_balanced",
+          "a": 1.4203856014199086,
+          "b": -3.0641959546000512
+        },
+        "input_peak_normalised": false,
+        "resampled_from_hz": null,
+        "inference": "float32, TF32 off, deterministic cuDNN"
+      }
+    },
+    "splicing_timeline": {
+      "total_segments_analyzed": 2,
+      "segments": [
+        {
+          "segment_index": 0,
+          "start_s": 0.0,
+          "end_s": 2.0,
+          "fake_probability": 0.88,
+          "status": "SYNTHETIC_INJECTION",
+          "reasons": [
+            "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+          ]
+        },
+        {
+          "segment_index": 1,
+          "start_s": 1.0,
+          "end_s": 3.0,
+          "fake_probability": 0.88,
+          "status": "SYNTHETIC_INJECTION",
+          "reasons": [
+            "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+          ]
+        }
+      ],
+      "first_order_f1_spikes_count": 4,
+      "first_order_spikes": [
+        {
+          "timestamp_s": 0.0,
+          "displacement_magnitude": 12.697,
+          "z_score": 4.19
+        },
+        {
+          "timestamp_s": 0.01,
+          "displacement_magnitude": 33.426,
+          "z_score": 11.41
+        },
+        {
+          "timestamp_s": 2.98,
+          "displacement_magnitude": 33.484,
+          "z_score": 11.43
+        },
+        {
+          "timestamp_s": 2.99,
+          "displacement_magnitude": 12.698,
+          "z_score": 4.19
+        }
+      ],
+      "suspicious_intervals": [
+        {
+          "start_s": 0.0,
+          "end_s": 2.0,
+          "fake_probability": 0.88,
+          "reasons": [
+            "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+          ]
+        },
+        {
+          "start_s": 1.0,
+          "end_s": 3.0,
+          "fake_probability": 0.88,
+          "reasons": [
+            "Sharp First-Order SSL displacement (F1) spike at segment boundary"
+          ]
+        }
+      ],
+      "worst_segment_fake_probability": 0.88,
+      "splicing_detected": true
+    },
+    "enf_environment": {
+      "enf_forensics": {
+        "enf_detected": true,
+        "nominal_grid_frequency_hz": 50.0,
+        "grid_carrier_snr_db": -57.88,
+        "estimated_mean_frequency_hz": 48.1449,
+        "frequency_std_hz": 3.88092,
+        "phase_discontinuity_count": 0,
+        "max_phase_slip_degrees": 0.0,
+        "phase_slip_intervals": [],
+        "splicing_detected_via_enf_phase": false,
+        "status": "COHERENT_GRID_PHASE"
+      },
+      "room_acoustics": {
+        "mean_reverberation_time_rt60_s": 2.817,
+        "reverberation_std_s": 0.0,
+        "segment_rt60_profiles": [
+          2.817
+        ],
+        "room_signature_inconsistent": false,
+        "acoustic_space_type": "REVERBERANT_HALL"
+      },
+      "microphone_hardware": {
+        "hardware_noise_floor_variance": 4.602,
+        "device_inconsistent": true,
+        "transducer_signature": "SUSPECTED_MULTIPLE_MICROPHONES"
+      },
+      "environmental_anomaly_score": 0.55,
+      "environmental_splicing_confirmed": false
+    },
+    "security_provenance": {
+      "provenance_c2pa": {
+        "c2pa_manifest_present": false,
+        "cryptographic_signature_status": "NOT_PRESENT",
+        "ai_generation_disclosed": false,
+        "software_or_generator_claim": null,
+        "provenance_confidence": "UNAVAILABLE"
+      },
+      "watermark_analysis": {
+        "watermark_detected": false,
+        "watermark_scheme": "NONE_CONFIRMED",
+        "detection_confidence": 0.0,
+        "overwriting_attack_suspected": false,
+        "anti_shortcut_status": "DEFENDED_WATERMARK_AGNOSTIC"
+      },
+      "steganography_forensics": {
+        "lsb_bitplane_entropy": 0.9965,
+        "lsb_payload_anomaly": false,
+        "echo_hiding_detected": false,
+        "echo_peak_prominence": 3.42,
+        "phase_coding_anomaly_detected": false,
+        "steganography_detected": false,
+        "covert_channel_status": "NO_COVERT_CHANNELS_CONFIRMED"
+      },
+      "cyber_security_risk_score": 0.0
+    },
+    "fusion_decision": {
+      "final_verdict": "AUTHENTIC",
+      "calibrated_fake_probability": 0.0003,
+      "generative_ai_risk_score": 0.0003,
+      "structural_tampering_risk_score": 0.5,
+      "decision_set": [
+        "AUTHENTIC"
+      ],
+      "decision_rule": "LCNN spoof probability p: authentic if p < 0.4170, flagged (AI-generated) if p >= 0.5770, inconclusive otherwise; heuristic signals carry no weight",
+      "decision_threshold": 0.49699533116869854,
+      "uncertain_band": 0.08,
+      "is_inconclusive": false,
+      "flagged_signals_count": 2,
+      "flagged_signals": [
+        "LCNN spoof probability 0.0% (threshold 0.497, inconclusive band 0.417-0.577)",
+        "Glottal anomaly score at or above 0.60 (heuristic, unvalidated; no weight)",
+        "Splice-timeline boundary spikes (heuristic, unvalidated; no weight)"
+      ],
+      "context_signals": {
+        "note": "computed and shown, no weight in the verdict (none separated bona fide from spoof on dev)",
+        "structural_tampering_risk": 0.5,
+        "glottal_anomaly": 0.6147,
+        "coarticulation_anomaly": 0.1,
+        "hand_set_rule_score": 0.3151
+      },
+      "verdict_source": "lcnn_asvspoof",
+      "evidence_graph": {
+        "nodes": [
+          {
+            "id": "file_root",
+            "label": "Audio file",
+            "type": "root",
+            "status": "NEUTRAL"
+          },
+          {
+            "id": "vault_node",
+            "label": "File hashes: EVID-20261022-523A245C",
+            "type": "integrity",
+            "status": "RECORDED"
+          },
+          {
+            "id": "dna_node",
+            "label": "Container: RIFF/WAV / PCM (Uncompressed)",
+            "type": "container",
+            "status": "NORMAL"
+          },
+          {
+            "id": "glottal_node",
+            "label": "Glottal anomaly 0.61 (heuristic, unvalidated)",
+            "type": "physics",
+            "status": "ALERT"
+          },
+          {
+            "id": "enf_node",
+            "label": "Mains hum (max slip 0.0 deg; heuristic, unvalidated)",
+            "type": "environment",
+            "status": "NORMAL"
+          },
+          {
+            "id": "model_node",
+            "label": "Model stage 0.0% (trained model (ASVspoof 2019 LA))",
+            "type": "model",
+            "status": "NORMAL"
+          },
+          {
+            "id": "splice_node",
+            "label": "Splice timeline: 4 spikes (heuristic, unvalidated)",
+            "type": "temporal",
+            "status": "ALERT"
+          },
+          {
+            "id": "verdict_node",
+            "label": "Verdict: AUTHENTIC",
+            "type": "verdict",
+            "status": "SECURE"
+          }
+        ],
+        "edges": [
+          {
+            "source": "file_root",
+            "target": "model_node",
+            "label": "model stage"
+          },
+          {
+            "source": "model_node",
+            "target": "verdict_node",
+            "label": "decides the verdict"
+          },
+          {
+            "source": "file_root",
+            "target": "vault_node",
+            "label": "context only"
+          },
+          {
+            "source": "file_root",
+            "target": "dna_node",
+            "label": "context only"
+          },
+          {
+            "source": "file_root",
+            "target": "glottal_node",
+            "label": "context only"
+          },
+          {
+            "source": "file_root",
+            "target": "enf_node",
+            "label": "context only"
+          },
+          {
+            "source": "file_root",
+            "target": "splice_node",
+            "label": "context only"
+          }
+        ]
+      }
+    },
+    "risk_score": 0,
+    "risk_tier": "LOW_RISK",
+    "generative_ai_risk": 0.0003,
+    "structural_tampering_risk": 0.5,
+    "decision_set": [
+      "AUTHENTIC"
+    ],
+    "decision_rule": "LCNN spoof probability p: authentic if p < 0.4170, flagged (AI-generated) if p >= 0.5770, inconclusive otherwise; heuristic signals carry no weight",
+    "is_inconclusive": false,
+    "decision_threshold": 0.49699533116869854,
+    "uncertain_band": 0.08
+  }
+}

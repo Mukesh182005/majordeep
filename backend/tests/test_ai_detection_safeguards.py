@@ -270,7 +270,7 @@ def test_video_scene_score_reaches_the_pipeline(tmp_path, monkeypatch):
 
     result = video.analyze_video(clip, tmp_path / "evidence", "video-scene-job")
     stage3 = next(m for m in result.evidence["pipeline_modules"] if m.get("stage") == 3)
-    assert "Full-scene ViT GenAI: 90.0%" in stage3["desc"]
+    assert "Scene AI (mean of 1 frame): 90.0%" in stage3["desc"]
 
 
 class TestAuthenticNeedsEvidence:

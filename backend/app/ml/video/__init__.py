@@ -199,7 +199,7 @@ def analyze_video(
             (f"GenD face (mean/max over {len(gend_scores)} faces): {gend_face_mean * 100:.1f}% / {gend_face_max * 100:.1f}%"
              f"{'' if settings.gend_in_verdict else ' (unvalidated, not in verdict)'}" if gend_ran
              else f"Face score: {round(face_display_prob * 100, 1)}%{'' if settings.face_model_in_verdict else ' (informational)'}")
-            + f" | Scene AI (mean of {len(scene_frame_scores)} frames): {round(vit_genai_prob * 100, 1)}%"
+            + f" | Scene AI (mean of {len(scene_frame_scores)} frame{'' if len(scene_frame_scores) == 1 else 's'}): {round(vit_genai_prob * 100, 1)}%"
         ),
     })
 

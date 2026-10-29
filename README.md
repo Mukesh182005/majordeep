@@ -244,10 +244,22 @@ All model weights are stored in `checkpoints/` with SHA-256 integrity validation
 cd backend
 python -m pytest -q
 
-# Frontend tests
+# Frontend unit tests, lint, build
 cd frontend
-npm test
+npm test -- --run
+npm run lint
+npm run build
+
+# Browser end-to-end tests (Playwright). First run: npx playwright install chromium
+python e2e/fixtures/make_fixtures.py     # from frontend/; writes small, uncommitted fixtures
+npm run e2e:fast                         # pages, sign-in/out, rejected uploads (~1 min)
+npm run e2e                              # plus real image/audio/video analysis (@slow)
+E2E_BASE_URL=http://localhost:8080 npm run e2e   # against an already running site
 ```
+
+The browser tests start their own backend (SQLite, inline jobs, a temporary storage folder,
+port 8100) and Vite (port 3100), so they never touch the development database. Accuracy is
+measured separately by the scripts in `backend/scripts/` (see `docs/research/EVALUATION.md`).
 
 ## License
 

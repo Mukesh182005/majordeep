@@ -63,9 +63,8 @@ FFMPEG_CONDITIONS: dict[str, tuple[list[str], str]] = {
     "amr_nb_12.2k": (["-ar", "8000", "-c:a", "libopencore_amrnb", "-b:a", "12.2k"], ".amr"),
     "amr_wb_8.85k": (["-ar", "16000", "-c:a", "libvo_amrwbenc", "-b:a", "8.85k"], ".amr"),
     "amr_wb_23.85k": (["-ar", "16000", "-c:a", "libvo_amrwbenc", "-b:a", "23.85k"], ".amr"),
-    "speex_wb": (["-ar", "16000", "-c:a", "libspeex"], ".ogg"),
     "speex_nb": (["-ar", "8000", "-c:a", "libspeex"], ".ogg"),
-    "gsm": (["-ar", "8000", "-c:a", "libgsm"], ".wav"),
+    "gsm": (["-ar", "8000", "-c:a", "libgsm", "-f", "gsm"], ".gsm"),
     "g722": (["-ar", "16000", "-c:a", "g722"], ".wav"),
 }
 ENCODEC_CONDITIONS = {"encodec_1.5k": 1.5, "encodec_3k": 3.0, "encodec_6k": 6.0, "encodec_12k": 12.0}
@@ -148,7 +147,12 @@ def cmd_prepare(args) -> int:
 
     exe = ffmpeg_exe()
     train = read_v5(args.v5_root, "train_sample", "train") + read_la_train(args.la_root, args.la_per_class, 0)
-    val = read_v5(args.v5_root, "dev_sample", "dev")
+    # The ASVspoof 5 dev sample is split by a hash of the speaker: half joins training, half is validation.
+    dev = read_v5(args.v5_root, "dev_sample", "dev")
+    speaker = {r["file_id"]: r["speaker"] for r in csv.DictReader(open(args.v5_root / "dev_sample" / "sample.tsv", encoding="utf-8"), delimiter="	")}
+    in_val = lambda r: int(hashlib.sha256(speaker[r["id"]].encode()).hexdigest(), 16) % 2 == 0
+    train += [r for r in dev if not in_val(r)]
+    val = [r for r in dev if in_val(r)]
     encodec = EncodecRunner("cuda" if torch.cuda.is_available() else "cpu")
     args.out.mkdir(parents=True, exist_ok=True)
     for split, items in (("train", train), ("val", val)):

@@ -246,7 +246,13 @@ def fuse_video_forensics(
 
     # Determine Granular Video Taxonomy (AI Generated, AI Edited, Human Edited, App Edited, Screen Recording, Authentic)
     software_category = container_info.get("software_category")
-    is_synthetic_ai = (attribution_info and attribution_info.get("is_ai_generated")) or bool(ai_tool) or vit_genai_prob >= 0.75
+    # Only measured signals may force a verdict: the scene AI detectors, an AI-tool signature in the
+    # container, the audio model, and GenD once it is in the verdict. The generator profile match and
+    # LipForensics are unvalidated heuristics: on DFD real videos they forced 26 of 60 to MANIPULATED
+    # while separating real from fake no better than chance (evaluation/VIDEO-GEND-01), so they now
+    # only label a video that the measured signals already score as manipulated.
+    is_synthetic_ai = bool(ai_tool) or vit_genai_prob >= 0.75
+    profile_says_ai = bool(attribution_info and attribution_info.get("is_ai_generated"))
 
     if is_synthetic_ai:
         dominant_threat = f"AI-Generated Video Media (unvalidated profile match: {predicted_platform})"
@@ -258,11 +264,16 @@ def fuse_video_forensics(
         threat_code = "AI_LIP_SYNC_REENACTMENT"
         category_name = "AI Voice Replacement Dub"
         final_prob = max(final_prob, 0.85)
-    elif lip_manip >= 0.65 or software_category == "AI_LIP_SYNC":
+    elif software_category == "AI_LIP_SYNC":
         dominant_threat = f"AI Talking-Head Lip Manipulation ({editing_tool or 'Neural Model'})"
         threat_code = "AI_LIP_SYNC_REENACTMENT"
         category_name = "AI Talking-Head & Lip-Sync"
         final_prob = max(final_prob, 0.82)
+    elif (lip_manip >= 0.65 or profile_says_ai) and final_prob >= 0.50:
+        dominant_threat = ("AI-Generated Video Media (unvalidated profile match)" if profile_says_ai
+                           else "Possible Lip Manipulation (unvalidated heuristic)")
+        threat_code = "AI_GENERATED_VIDEO" if profile_says_ai else "AI_LIP_SYNC_REENACTMENT"
+        category_name = "AI Generated Video" if profile_says_ai else "AI Talking-Head & Lip-Sync"
     elif spatial_prob >= 0.65 or (spatial_prob >= 0.45 and (temporal_jitter >= 0.45 or motion_score >= 0.45)) or software_category == "AI_FACE_SWAP":
         dominant_threat = f"Deepfake Neural Face-Swap ({editing_tool or 'Neural Model'})"
         threat_code = "DEEPFAKE_FACE_SWAP"

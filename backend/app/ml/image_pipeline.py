@@ -62,13 +62,16 @@ class SceneDetectorSpec:
 #   Organika alone                AUC 0.836, 23% of real photos >= 0.5
 #   umm-maybe/AI-image-detector   AUC 0.469 — below chance; removed
 #   max-of-experts (old rule)     flagged 26-36% of real photos
+# Organika/sdxl-detector was removed on 2026-10-29: on the validation split of
+# the newer-generator set (evaluation/COMMFOR-FT-01/val_ft1.json) it scored
+# AUC 0.596 and flagged 15.6% of real images, and the fusion was the same with
+# or without it (AUC 0.9625 vs 0.9626).
+# Community Forensics: weight chosen on the COCO + Synthbuster dev half
+# (evaluation/COMMFOR-02); COMMFOR_MODEL_ID may point at a fine-tuned checkpoint.
 SCENE_DETECTORS: tuple[SceneDetectorSpec, ...] = (
     SceneDetectorSpec(
         "haywoodsloan/ai-image-detector-deploy", 0.75, "Modern diffusion & GAN detector (SwinV2)"
     ),
-    SceneDetectorSpec("Organika/sdxl-detector", 0.25, "Stable Diffusion / SDXL specialist (Swin)"),
-    # Not yet measured on the set above. At weight 0 its score is reported in
-    # model_scores but adds nothing to the fusion.
     SceneDetectorSpec(
         settings.commfor_model_id,
         settings.commfor_weight,
@@ -580,7 +583,7 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
 
     return AnalysisResult(
         fake_probability=round(final_fake_prob, 4),
-        model_name="Ensemble (SwinV2 + Swin scene detectors, EfficientNet-B4 face model, forensic modules)",
+        model_name="Ensemble (SwinV2 + Community Forensics ViT scene detectors, EfficientNet-B4 face model, forensic modules)",
         model_version="2.5-forensics",
         weights_status=loaded.weights_status,
         evidence=evidence_payload,

@@ -45,9 +45,18 @@ def get_gend():
     with _LOCK:
         if _MODEL is None and not _FAILED:
             try:
-                from app.ml.video.gend_model import GenD
+                from huggingface_hub import hf_hub_download
+                from safetensors.torch import load_file
 
-                model = GenD.from_pretrained(settings.gend_model_id)
+                from app.ml.video.gend_model import GenD, GenDConfig
+
+                # GenD.from_pretrained fails on transformers 5: GenD's constructor itself calls
+                # CLIPModel.from_pretrained, which is refused inside from_pretrained's meta-device
+                # context. Building from the config and loading the weights strictly is equivalent.
+                config = GenDConfig.from_pretrained(settings.gend_model_id)
+                model = GenD(config)
+                state = load_file(hf_hub_download(settings.gend_model_id, "model.safetensors"))
+                model.load_state_dict(state, strict=True)
                 _MODEL = model.float().eval().to(resolve_device())
                 logger.info("Loaded GenD %s on %s", settings.gend_model_id, resolve_device())
             except Exception as exc:

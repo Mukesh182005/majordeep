@@ -198,8 +198,8 @@ score >= 0.5. Same full-pipeline samples as above (`evaluation/E2E-03/summary.js
 MANIPULATED 15.0 % -> 4.0 % (EnCodec C04 + C07: 30/50 -> 6/50), but fakes called MANIPULATED 77.0 % -> 54.0 %;
 ASVspoof 2019 fakes 97.7 % -> 84.7 % (real 0.3 % -> 0.0 %). The rule fixed before testing (fewer false alarms
 *and* at most a 5-point loss of detection, and >= 95 % on ASVspoof 2019) was not met, so the original pellav2
-stays the default. The fine-tuned model can be enabled with `AUDIO_PELLAV2_MODEL_ID=checkpoints/pellav2_ft_v1` and
-`AUDIO_PELLAV2_CONFIG_FILE=checkpoints/pellav2_ft_v1/pellav2_verdict_config.json`.
+stays the default. The fine-tuned checkpoint was deleted to free disk space; `finetune_pellav2.py prepare` and
+`train` rebuild it from the same samples.
 
 ## 6. Video
 

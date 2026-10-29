@@ -54,7 +54,7 @@ def get_model_audit_info() -> dict[str, Any]:
         from app.ml.image_pipeline import SCENE_DETECTORS
 
         scene_architecture = "; ".join(
-            f"{s.model_id} ({s.role}, weight {s.weight}{', unvalidated, not in verdict' if s.weight == 0 else ''})"
+            f"{Path(s.model_id).parent.name if Path(s.model_id).suffix in ('.safetensors', '.pt') else s.model_id} ({s.role}, weight {s.weight}{', unvalidated, not in verdict' if s.weight == 0 else ''})"
             for s in SCENE_DETECTORS
             if s.loader != "commfor" or settings.commfor_enabled
         )

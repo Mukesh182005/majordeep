@@ -425,7 +425,7 @@ def analyze_video(
             "risk_tier": fusion.get("risk_tier", "LOW_RISK"),
             "dominant_threat": fusion["dominant_threat"],
             "threat_code": fusion["threat_code"],
-            "video_category": fusion.get("video_category", "Authentic Camera Recording"),
+            "video_category": fusion.get("video_category", "No Manipulation Detected"),
             "corroborating_signals": fusion["corroborating_signals"],
             "segment_timeline": fusion["segment_timeline"],
             "pipeline_modules": pipeline_modules,

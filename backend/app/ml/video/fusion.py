@@ -13,6 +13,9 @@ from __future__ import annotations
 from typing import Any
 import numpy as np
 
+from app.ml.base import classify
+from app.models import Verdict
+
 
 def compute_video_risk(
     spatial_prob: float,
@@ -288,10 +291,10 @@ def fuse_video_forensics(
         dominant_threat = f"Traditionally Transcoded Video ({editing_tool or 'FFmpeg'})"
         threat_code = "TRADITIONALLY_EDITED"
         category_name = "Traditionally Edited / Transcoded"
-    elif final_prob <= 0.42 or (spatial_prob < 0.40 and vit_genai_prob < 0.40):
-        dominant_threat = "Authentic Camera Video Recording"
-        threat_code = "AUTHENTIC_PHOTOGRAPH"
-        category_name = "Authentic Camera Recording"
+    elif classify(final_prob) is Verdict.AUTHENTIC:  # the label follows the verdict's own band
+        dominant_threat = "No Manipulation Detected (origin unverified)"
+        threat_code = "NO_MANIPULATION_DETECTED"
+        category_name = "No Manipulation Detected"
     else:
         dominant_threat = "Inconclusive Forensic Signals"
         threat_code = "INCONCLUSIVE"

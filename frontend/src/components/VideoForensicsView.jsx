@@ -559,7 +559,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
           <Card title="Video Stream Specifications" subtitle="Ingestion container and temporal format metadata">
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { label: 'Video Category',   value: evidence.video_category || 'Authentic Camera Recording' },
+                { label: 'Video Category',   value: evidence.video_category || 'No Manipulation Detected' },
                 { label: 'Editing App / Tool', value: container.editing_software || 'Camera Direct Capture' },
                 { label: 'Container Brand',  value: container.container_format || 'MP4' },
                 { label: 'Duration',         value: evidence.duration_seconds ? `${evidence.duration_seconds.toFixed(2)}s` : '–' },

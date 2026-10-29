@@ -220,7 +220,9 @@ def describe() -> dict[str, str]:
         f"{TRAINED if checkpoint_path('image').exists() else UNTRAINED}, "
         f"configured {settings.image_model_version}",
         "audio": _describe_audio(),
-        "video": f"frame-aggregation over the image model, configured "
+        "video": f"GenD face-swap detector ({settings.gend_model_id}, "
+        f"{'in the verdict' if settings.gend_in_verdict else 'shown, not in the verdict'}) on sampled face frames, "
+        f"scene AI detectors on {settings.video_scene_frames} frames, multi-modal forensics; configured "
         f"{settings.video_model_version}",
     }
 

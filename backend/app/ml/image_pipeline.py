@@ -571,7 +571,7 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "analysed_region": face_scores[worst_face_idx]["box"] if face_scores else None,
         "backbone": loaded.metadata.get("backbone", settings.image_model_backbone),
         "input_size": loaded.input_size,
-        "scene_model_scores": scene["model_scores"],
+        "scene_model_scores": {_display_name(k): v for k, v in scene["model_scores"].items()},
         "trufor": trufor_res,
         "trufor_file": trufor_res.get("heatmap_file") if trufor_res else None,
         "verdict_basis": verdict_basis,

@@ -78,6 +78,16 @@ SCENE_DETECTORS: tuple[SceneDetectorSpec, ...] = (
         "Community Forensics, 4,803 generators (ViT-S/384)",
         loader="commfor",
     ),
+    *(
+        [SceneDetectorSpec(
+            str(Path(settings.checkpoint_dir) / settings.commfor_ft_checkpoint),
+            settings.commfor_ft_weight,
+            "Community Forensics fine-tuned on FLUX.2 / GPT Image 2 / Nano Banana 2",
+            loader="commfor",
+        )]
+        if settings.commfor_ft_checkpoint and settings.commfor_ft_weight > 0
+        else []
+    ),
 )
 _REAL_CLASS_NAMES = frozenset({"real", "human", "hum", "authentic"})
 
@@ -140,6 +150,14 @@ def get_scene_detector() -> list[LoadedSceneDetector]:
                 logger.error("No scene detector could be loaded: AI-generation analysis is unavailable.")
             _SCENE_DETECTORS = loaded
     return _SCENE_DETECTORS
+
+
+def _display_name(model_id: str) -> str:
+    """Short name for a scene detector: the repo name, or the folder of a local checkpoint file."""
+    path = Path(model_id)
+    if path.suffix in (".safetensors", ".pt", ".pth"):
+        return path.parent.name
+    return model_id.replace("\\", "/").split("/")[-1]
 
 
 def _logit(p: float, eps: float = 1e-6) -> float:
@@ -506,7 +524,7 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     # so its score cannot be read as part of the verdict.
     unweighted = {spec.model_id for spec in SCENE_DETECTORS if spec.weight == 0}
     model_summary = " | ".join(
-        f"{model_id.split('/')[-1]}{' (unvalidated, not in verdict)' if model_id in unweighted else ''}: {round(p * 100, 1)}%"
+        f"{_display_name(model_id)}{' (unvalidated, not in verdict)' if model_id in unweighted else ''}: {round(p * 100, 1)}%"
         for model_id, p in scene["model_scores"].items()
     ) or "unavailable"
     for mod in forensics.get("pipeline_modules", []):

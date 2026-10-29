@@ -1,0 +1,1941 @@
+{
+  "created_at": "2026-10-29T06:57:58+00:00",
+  "script": "backend/scripts/eval_scene_detectors.py",
+  "git_commit": "bab39ec91dd385f43de2fa853ecae2ac6cae8e00",
+  "device": "cuda",
+  "data": "C:\\deepsentinel_data\\ACC_TEST",
+  "folder_counts": {
+    "real/100_real": 20,
+    "real/100_real_edited": 20,
+    "real/100_real_whatsapp": 20,
+    "fake/100_ai": 40,
+    "fake/100_ai_processed": 20
+  },
+  "missing_or_empty_folders": [],
+  "flag_threshold": 0.5,
+  "experts": [
+    {
+      "model_id": "haywoodsloan/ai-image-detector-deploy",
+      "role": "Modern diffusion & GAN detector (SwinV2)",
+      "weight": 0.75,
+      "loader": "pipeline"
+    },
+    {
+      "model_id": "../checkpoints/commfor_ft_v2/model.safetensors",
+      "role": "Community Forensics, 4,803 generators (ViT-S/384)",
+      "weight": 4.0,
+      "loader": "commfor"
+    }
+  ],
+  "per_expert": {
+    "haywoodsloan/ai-image-detector-deploy": {
+      "auc": 0.45166666666666666,
+      "real_flagged_rate": 0.06666666666666667,
+      "ai_caught_rate": 0.05,
+      "real_flagged": 4,
+      "n_real": 60,
+      "ai_caught": 3,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "../checkpoints/commfor_ft_v2/model.safetensors": {
+      "auc": 0.7936111111111112,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.18333333333333332,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 11,
+      "n_ai": 60,
+      "n_unscored": 0
+    }
+  },
+  "commfor_model_id": "../checkpoints/commfor_ft_v2/model.safetensors",
+  "commfor_weight_grid": [
+    0.0,
+    2.0,
+    4.0,
+    8.0
+  ],
+  "per_commfor_weight": {
+    "0.0": {
+      "auc": 0.45166666666666666,
+      "real_flagged_rate": 0.06666666666666667,
+      "ai_caught_rate": 0.05,
+      "real_flagged": 4,
+      "n_real": 60,
+      "ai_caught": 3,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "2.0": {
+      "auc": 0.7813888888888889,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.05,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 3,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "4.0": {
+      "auc": 0.7908333333333334,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.1,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 6,
+      "n_ai": 60,
+      "n_unscored": 0
+    },
+    "8.0": {
+      "auc": 0.7908333333333334,
+      "real_flagged_rate": 0.0,
+      "ai_caught_rate": 0.13333333333333333,
+      "real_flagged": 0,
+      "n_real": 60,
+      "ai_caught": 8,
+      "n_ai": 60,
+      "n_unscored": 0
+    }
+  },
+  "recommendation": {
+    "commfor_weight": 4.0,
+    "rule": "best AUC with real_flagged_rate <= weight-0 rate + 0.01; ties go to the smaller weight",
+    "real_flagged_rate_limit": 0.07666666666666666,
+    "note": "Weight chosen on the same images it is measured on; not a held-out estimate."
+  },
+  "per_folder_at_recommended": {
+    "real/100_real": {
+      "label": 0,
+      "flagged": 0,
+      "n": 20,
+      "flagged_rate": 0.0
+    },
+    "real/100_real_edited": {
+      "label": 0,
+      "flagged": 0,
+      "n": 20,
+      "flagged_rate": 0.0
+    },
+    "real/100_real_whatsapp": {
+      "label": 0,
+      "flagged": 0,
+      "n": 20,
+      "flagged_rate": 0.0
+    },
+    "fake/100_ai": {
+      "label": 1,
+      "flagged": 6,
+      "n": 40,
+      "flagged_rate": 0.15
+    },
+    "fake/100_ai_processed": {
+      "label": 1,
+      "flagged": 0,
+      "n": 20,
+      "flagged_rate": 0.0
+    }
+  },
+  "images": [
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_003278.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.025610923767089844,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 9.786383998289239e-06
+      },
+      "fused": {
+        "0.0": 0.02561092376708985,
+        "2.0": 8.429266849511933e-05,
+        "4.0": 3.404420866807962e-05,
+        "8.0": 1.9254760099124564e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_003478.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.03519153594970703,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 9.384043551108334e-06
+      },
+      "fused": {
+        "0.0": 0.03519153594970703,
+        "2.0": 8.940007975502269e-05,
+        "4.0": 3.4606564348511174e-05,
+        "8.0": 1.9057506341442997e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_003905.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.8860413134098053,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0010027125244960189
+      },
+      "fused": {
+        "0.0": 0.8860413134098053,
+        "2.0": 0.011410124931209582,
+        "4.0": 0.004110463893069158,
+        "8.0": 0.0021578682093535786
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_004165.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.8868732154369354,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.011307355016469955
+      },
+      "fused": {
+        "0.0": 0.8868732154369355,
+        "2.0": 0.06356676349319522,
+        "4.0": 0.031072757242583633,
+        "8.0": 0.019623568688335768
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_011395.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.06265383958816528,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.02233356237411499
+      },
+      "fused": {
+        "0.0": 0.06265383958816528,
+        "2.0": 0.02970559142279715,
+        "4.0": 0.02635075401196745,
+        "8.0": 0.024433795412240496
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_012280.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0047438740730285645,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 3.884159980316326e-07
+      },
+      "fused": {
+        "0.0": 0.004743874073028564,
+        "2.0": 1.0072584751771435e-05,
+        "4.0": 3.808613154995937e-06,
+        "8.0": 2.0666819140642677e-06
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_013434.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006270289421081543,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.000513706705532968
+      },
+      "fused": {
+        "0.0": 0.00627028942108154,
+        "2.0": 0.0010174623743873534,
+        "4.0": 0.0007630746247463695,
+        "8.0": 0.0006368124316873588
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_014592.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009600341320037842,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.00015074883413035423
+      },
+      "fused": {
+        "0.0": 0.009600341320037837,
+        "2.0": 0.000469082605920927,
+        "4.0": 0.00029086504457775947,
+        "8.0": 0.00021538266758738725
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_018289.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.003161907196044922,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 1.2486861123761628e-05
+      },
+      "fused": {
+        "0.0": 0.003161907196044923,
+        "2.0": 5.6533599711206946e-05,
+        "4.0": 2.9933765715225936e-05,
+        "8.0": 2.0071569838866745e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_028657.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0034133195877075195,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 1.6966432667686604e-05
+      },
+      "fused": {
+        "0.0": 0.00341331958770752,
+        "2.0": 7.214734961155249e-05,
+        "4.0": 3.922277715571374e-05,
+        "8.0": 2.6740110939311372e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_029256.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.07269978523254395,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 7.944343815324828e-05
+      },
+      "fused": {
+        "0.0": 0.07269978523254395,
+        "2.0": 0.0005205613461766963,
+        "4.0": 0.00023591832718920677,
+        "8.0": 0.00014344244601826515
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_030495.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006751418113708496,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 3.2349812499887776e-06
+      },
+      "fused": {
+        "0.0": 0.006751418113708494,
+        "2.0": 2.6060837411682062e-05,
+        "4.0": 1.0826000200020796e-05,
+        "8.0": 6.232367930838981e-06
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_032098.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.06268209218978882,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0005723315989598632
+      },
+      "fused": {
+        "0.0": 0.0626820921897888,
+        "2.0": 0.0020932054094082936,
+        "4.0": 0.001212815152476053,
+        "8.0": 0.0008604483599728669
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_036048.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.16460037231445312,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0023206970654428005
+      },
+      "fused": {
+        "0.0": 0.16460037231445312,
+        "2.0": 0.0077454024085563365,
+        "4.0": 0.004666623344820346,
+        "8.0": 0.0033915747351065226
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_055302.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.027155816555023193,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 8.599073044024408e-05
+      },
+      "fused": {
+        "0.0": 0.027155816555023197,
+        "2.0": 0.00041611806811673425,
+        "4.0": 0.00021425048343528592,
+        "8.0": 0.00014115120418591747
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_066237.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0059868693351745605,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.009598434902727604
+      },
+      "fused": {
+        "0.0": 0.005986869335174562,
+        "2.0": 0.00844048683141155,
+        "4.0": 0.008910129578171007,
+        "8.0": 0.00921849481363097
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_071482.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005295455455780029,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 1.1518871360749472e-05
+      },
+      "fused": {
+        "0.0": 0.005295455455780028,
+        "2.0": 6.139745133020869e-05,
+        "4.0": 3.0350003281630073e-05,
+        "8.0": 1.949024978723533e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_073563.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0035325288772583008,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 3.577586903702468e-05
+      },
+      "fused": {
+        "0.0": 0.0035325288772583034,
+        "2.0": 0.00012529090579068176,
+        "4.0": 7.391527296592687e-05,
+        "8.0": 5.3048102049776125e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_077397.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0011458396911621094,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 9.064615005627275e-05
+      },
+      "fused": {
+        "0.0": 0.0011458396911621094,
+        "2.0": 0.00018110026552250287,
+        "4.0": 0.00013532148523394066,
+        "8.0": 0.00011267223647520759
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real\\instagram_real_078907.jpg",
+      "folder": "real/100_real",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002824544906616211,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 4.322348104324192e-06
+      },
+      "fused": {
+        "0.0": 0.0028245449066162105,
+        "2.0": 2.5341643704004508e-05,
+        "4.0": 1.2034272942640042e-05,
+        "8.0": 7.535790179285392e-06
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_000425.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.11542665958404541,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 3.130151526420377e-05
+      },
+      "fused": {
+        "0.0": 0.11542665958404544,
+        "2.0": 0.0003038910184200973,
+        "4.0": 0.00011670948701487511,
+        "8.0": 6.394937795155155e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_010463.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.911177009344101,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.00027336410130374134
+      },
+      "fused": {
+        "0.0": 0.911177009344101,
+        "2.0": 0.0048114872474041455,
+        "4.0": 0.0014403864511698262,
+        "8.0": 0.0006739740443326372
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_013031.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002668619155883789,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 1.7245300114154816e-05
+      },
+      "fused": {
+        "0.0": 0.0026686191558837886,
+        "2.0": 6.825445785866139e-05,
+        "4.0": 3.824481024056568e-05,
+        "8.0": 2.657338588461779e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_014446.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008874595165252686,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.00020479552040342242
+      },
+      "fused": {
+        "0.0": 0.008874595165252686,
+        "2.0": 0.0005735872172336321,
+        "4.0": 0.0003717848415824388,
+        "8.0": 0.0002830806644096348
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_018210.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032431483268737793,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0009905975311994553
+      },
+      "fused": {
+        "0.0": 0.00324314832687378,
+        "2.0": 0.0013692208360149834,
+        "4.0": 0.0011947857445821412,
+        "8.0": 0.0010966902127062838
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_018231.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.055429816246032715,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0007061299402266741
+      },
+      "fused": {
+        "0.0": 0.0554298162460327,
+        "2.0": 0.0023529820905487317,
+        "4.0": 0.0014178340041896944,
+        "8.0": 0.0010309945539228817
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_022298.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0065498948097229,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 8.115400851238519e-05
+      },
+      "fused": {
+        "0.0": 0.006549894809722903,
+        "2.0": 0.00026919519788086617,
+        "4.0": 0.0001624849067563392,
+        "8.0": 0.00011830036999872707
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_027493.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.14466649293899536,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0026804807130247355
+      },
+      "fused": {
+        "0.0": 0.14466649293899536,
+        "2.0": 0.008248553262694747,
+        "4.0": 0.005142435685128413,
+        "8.0": 0.0038186010716798756
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_027696.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032821297645568848,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.009093494154512882
+      },
+      "fused": {
+        "0.0": 0.0032821297645568843,
+        "2.0": 0.006891281856526564,
+        "4.0": 0.007745331476574911,
+        "8.0": 0.008335091594857907
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_029439.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.015829026699066162,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 1.1456764696049504e-05
+      },
+      "fused": {
+        "0.0": 0.015829026699066155,
+        "2.0": 8.26780373161824e-05,
+        "4.0": 3.597460928715945e-05,
+        "8.0": 2.1321988806509113e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_035713.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0028311610221862793,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 1.7902120816870593e-05
+      },
+      "fused": {
+        "0.0": 0.0028311610221862806,
+        "2.0": 7.127851624889855e-05,
+        "4.0": 3.9838975221157213e-05,
+        "8.0": 2.7637324259163628e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_038618.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.001356661319732666,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 8.471040928270668e-05
+      },
+      "fused": {
+        "0.0": 0.0013566613197326662,
+        "2.0": 0.0001805324918196083,
+        "4.0": 0.00013127847448901205,
+        "8.0": 0.0001074533879280556
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_042590.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0012714266777038574,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0005314339650794864
+      },
+      "fused": {
+        "0.0": 0.0012714266777038576,
+        "2.0": 0.0006742105416534108,
+        "4.0": 0.0006099344235920844,
+        "8.0": 0.0005727051884114793
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_045753.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.07946836948394775,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.011733419261872768
+      },
+      "fused": {
+        "0.0": 0.07946836948394775,
+        "2.0": 0.019987808013396207,
+        "4.0": 0.015980743782206035,
+        "8.0": 0.013878192562562617
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_045962.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.016129612922668457,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.022632470354437828
+      },
+      "fused": {
+        "0.0": 0.016129612922668457,
+        "2.0": 0.020640042133405916,
+        "4.0": 0.021457128189897,
+        "8.0": 0.021986831187989296
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_046925.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.015486538410186768,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0006138298194855452
+      },
+      "fused": {
+        "0.0": 0.015486538410186768,
+        "2.0": 0.001485193942541846,
+        "4.0": 0.001023885867174482,
+        "8.0": 0.0008103714117524628
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_049729.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.012166857719421387,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0003450442454777658
+      },
+      "fused": {
+        "0.0": 0.012166857719421388,
+        "2.0": 0.0009141730610678533,
+        "4.0": 0.0006065799072352676,
+        "8.0": 0.00046869458726372324
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_052810.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.9537355415523052,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.000411816465202719
+      },
+      "fused": {
+        "0.0": 0.9537355415523052,
+        "2.0": 0.007818088740691734,
+        "4.0": 0.002269291759469489,
+        "8.0": 0.0010404649426116626
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_053046.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01407170295715332,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 2.745566234807484e-05
+      },
+      "fused": {
+        "0.0": 0.014071702957153315,
+        "2.0": 0.00015110075181029237,
+        "4.0": 7.369388376591725e-05,
+        "8.0": 4.692575329027012e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_edited\\facebook_real_056970.jpg",
+      "folder": "real/100_real_edited",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006274878978729248,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.01329594012349844
+      },
+      "fused": {
+        "0.0": 0.006274878978729247,
+        "2.0": 0.0108397401820572,
+        "4.0": 0.011813892898486856,
+        "8.0": 0.012469983915033466
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_002847.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0016373991966247559,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.006719416938722134
+      },
+      "fused": {
+        "0.0": 0.0016373991966247554,
+        "2.0": 0.0045754460245436045,
+        "4.0": 0.0053795956463213515,
+        "8.0": 0.005955489615359358
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_006078.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032900571823120117,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 2.9965043722768314e-05
+      },
+      "fused": {
+        "0.0": 0.0032900571823120104,
+        "2.0": 0.00010801695768338258,
+        "4.0": 6.295390912403107e-05,
+        "8.0": 4.483710921805639e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_006338.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00667649507522583,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.08330755680799484
+      },
+      "fused": {
+        "0.0": 0.00667649507522583,
+        "2.0": 0.042758920379980754,
+        "4.0": 0.05681687697453441,
+        "8.0": 0.06777046957208427
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_006698.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.2772483825683594,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.026959894225001335
+      },
+      "fused": {
+        "0.0": 0.2772483825683594,
+        "2.0": 0.05368872028345646,
+        "4.0": 0.04026634830546542,
+        "8.0": 0.033542488591849356
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_008180.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.017138957977294922,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0005915837245993316
+      },
+      "fused": {
+        "0.0": 0.01713895797729492,
+        "2.0": 0.0014870413072843162,
+        "4.0": 0.0010088272979171735,
+        "8.0": 0.0007904289970627415
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_010189.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006835758686065674,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.00012577978486660868
+      },
+      "fused": {
+        "0.0": 0.006835758686065674,
+        "2.0": 0.00037456750059760343,
+        "4.0": 0.00023659174263378197,
+        "8.0": 0.00017724276190273565
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_014110.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0025874972343444824,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.02881898544728756
+      },
+      "fused": {
+        "0.0": 0.0025874972343444824,
+        "2.0": 0.015036656413974456,
+        "4.0": 0.019796265260779426,
+        "8.0": 0.02351401531195745
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_017335.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002779841423034668,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.01564428210258484
+      },
+      "fused": {
+        "0.0": 0.002779841423034667,
+        "2.0": 0.009789403947396835,
+        "4.0": 0.011929631684718793,
+        "8.0": 0.013505185519558139
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_022059.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.021899104118347168,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.01223332155495882
+      },
+      "fused": {
+        "0.0": 0.021899104118347168,
+        "2.0": 0.014346528408992218,
+        "4.0": 0.013416124704620275,
+        "8.0": 0.012862030483224991
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_022541.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0036266446113586426,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.07827602326869965
+      },
+      "fused": {
+        "0.0": 0.003626644611358643,
+        "2.0": 0.034721972372229286,
+        "4.0": 0.04910966699584292,
+        "8.0": 0.06088288158605257
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_023526.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.016543328762054443,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 9.465025505051017e-05
+      },
+      "fused": {
+        "0.0": 0.016543328762054443,
+        "2.0": 0.00038864217313933113,
+        "4.0": 0.00021443037437545232,
+        "8.0": 0.00014754709073131397
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_024807.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0026514530181884766,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.004643194377422333
+      },
+      "fused": {
+        "0.0": 0.0026514530181884753,
+        "2.0": 0.00398568850377921,
+        "4.0": 0.0042504033551102926,
+        "8.0": 0.004425682321658049
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_024898.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.08219385147094727,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.01064569316804409
+      },
+      "fused": {
+        "0.0": 0.08219385147094727,
+        "2.0": 0.01881714610726616,
+        "4.0": 0.014813099014828931,
+        "8.0": 0.012738962525767582
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_030108.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00766521692276001,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 3.7219062505755574e-05
+      },
+      "fused": {
+        "0.0": 0.007665216922760012,
+        "2.0": 0.00015945733884565377,
+        "4.0": 8.641706886528135e-05,
+        "8.0": 5.8798102710599074e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_035142.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009661853313446045,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.005575556308031082
+      },
+      "fused": {
+        "0.0": 0.009661853313446045,
+        "2.0": 0.006478894766345965,
+        "4.0": 0.006082052817687069,
+        "8.0": 0.0058450732364412
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_039565.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004908084869384766,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.02883617952466011
+      },
+      "fused": {
+        "0.0": 0.004908084869384764,
+        "2.0": 0.017872928536776134,
+        "4.0": 0.02187486999424557,
+        "8.0": 0.02482589091859684
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_047823.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008941471576690674,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0011388106504455209
+      },
+      "fused": {
+        "0.0": 0.008941471576690672,
+        "2.0": 0.0020002532711714265,
+        "4.0": 0.0015780013192863123,
+        "8.0": 0.001359434084809998
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_050036.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.14691555500030518,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 6.666704575764015e-05
+      },
+      "fused": {
+        "0.0": 0.14691555500030515,
+        "2.0": 0.0005679052593384648,
+        "4.0": 0.00023046146396310516,
+        "8.0": 0.00013072304442323155
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_052895.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01571178436279297,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0019588181748986244
+      },
+      "fused": {
+        "0.0": 0.01571178436279297,
+        "2.0": 0.0034641020148786167,
+        "4.0": 0.0027251186862893473,
+        "8.0": 0.0023434128887727668
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\real\\100_real_whatsapp\\snapchat_real_055541.jpg",
+      "folder": "real/100_real_whatsapp",
+      "label": 0,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005181729793548584,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.004876724909991026
+      },
+      "fused": {
+        "0.0": 0.005181729793548582,
+        "2.0": 0.004958090683782948,
+        "4.0": 0.00492366805459949,
+        "8.0": 0.004902152797786235
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_001051.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 1.2040138244628906e-05,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.6203616857528687
+      },
+      "fused": {
+        "0.0": 1.204013824462891e-05,
+        "2.0": 0.06110563184744878,
+        "4.0": 0.20181814851040059,
+        "8.0": 0.37240418372806633
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_001832.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00017780065536499023,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.2744622528553009
+      },
+      "fused": {
+        "0.0": 0.0001778006553649901,
+        "2.0": 0.04470686035758999,
+        "4.0": 0.1013805035098043,
+        "8.0": 0.1639823250637443
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_002168.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0023325085639953613,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.005854560062289238
+      },
+      "fused": {
+        "0.0": 0.002332508563995361,
+        "2.0": 0.004556599361892551,
+        "4.0": 0.005063969013795215,
+        "8.0": 0.005411263886718514
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_002339.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.011280834674835205,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.5955010652542114
+      },
+      "fused": {
+        "0.0": 0.011280834674835209,
+        "2.0": 0.28115965473960036,
+        "4.0": 0.4059764797261368,
+        "8.0": 0.4925449461459081
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_005354.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.011886894702911377,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0012987629743292928
+      },
+      "fused": {
+        "0.0": 0.01188689470291138,
+        "2.0": 0.00237990549555606,
+        "4.0": 0.001844358457116071,
+        "8.0": 0.0015711793861876077
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_005607.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005875885486602783,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.02026320807635784
+      },
+      "fused": {
+        "0.0": 0.005875885486602782,
+        "2.0": 0.014484643128314585,
+        "4.0": 0.016687866056329485,
+        "8.0": 0.018238087832160636
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_006913.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004435539245605469,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.6557884216308594
+      },
+      "fused": {
+        "0.0": 0.00443553924560547,
+        "2.0": 0.26743682157416565,
+        "4.0": 0.42263081025243193,
+        "8.0": 0.5312850193565143
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_007196.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.003915548324584961,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0003189249546267092
+      },
+      "fused": {
+        "0.0": 0.003915548324584961,
+        "2.0": 0.0006324228847338177,
+        "4.0": 0.0004740586322418217,
+        "8.0": 0.0003954951705950216
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_007505.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.026612579822540283,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.003969054669141769
+      },
+      "fused": {
+        "0.0": 0.02661257982254028,
+        "2.0": 0.006692731584271561,
+        "4.0": 0.0053720003852370515,
+        "8.0": 0.004678085228507649
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_008021.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.001238107681274414,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.10475800931453705
+      },
+      "fused": {
+        "0.0": 0.0012381076812744136,
+        "2.0": 0.03274645583495047,
+        "4.0": 0.053989403582818715,
+        "8.0": 0.07342530677747469
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_008773.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002554655075073242,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.29250508546829224
+      },
+      "fused": {
+        "0.0": 0.0025546550750732413,
+        "2.0": 0.09365497517713038,
+        "4.0": 0.15630389013179385,
+        "8.0": 0.2109809634891441
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_008845.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.015113532543182373,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0048307389952242374
+      },
+      "fused": {
+        "0.0": 0.015113532543182373,
+        "2.0": 0.006600349744818473,
+        "4.0": 0.005787905475326741,
+        "8.0": 0.005328948407025012
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_010336.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01606649160385132,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.7486116290092468
+      },
+      "fused": {
+        "0.0": 0.01606649160385132,
+        "2.0": 0.41857915482656877,
+        "4.0": 0.5669000260965541,
+        "8.0": 0.6558803512380639
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_010626.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0004761219024658203,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.03800404816865921
+      },
+      "fused": {
+        "0.0": 0.00047612190246582037,
+        "2.0": 0.01170184006114896,
+        "4.0": 0.01928596526341825,
+        "8.0": 0.026339141528705295
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_012433.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00035190582275390625,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.9603390693664551
+      },
+      "fused": {
+        "0.0": 0.00035190582275390603,
+        "2.0": 0.5372032430642748,
+        "4.0": 0.8066168602983969,
+        "8.0": 0.9031016692832721
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_013145.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00039273500442504883,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.017091093584895134
+      },
+      "fused": {
+        "0.0": 0.00039273500442504915,
+        "2.0": 0.006147142739304284,
+        "4.0": 0.009467444122743127,
+        "8.0": 0.012409349190592098
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_015147.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0013682246208190918,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.7933286428451538
+      },
+      "fused": {
+        "0.0": 0.001368224620819092,
+        "2.0": 0.305806986351801,
+        "4.0": 0.5229195391382105,
+        "8.0": 0.6603174978026164
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_017502.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.016198575496673584,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.8469749689102173
+      },
+      "fused": {
+        "0.0": 0.01619857549667358,
+        "2.0": 0.5310747783303263,
+        "4.0": 0.68836913918517,
+        "8.0": 0.770726990884846
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_018250.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.8401273787021637,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.9218859672546387
+      },
+      "fused": {
+        "0.0": 0.8401273787021637,
+        "2.0": 0.9044428668229073,
+        "4.0": 0.9121763913703212,
+        "8.0": 0.9167435734368348
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\diffusion_fake_019960.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.020121991634368896,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.007465645205229521
+      },
+      "fused": {
+        "0.0": 0.0201219916343689,
+        "2.0": 0.009794997302095737,
+        "4.0": 0.008737367658222526,
+        "8.0": 0.00813134853002031
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_009065.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.11622130870819092,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0003417648549657315
+      },
+      "fused": {
+        "0.0": 0.1162213087081909,
+        "2.0": 0.0017303812911723148,
+        "4.0": 0.0008743078053084066,
+        "8.0": 0.0005691224715172155
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_009150.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004296600818634033,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.007891383022069931
+      },
+      "fused": {
+        "0.0": 0.004296600818634034,
+        "2.0": 0.006687193296807085,
+        "4.0": 0.007170212619729171,
+        "8.0": 0.007491392718387553
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_009363.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0445026159286499,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 5.894742571399547e-05
+      },
+      "fused": {
+        "0.0": 0.044502615928649916,
+        "2.0": 0.00036358415481222496,
+        "4.0": 0.0001690219780125896,
+        "8.0": 0.00010442787167463484
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_013934.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0008298158645629883,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0005621121963486075
+      },
+      "fused": {
+        "0.0": 0.0008298158645629884,
+        "2.0": 0.0006251173561520432,
+        "4.0": 0.0005977714310320234,
+        "8.0": 0.00058119785990294
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_014373.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.07271158695220947,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0008747302345000207
+      },
+      "fused": {
+        "0.0": 0.07271158695220947,
+        "2.0": 0.002974136953216483,
+        "4.0": 0.0017771066773374273,
+        "8.0": 0.0012853501057660448
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_016162.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.04540008306503296,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0010211382759734988
+      },
+      "fused": {
+        "0.0": 0.04540008306503295,
+        "2.0": 0.0029046521347106005,
+        "4.0": 0.0018708421973106396,
+        "8.0": 0.001418593762822126
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_017219.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.040129780769348145,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0005607056664302945
+      },
+      "fused": {
+        "0.0": 0.04012978076934815,
+        "2.0": 0.0018147229945955873,
+        "4.0": 0.0011069296258902064,
+        "8.0": 0.0008111606551399296
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_017359.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.998068300075829,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.003759619314223528
+      },
+      "fused": {
+        "0.0": 0.9980683000758291,
+        "2.0": 0.08674041205646785,
+        "4.0": 0.023840614454276342,
+        "8.0": 0.01029325240275847
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_020622.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008547425270080566,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.02066541090607643
+      },
+      "fused": {
+        "0.0": 0.008547425270080566,
+        "2.0": 0.01626184634686677,
+        "4.0": 0.01799065839851988,
+        "8.0": 0.01916840624999611
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_023723.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.018565654754638672,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.00032731302781030536
+      },
+      "fused": {
+        "0.0": 0.018565654754638672,
+        "2.0": 0.000988897534904145,
+        "4.0": 0.0006208772865874206,
+        "8.0": 0.0004633517179835961
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_025928.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.003588378429412842,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 5.120298374095e-05
+      },
+      "fused": {
+        "0.0": 0.003588378429412842,
+        "2.0": 0.00016330991844289603,
+        "4.0": 0.00010021390234905642,
+        "8.0": 7.372451771488033e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_026175.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.00989001989364624,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 3.59079749614466e-05
+      },
+      "fused": {
+        "0.0": 0.00989001989364624,
+        "2.0": 0.00016663390646360065,
+        "4.0": 8.731961848440141e-05,
+        "8.0": 5.8169227000314235e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_028077.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.007548272609710693,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 1.8544724298408255e-05
+      },
+      "fused": {
+        "0.0": 0.007548272609710694,
+        "2.0": 9.56750354481894e-05,
+        "4.0": 4.794820000502028e-05,
+        "8.0": 3.105836855347514e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_030071.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.013741612434387207,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.00046669659786857665
+      },
+      "fused": {
+        "0.0": 0.013741612434387205,
+        "2.0": 0.0011774609298044307,
+        "4.0": 0.0007975456213103613,
+        "8.0": 0.0006242785511591899
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_032717.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.9466787129640579,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 7.648691098438576e-05
+      },
+      "fused": {
+        "0.0": 0.9466787129640578,
+        "2.0": 0.002218316910540252,
+        "4.0": 0.0005377737723804028,
+        "8.0": 0.00022051601274733016
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_035322.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009979605674743652,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.5753155946731567
+      },
+      "fused": {
+        "0.0": 0.009979605674743654,
+        "2.0": 0.26250349592168726,
+        "4.0": 0.38456159580948646,
+        "8.0": 0.4709098323668119
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_036789.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.006358087062835693,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.03638366609811783
+      },
+      "fused": {
+        "0.0": 0.00635808706283569,
+        "2.0": 0.022738718135490058,
+        "4.0": 0.027737286778596385,
+        "8.0": 0.03140976984130477
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_037170.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.02198636531829834,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.2236287146806717
+      },
+      "fused": {
+        "0.0": 0.021986365318298333,
+        "2.0": 0.12562335935870728,
+        "4.0": 0.1614677631607089,
+        "8.0": 0.18797008585519767
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_038242.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.01569664478302002,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.125630185008049
+      },
+      "fused": {
+        "0.0": 0.01569664478302002,
+        "2.0": 0.07312120517006795,
+        "4.0": 0.092183173185,
+        "8.0": 0.10634903309928082
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai\\inpaint_fake_038311.jpg",
+      "folder": "fake/100_ai",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.09678620100021362,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.6692740321159363
+      },
+      "fused": {
+        "0.0": 0.09678620100021361,
+        "2.0": 0.47590193547353304,
+        "4.0": 0.5599482753745629,
+        "8.0": 0.6113627675240392
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_006006.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.011657774448394775,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.006837353575974703
+      },
+      "fused": {
+        "0.0": 0.011657774448394774,
+        "2.0": 0.007910306632274032,
+        "4.0": 0.00743955283490638,
+        "8.0": 0.007157993317629233
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_009116.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.004360318183898926,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.04414321482181549
+      },
+      "fused": {
+        "0.0": 0.004360318183898927,
+        "2.0": 0.023715510660800253,
+        "4.0": 0.03085495294963612,
+        "8.0": 0.036365779745197946
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_010328.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.13425326347351074,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.14121392369270325
+      },
+      "fused": {
+        "0.0": 0.13425326347351074,
+        "2.0": 0.13928619014216678,
+        "4.0": 0.14009516513820772,
+        "8.0": 0.14060567423868892
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_010458.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.013316214084625244,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.36912116408348083
+      },
+      "fused": {
+        "0.0": 0.013316214084625246,
+        "2.0": 0.1730732575143559,
+        "4.0": 0.24394821982529233,
+        "8.0": 0.297531920133582
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_013238.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.03192341327667236,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0020352702122181654
+      },
+      "fused": {
+        "0.0": 0.031923413276672356,
+        "2.0": 0.004337728874795111,
+        "4.0": 0.0031548651179315636,
+        "8.0": 0.00258217838082416
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_021319.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.001638948917388916,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.011743787676095963
+      },
+      "fused": {
+        "0.0": 0.0016389489173889154,
+        "2.0": 0.006878410674787313,
+        "4.0": 0.008618732910391762,
+        "8.0": 0.009929322585367469
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_025203.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.002779364585876465,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.3535700738430023
+      },
+      "fused": {
+        "0.0": 0.0027793645858764653,
+        "2.0": 0.11474023613760596,
+        "4.0": 0.1920154175656576,
+        "8.0": 0.2580937022883722
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_027460.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0011234879493713379,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.7277625203132629
+      },
+      "fused": {
+        "0.0": 0.0011234879493713372,
+        "2.0": 0.24291874980488393,
+        "4.0": 0.43927778763305136,
+        "8.0": 0.578593103607313
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_029871.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0026424527168273926,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.21910883486270905
+      },
+      "fused": {
+        "0.0": 0.002642452716827392,
+        "2.0": 0.0729341544314491,
+        "4.0": 0.11846398303407808,
+        "8.0": 0.15835578959748212
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_030512.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0020894408226013184,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.03100234642624855
+      },
+      "fused": {
+        "0.0": 0.0020894408226013184,
+        "2.0": 0.014982025338066675,
+        "4.0": 0.020378017586285192,
+        "8.0": 0.024700885488654904
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_034993.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008933484554290771,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.2013351023197174
+      },
+      "fused": {
+        "0.0": 0.00893348455429077,
+        "2.0": 0.0922533690282168,
+        "4.0": 0.1296655841118102,
+        "8.0": 0.15929467544773818
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_036434.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.009904861450195312,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.20368114113807678
+      },
+      "fused": {
+        "0.0": 0.009904861450195309,
+        "2.0": 0.09557021868368948,
+        "4.0": 0.13293736808786147,
+        "8.0": 0.16229200797894505
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_037930.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.10409754514694214,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.05544605851173401
+      },
+      "fused": {
+        "0.0": 0.10409754514694212,
+        "2.0": 0.0660454735484733,
+        "4.0": 0.06137048696300981,
+        "8.0": 0.05859210600185191
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_038427.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.013443827629089355,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.042291060090065
+      },
+      "fused": {
+        "0.0": 0.013443827629089354,
+        "2.0": 0.031049754268871434,
+        "4.0": 0.03537923101636673,
+        "8.0": 0.03839246364042849
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_046566.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.005717873573303223,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 5.40126820851583e-05
+      },
+      "fused": {
+        "0.0": 0.0057178735733032235,
+        "2.0": 0.00019288999778776055,
+        "4.0": 0.00011286396292252934,
+        "8.0": 8.058323405795119e-05
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_047400.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0015823841094970703,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.07717890292406082
+      },
+      "fused": {
+        "0.0": 0.00158238410949707,
+        "2.0": 0.02757384522580045,
+        "4.0": 0.04279858956420574,
+        "8.0": 0.05618681742645157
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_047819.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.029746294021606445,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.0009551815455779433
+      },
+      "fused": {
+        "0.0": 0.02974629402160645,
+        "2.0": 0.0024556876794092314,
+        "4.0": 0.0016503666786888125,
+        "8.0": 0.001285381565861245
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_048520.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.008769989013671875,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.13182207942008972
+      },
+      "fused": {
+        "0.0": 0.008769989013671877,
+        "2.0": 0.06536210627530364,
+        "4.0": 0.08836322351021347,
+        "8.0": 0.10634789978796028
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_049823.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.06264150142669678,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.28901949524879456
+      },
+      "fused": {
+        "0.0": 0.06264150142669676,
+        "2.0": 0.1989999571152037,
+        "4.0": 0.23411353525325368,
+        "8.0": 0.25828395732860215
+      }
+    },
+    {
+      "path": "C:\\deepsentinel_data\\ACC_TEST\\fake\\100_ai_processed\\instagram_fake_059429.jpg",
+      "folder": "fake/100_ai_processed",
+      "label": 1,
+      "scores": {
+        "haywoodsloan/ai-image-detector-deploy": 0.0032238364219665527,
+        "../checkpoints/commfor_ft_v2/model.safetensors": 0.014034123159945011
+      },
+      "fused": {
+        "0.0": 0.0032238364219665523,
+        "2.0": 0.009412460275814381,
+        "4.0": 0.01113898971496328,
+        "8.0": 0.012380883169324734
+      }
+    }
+  ]
+}

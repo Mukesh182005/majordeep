@@ -78,8 +78,9 @@ def get_model_audit_info() -> dict[str, Any]:
             "name": "Full-scene AI-generation detector ensemble (log-odds fusion)",
             "architecture": scene_architecture,
             "measured_performance": (
-                "AUC 0.984 on 560 held-out images: 200 real photos (COCO, Flickr) and 360 from "
-                "SD 2.1, SDXL, SD3, DALL-E 3, Midjourney v6, Flux.1-dev and Gemini Nano Banana / Pro"
+                "See docs/research/EVALUATION.md (image sections) and evaluation/COMMFOR-FT-01 and "
+                "evaluation/E2E-01: held-out COCO photos, Synthbuster (9 generators) and FLUX.2 / GPT Image 2 / "
+                "Nano Banana 2 / Qwen Image 2.1 test images."
             ),
             "classes": ["Artificial / Generative", "Authentic Photograph"],
         },

@@ -133,6 +133,14 @@ class Settings(BaseSettings):
     commfor_enabled: bool = True
     commfor_model_id: str = "OwensLab/commfor-model-384"
     commfor_weight: float = 4.0
+    # A second Community Forensics expert fine-tuned on FLUX.2, GPT Image 2 and Nano Banana 2
+    # (ml/training/finetune_commfor.py, calibrated on its validation split). Path relative to
+    # checkpoint_dir; it is skipped if the file is missing. Used together with the original
+    # at equal weight, a rule fixed before scoring the test sets (evaluation/COMMFOR-FT-01):
+    # the combination flagged none of 1,069 real test photos, the fine-tuned model alone 5.7 %
+    # of COCO photos.
+    commfor_ft_checkpoint: str = "commfor_ft_v3/model.safetensors"
+    commfor_ft_weight: float = 4.0
     # Without camera metadata nothing positively shows an image came from a camera, so a
     # low score only means no detector fired. AUTHENTIC then needs a fused P(AI) below
     # this; between it and the decision band the verdict is INCONCLUSIVE. Chosen on the

@@ -166,6 +166,15 @@ fine-tuned model without the original flags more of them but also scored 6.4 % o
 (`evaluation/COMMFOR-FT-01/old_v3.json`, `COMMFOR_WEIGHT=4.0`), which a forensic tool should not do. Model-level comparisons of the original,
 fine-tuned and combined detectors: `evaluation/COMMFOR-FT-01/`.
 
+**A tried and rejected alternative (v4).** A second fine-tune (`checkpoints/commfor_ft_v4/`) added 1,600 more COCO
+photos, 1,350 unused Synthbuster images and 2,400 more GPT Image 2 / Nano Banana 2 images, and validation (which
+now also held COCO and Synthbuster images) chose it alone at weight 8 (0.7 % of validation real images MANIPULATED).
+On the held-out test sets (`evaluation/COMMFOR-FT-02/*_v4.json`, verdict thresholds as above) it called 84.2 % of
+newest-generator images MANIPULATED (GPT Image 2 85.6 %, Nano Banana 2 55.7 %) but also 6 of 296 COCO photos
+(2.0 %), and caught 8.3 % of `accuracy_test` AI images. The rule fixed beforehand was to switch only if no test
+set got worse, so the original + v3 ensemble stays. v4 can be enabled with `COMMFOR_FT_CHECKPOINT` and the weights
+`COMMFOR_WEIGHT=0`, `COMMFOR_FT_WEIGHT=8`, at the cost stated here.
+
 Stage diagnosis (`stage_diagnosis`): apart from the AI-detection stage, no forensic stage separated real from AI
 images on these sets (balanced accuracy 0.5).
 

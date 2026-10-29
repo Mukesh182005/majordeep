@@ -73,7 +73,7 @@
 
 ### 17. The newest image generators are mostly INCONCLUSIVE, not flagged
 - **Description:** On held-out test images (`evaluation/E2E-02/summary.json`, `sets.image_newest_generators`) the image verdict calls 44.0 % of FLUX.2 / GPT Image 2 / Nano Banana 2 / Qwen Image 2.1 images MANIPULATED, 44.4 % INCONCLUSIVE and 11.6 % AUTHENTIC; GPT Image 2 46/195 and Nano Banana 2 8/192 are flagged. 19.3 % of that set's real photos are INCONCLUSIVE. The original Community Forensics scores these generators as real and outvotes the fine-tuned model; the fine-tuned model alone would flag more of them but scored 6.4 % of COCO test photos as AI (`evaluation/COMMFOR-FT-01/old_v3.json`).
-- **Impact:** An image from a current generator is usually reported as "cannot confirm", not as AI-generated. No real test photo was called MANIPULATED. More training data for these generators (`docs/models/RETRAINING_IMAGE.md`) is the route to improve it.
+- **Impact:** An image from a current generator is usually reported as "cannot confirm", not as AI-generated. No real test photo was called MANIPULATED. A larger fine-tune (v4, `evaluation/COMMFOR-FT-02`) flags 84 % of these generators but wrongly calls 2.0 % of COCO photos MANIPULATED and misses most small thumbnails, so it is not the default (see `docs/research/EVALUATION.md` section 5).
 
 ### 18. Composites and local edits are not part of the image verdict
 - **Description:** The three AI detectors look at whole-image generation; an edited region pasted into a real photo is often scored as real. TruFor localises such edits (AUC 0.962 on controlled splices, `evaluation/TRUFOR-01/results.json`) but is shown, not used in the verdict, because it flags 10 % of re-compressed social-media photos in `accuracy_test`.

@@ -1,19 +1,18 @@
 /**
  * Thin API client.
  *
- * The token lives in localStorage: simple, and adequate here because the API is
- * stateless and CSRF-free. A production deployment handling real case material
- * should move to an httpOnly cookie so a script injection cannot read it.
+ * The session is the httpOnly SameSite=Lax cookie the API sets at login, sent with
+ * every request (credentials: 'include'); script cannot read it. Report downloads and
+ * the live-status WebSocket use the signed 5-minute links from POST /jobs/{id}/links.
+ * Only the non-secret user profile (name, email) is cached in localStorage, so the
+ * header renders before /auth/me answers. TOKEN_KEY is removed on logout to clear a
+ * token left by versions that stored one.
  */
 
 const BASE = import.meta.env.VITE_API_BASE || ''
 const API = `${BASE}/api`
 const TOKEN_KEY = 'dfd.token'
 const USER_KEY = 'dfd.user'
-
-export function getToken() {
-  return null
-}
 
 export function getStoredUser() {
   try {

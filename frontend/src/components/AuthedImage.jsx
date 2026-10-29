@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react'
-import { getToken } from '../lib/api'
 
 /**
- * Loads an image from an endpoint that requires the Authorization header.
- *
- * A plain <img src> cannot send headers, so evidence images belonging to a
- * signed-in user's job would 404. Fetching the bytes and handing the element an
- * object URL is what makes them display.
+ * Loads an evidence image with the session cookie (credentials: 'include') and shows
+ * it through an object URL, so an unavailable image gets a clear message instead of a
+ * broken-image icon.
  */
 export default function AuthedImage({ src, alt, className }) {
   const [objectUrl, setObjectUrl] = useState(null)

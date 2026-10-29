@@ -8,11 +8,6 @@
 - **Impact:** Repository bloat (~100 KB of duplicate code). No runtime impact.
 - **Status:** REQUIRES_REVIEW — needs verification that no test or deployment path imports from `ml_v1` before removal.
 
-### 2. JWT tokens stored in localStorage
-- **Description:** Frontend stores JWT tokens in `localStorage`, which is accessible to JavaScript and vulnerable to XSS token theft.
-- **Impact:** Low risk for the current use case; documented in the API client code.
-- **Status:** Backend side done on `fix/p5-security`: login sets an httpOnly, SameSite=Lax session cookie, and `?token=` URLs are replaced by signed 5-minute links (`docs/API_CHANGES.md`). Open until the frontend (`frontend/src/lib/api.js`) stops storing the token and uses the cookie and the signed links; until then, report download and live status for signed-in users' jobs fail, because the backend no longer reads `?token=`.
-
 ### 3. SQLite concurrent write limitations
 - **Description:** Development mode uses SQLite, which does not handle concurrent writes well.
 - **Impact:** Under concurrent requests, SQLite may return "database is locked" errors.
@@ -81,6 +76,9 @@
 - **Impact:** A composite with no AI-generated pixels can be reported "No manipulation detected"; the TruFor heatmap on the result page is then the evidence to check.
 
 ## Resolved Issues
+
+### JWT tokens stored in localStorage (fixed 2026-10-29; was #2)
+- Login sets an httpOnly, SameSite=Lax cookie (`backend/app/routers/auth.py`); the frontend sends it on every request (`credentials: 'include'` in `frontend/src/lib/api.js`, `xhr.withCredentials` for uploads, `AuthedImage.jsx` for evidence images) and stores no token. Report downloads and the live-status WebSocket use the signed 5-minute links from `POST /api/jobs/{id}/links`. Only the non-secret user profile is cached in localStorage. Checked by uploading through the site and downloading every PDF via the signed link.
 
 ### Untrained audio branches and standards claims in outputs (fixed 2026-10-22, branch `fix/p1-honest-outputs`)
 - The audio model stage reported a random-weight "Sinc-RawNet" score and "WavLM layer 18" / "Whisper layer 4" scores that were an FFT smoothness formula (the second 0.92 x the first + 0.04); none of these models ran. All three, and the typology and generator-family breakdowns built on them, were removed. Without the trained LCNN, audio results are now marked experimental.

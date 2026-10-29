@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { api, getStoredUser, getToken, clearSession } from './api'
+import { api, getStoredUser, clearSession } from './api'
 
 const AuthContext = createContext({ user: null, setUser: () => {}, loading: true })
 

@@ -79,6 +79,15 @@ class CommForScorer:
         self.model_id = str(model_id)
         self.device = resolve_device(device)
         weights = _resolve_weights(model_id)
+        # A fine-tuned checkpoint may carry a calibration in metadata.json next to it: a logit
+        # offset fitted on its validation split (ml/training/calibrate_commfor.py).
+        self.logit_bias = 0.0
+        meta_path = weights.parent / "metadata.json"
+        if weights.parent != Path(".") and meta_path.is_file():
+            import json
+
+            calibration = json.loads(meta_path.read_text(encoding="utf-8")).get("calibration") or {}
+            self.logit_bias = float(calibration.get("logit_bias", 0.0))
 
         state = load_file(str(weights), device="cpu")
         state = {k[len(_KEY_PREFIX):] if k.startswith(_KEY_PREFIX) else k: v for k, v in state.items()}
@@ -97,7 +106,7 @@ class CommForScorer:
         tensor = self.transform(image.convert("RGB")).unsqueeze(0).to(self.device, dtype=torch.float32)
         device_type = torch.device(self.device).type
         with torch.inference_mode(), torch.autocast(device_type=device_type, enabled=False):
-            logit = self.model(tensor).float()
+            logit = self.model(tensor).float() - self.logit_bias
         probability = float(torch.sigmoid(logit).item())
         return probability if math.isfinite(probability) else None
 

@@ -56,7 +56,7 @@ UNSEEN_GENERATOR = "Qwen Image 2.1"
 MEAN, STD = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
 
 
-def build_splits(mllm_root: Path, e2e_manifest: Path, e2e_root: Path) -> list[dict]:
+def build_splits(mllm_root: Path, e2e_manifest: Path, e2e_root: Path, extra_root: Path | None = None) -> list[dict]:
     rows = list(csv.DictReader(open(mllm_root / "subset.csv", newline="", encoding="utf-8")))
     rng = random.Random(0)
     out = []
@@ -74,6 +74,10 @@ def build_splits(mllm_root: Path, e2e_manifest: Path, e2e_root: Path) -> list[di
                 split = "train" if i < 0.6 * n else ("val" if i < 0.8 * n else "test")
             out.append({"path": str(mllm_root / r["path"]), "label": int(gen != "Real"), "source": f"mllm/{gen}",
                         "category": cat, "split": split})
+    if extra_root is not None:  # extra images of the hardest generators: training only, never in the subset
+        for r in csv.DictReader(open(extra_root / "extra.csv", newline="", encoding="utf-8")):
+            out.append({"path": str(extra_root / r["path"]), "label": 1, "source": f"mllm/{r['generator']}",
+                        "category": r["category"], "split": "train"})
     for r in csv.DictReader(open(e2e_manifest, newline="", encoding="utf-8")):
         if r["split"] == "dev":  # replay of older generators; the test half is never read here
             out.append({"path": str(e2e_root / r["path"]), "label": int(r["label"]), "source": r["group"],
@@ -81,9 +85,29 @@ def build_splits(mllm_root: Path, e2e_manifest: Path, e2e_root: Path) -> list[di
     return out
 
 
-def reencode(img: Image.Image, rng: random.Random) -> Image.Image:
-    """Random downscale and JPEG quality, applied to real and AI images alike."""
+def damage(img: Image.Image, rng: random.Random) -> Image.Image:
+    """Training-only degradations seen in real uploads: blur, screenshot-style resampling, a second JPEG pass."""
+    from PIL import ImageFilter
+
+    if rng.random() < 0.3:
+        img = img.filter(ImageFilter.GaussianBlur(rng.uniform(0.3, 1.5)))
+    if rng.random() < 0.3:
+        w, h = img.size
+        f = rng.uniform(0.4, 0.8)
+        img = img.resize((max(64, round(w * f)), max(64, round(h * f))), Image.BILINEAR).resize((w, h), Image.BICUBIC)
+    if rng.random() < 0.5:
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=rng.randint(50, 90))
+        buf.seek(0)
+        img = Image.open(buf).convert("RGB")
+    return img
+
+
+def reencode(img: Image.Image, rng: random.Random, strong: bool = False) -> Image.Image:
+    """Random downscale and JPEG quality, applied to real and AI images alike (plus ``damage`` if strong)."""
     img = img.convert("RGB")
+    if strong:
+        img = damage(img, rng)
     w, h = img.size
     short = rng.uniform(384, max(384, min(1024, min(w, h))))
     scale = short / min(w, h)
@@ -96,10 +120,10 @@ def reencode(img: Image.Image, rng: random.Random) -> Image.Image:
 
 
 class Images(Dataset):
-    def __init__(self, rows: list[dict], train: bool):
+    def __init__(self, rows: list[dict], train: bool, strong: bool = False):
         from torchvision import transforms
 
-        self.rows, self.train = rows, train
+        self.rows, self.train, self.strong = rows, train, strong
         norm = [transforms.ToTensor(), transforms.Normalize(MEAN, STD)]
         self.tf = transforms.Compose(
             ([transforms.RandomCrop(384, pad_if_needed=True), transforms.RandomHorizontalFlip()] if train
@@ -111,7 +135,7 @@ class Images(Dataset):
     def __getitem__(self, i):
         r = self.rows[i]
         rng = random.Random() if self.train else random.Random(hash(r["path"]) & 0xFFFFFFFF)
-        img = reencode(Image.open(r["path"]), rng)
+        img = reencode(Image.open(r["path"]), rng, strong=self.train and self.strong)
         return self.tf(img), torch.tensor(float(r["label"]))
 
 
@@ -146,6 +170,8 @@ def main() -> int:
     ap.add_argument("--e2e-root", type=Path, required=True)
     ap.add_argument("--e2e-manifest", type=Path, default=REPO / "evaluation/E2E-01/image_manifest.csv")
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--extra-root", type=Path, default=None, help="folder with extra.csv: more training images")
+    ap.add_argument("--strong-aug", action="store_true", help="add blur / resampling / double-JPEG damage in training")
     ap.add_argument("--epochs", type=int, default=4)
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--lr", type=float, default=2e-5)
@@ -154,7 +180,7 @@ def main() -> int:
 
     torch.manual_seed(0); random.seed(0); np.random.seed(0)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    rows = build_splits(args.mllm_root, args.e2e_manifest, args.e2e_root)
+    rows = build_splits(args.mllm_root, args.e2e_manifest, args.e2e_root, args.extra_root)
     args.out.mkdir(parents=True, exist_ok=True)
     with open(args.out / "splits.csv", "w", newline="", encoding="utf-8") as h:
         w = csv.DictWriter(h, fieldnames=["path", "label", "source", "category", "split"]); w.writeheader(); w.writerows(rows)
@@ -164,7 +190,7 @@ def main() -> int:
     weights = np.array([1.0 / sum(x["label"] == r["label"] for x in train) for r in train])
     sampler = torch.utils.data.WeightedRandomSampler(weights, num_samples=len(train), replacement=True,
                                                      generator=torch.Generator().manual_seed(0))
-    tl = DataLoader(Images(train, True), batch_size=args.batch, sampler=sampler, num_workers=args.workers,
+    tl = DataLoader(Images(train, True, args.strong_aug), batch_size=args.batch, sampler=sampler, num_workers=args.workers,
                     persistent_workers=args.workers > 0, drop_last=True)
     vl = DataLoader(Images(val, False), batch_size=64, num_workers=args.workers)
     print(f"train {len(train)} (real {sum(r['label'] == 0 for r in train)}), val {len(val)}, device {device}", flush=True)
@@ -204,6 +230,7 @@ def main() -> int:
             "best_val_auc": best[0], "history": history, "train_n": len(train), "val_n": len(val),
             "train_generators": list(TRAIN_GENERATORS), "unseen_test_generator": UNSEEN_GENERATOR,
             "replay": "evaluation/E2E-01/image_manifest.csv dev half", "shortcut_control": "random resize + JPEG q60-95 on every image",
+            "extra_root": str(args.extra_root) if args.extra_root else None, "strong_aug": args.strong_aug,
             "lr": args.lr, "epochs": args.epochs, "batch": args.batch, "git_commit": commit,
             "utc_time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "data_licence": "zr-zhang/MLLM-Generated-Image-Detection-Dataset: research use only"}

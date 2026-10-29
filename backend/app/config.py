@@ -102,6 +102,12 @@ class Settings(BaseSettings):
     # faces, so its score is reported but kept out of verdicts until a
     # retrained model is validated.
     face_model_in_verdict: bool = False
+    # GenD face-swap detector (app/ml/gend.py; pretrained by its authors, WACV 2026, MIT).
+    gend_enabled: bool = True
+    gend_model_id: str = "yermandy/GenD_CLIP_L_14"
+    # True only after scripts/eval_video_detector.py has measured it; until then shown, not in the verdict.
+    gend_in_verdict: bool = False
+    video_scene_frames: int = 8  # frames scored by the scene AI detectors per video (was 1)
     # Audio model stage. "lcnn_asvspoof" (default): the ASVspoof 2019 LA-trained
     # LCNN chosen on dev, with the dev-fitted calibration and checkpoint hash in
     # audio_lcnn_calibration_file and the verdict rule frozen on dev in

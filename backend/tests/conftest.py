@@ -42,6 +42,8 @@ os.environ.update(
         "AUDIO_VERDICT_CONFIG_FILE": str(TEST_ROOT / "config" / "frozen_audio_config.json"),
         # TruFor's weights (260 MB) are downloaded on first use; tests stub it (tests/test_trufor.py).
         "TRUFOR_ENABLED": "false",
+        # GenD (~3 GB with CLIP) is never downloaded in tests; tests/test_video_gend.py stubs it.
+        "GEND_ENABLED": "false",
         # pellav2 weights are 2.3 GB; tests that need it enable it with a tiny model
         # (tests/test_audio_pellav2.py).
         "AUDIO_PELLAV2_ENABLED": "false",

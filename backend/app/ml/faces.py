@@ -23,8 +23,10 @@ _detector_failed = False
 @dataclass
 class FaceCrop:
     image: Image.Image
-    box: tuple[int, int, int, int] | None  # (x1, y1, x2, y2) in source coordinates
+    box: tuple[int, int, int, int] | None  # (x1, y1, x2, y2) in source coordinates, margin included
     confidence: float | None
+    # The detector's own box, before the margin (GenD crops 1.3x this box, as it was trained).
+    detection_box: tuple[int, int, int, int] | None = None
 
 
 def get_detector():
@@ -85,6 +87,7 @@ def extract_faces(image, margin: float = 0.25, min_size: int = 48) -> list[FaceC
                 image=image.crop(crop_box),
                 box=crop_box,
                 confidence=float(prob) if prob is not None else None,
+                detection_box=(int(x1), int(y1), int(x2), int(y2)),
             )
         )
 

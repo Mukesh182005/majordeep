@@ -26,6 +26,7 @@ from PIL import Image
 from app.config import settings
 from app.ml.base import AnalysisResult
 from app.ml.faces import extract_faces
+from app.ml.gend import score_faces, square_face_crop
 from app.ml.forensics import run_comprehensive_forensics
 from app.ml.gradcam import compute_gradcam, overlay_heatmap
 from app.ml.image_pipeline import score_scene
@@ -105,6 +106,7 @@ def analyze_video(
     frame_tensors: list[tuple[float, object, object]] = []
     np_frames: list[np.ndarray] = []
     face_boxes: list[tuple[int, int, int, int] | None] = []
+    gend_crops: list[tuple[int, Image.Image]] = []  # (frame index, 1.3x square crop) for GenD
 
     for timestamp_s, pil_frame in frames_pil:
         np_frames.append(np.array(pil_frame, dtype=np.uint8))
@@ -124,6 +126,21 @@ def analyze_video(
             "face_detected": crop.box is not None,
         })
         frame_tensors.append((timestamp_s, tensor, crop.image))
+        if crop.box is not None and crop.detection_box is not None:
+            gend_crops.append((len(frame_scores) - 1, square_face_crop(pil_frame, crop.detection_box)))
+
+    # GenD face-swap scores (app/ml/gend.py). The per-frame score becomes GenD's, so the
+    # timeline follows the detector that is meant to judge faces (KNOWN_ISSUES #11); the
+    # StyleGAN-trained EfficientNet score is kept as legacy_face_probability.
+    gend_scores = score_faces([c for _, c in gend_crops]) if gend_crops else []
+    for s in frame_scores:
+        s["legacy_face_probability"] = s["fake_probability"]
+    for (i, _), g in zip(gend_crops, gend_scores):
+        frame_scores[i]["gend_probability"] = round(g, 4)
+        frame_scores[i]["fake_probability"] = round(g, 4)
+    gend_ran = bool(gend_scores)
+    gend_face_mean = float(np.mean(gend_scores)) if gend_ran else None
+    gend_face_max = float(np.max(gend_scores)) if gend_ran else None
 
     # The face model is trained on face crops; on a frame without a face it
     # scores scenery, which is noise. Only frames with a detected face count.
@@ -139,22 +156,38 @@ def analyze_video(
     # The face model's score is shown per frame, but it only feeds the verdict
     # when a validated face model is configured (see settings.face_model_in_verdict).
     face_display_prob = worst_prob
-    if not settings.face_model_in_verdict:
-        worst_prob = 0.0
+    # The face input to the verdict: GenD's mean over face frames (the paper's video protocol)
+    # once it is measured and switched on; otherwise the old rule (legacy model, max frame).
+    if settings.gend_in_verdict and gend_ran:
+        spatial_prob = gend_face_mean
+        worst_prob = gend_face_mean
+    else:
+        spatial_prob = worst_prob if settings.face_model_in_verdict else 0.0
+        if not settings.face_model_in_verdict:
+            worst_prob = 0.0
 
     # Full-scene generative-AI detectors on the worst frame — the same fused
     # ensemble the image pipeline uses. (This block used to call each
     # ensemble entry directly; entries are records, not callables, so every
     # call raised, the bare ``except`` swallowed it, and the score was 0.0.)
+    # Scored on settings.video_scene_frames evenly spaced frames and averaged, not on one.
     vit_genai_prob = 0.0
-    try:
-        scene = score_scene(worst_pil)
+    n_scene = max(1, min(settings.video_scene_frames, len(frames_pil)))
+    scene_idx = sorted({round(k * (len(frames_pil) - 1) / max(1, n_scene - 1)) for k in range(n_scene)})
+    scene_frame_scores: list[dict[str, Any]] = []
+    for i in scene_idx:
+        try:
+            scene = score_scene(frames_pil[i][1])
+        except Exception as exc:
+            logger.warning("Scene AI detection on video frame %s failed: %s", i, exc)
+            continue
         if scene["scene_ai_prob"] is not None:
-            vit_genai_prob = float(scene["scene_ai_prob"])
-        else:
-            logger.warning("No scene detector available for video job %s; scene AI score omitted.", job_id)
-    except Exception as exc:
-        logger.warning("Scene AI detection on video keyframe failed: %s", exc)
+            scene_frame_scores.append({"frame_index": i, "timestamp_s": round(frames_pil[i][0], 3),
+                                       "scene_ai_prob": round(float(scene["scene_ai_prob"]), 4)})
+    if scene_frame_scores:
+        vit_genai_prob = float(np.mean([s["scene_ai_prob"] for s in scene_frame_scores]))
+    else:
+        logger.warning("No scene detector available for video job %s; scene AI score omitted.", job_id)
 
     st3_ms = int((time.perf_counter() - st3_start) * 1000)
     pipeline_modules.append({
@@ -162,7 +195,12 @@ def analyze_video(
         "name": "Spatial Neural & Generative AI Backbone",
         "duration_ms": st3_ms,
         "status": "AI_FLAGGED" if max(worst_prob, vit_genai_prob) >= 0.65 else "PASSED",
-        "desc": f"Face score: {round(face_display_prob * 100, 1)}%{'' if settings.face_model_in_verdict else ' (informational)'} | Full-scene ViT GenAI: {round(vit_genai_prob * 100, 1)}%",
+        "desc": (
+            (f"GenD face (mean/max over {len(gend_scores)} faces): {gend_face_mean * 100:.1f}% / {gend_face_max * 100:.1f}%"
+             f"{'' if settings.gend_in_verdict else ' (unvalidated, not in verdict)'}" if gend_ran
+             else f"Face score: {round(face_display_prob * 100, 1)}%{'' if settings.face_model_in_verdict else ' (informational)'}")
+            + f" | Scene AI (mean of {len(scene_frame_scores)} frames): {round(vit_genai_prob * 100, 1)}%"
+        ),
     })
 
     # ── Stage 4: Comprehensive 28-Module Image Forensics on Keyframe ─────────────
@@ -330,7 +368,7 @@ def analyze_video(
 
     # ── Multi-signal fusion (hand-set weights) ─────────────────────────────────────────────
     fusion = fuse_video_forensics(
-        spatial_prob=worst_prob,
+        spatial_prob=spatial_prob,
         frame_scores=frame_scores,
         temporal_jitter=temporal_jitter,
         motion_metrics=motion_metrics,
@@ -411,6 +449,12 @@ def analyze_video(
             "spatiotemporal_forensics": spatiotemporal_info,
             "lip_forensics": lip_forensics_info,
             "vit_genai_prob": round(vit_genai_prob, 4),
+            "scene_frame_scores": scene_frame_scores,
+            "gend_face_mean": None if gend_face_mean is None else round(gend_face_mean, 4),
+            "gend_face_max": None if gend_face_max is None else round(gend_face_max, 4),
+            "gend_faces_scored": len(gend_scores),
+            "gend_in_verdict": bool(settings.gend_in_verdict and gend_ran),
+            "gend_model": settings.gend_model_id if gend_ran else None,
             "heatmap_file": heatmap_name,
             "timeline_file": chart_name,
             "optical_flow_file": motion_metrics.get("flow_heatmap_file"),

@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite'
+import { configDefaults } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
@@ -21,6 +22,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.js',
+    // e2e/ holds the Playwright browser tests (npm run e2e), not unit tests.
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     css: false,
     coverage: { reporter: ['text', 'lcov'], include: ['src/**/*.{js,jsx}'] },
   },

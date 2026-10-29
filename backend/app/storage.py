@@ -115,6 +115,17 @@ def media_type_for_extension(filename: str) -> MediaType:
     )
 
 
+def _looks_like_text(header: bytes) -> bool:
+    """True when the first bytes are printable text; no supported media format starts that way."""
+    if len(header) < 8:
+        return False
+    try:
+        text = header.decode("utf-8")
+    except UnicodeDecodeError:
+        return False
+    return all(ch.isprintable() or ch in "\t\r\n" for ch in text)
+
+
 def sniff_media_type(header: bytes) -> MediaType | None:
     """Best-effort media type from magic numbers; ``None`` when unrecognised."""
     if not header:
@@ -199,6 +210,11 @@ def save_upload(
         raise UploadValidationError("Uploaded file is empty.")
 
     sniffed = sniff_media_type(header)
+    if sniffed is None and _looks_like_text(header):
+        target.unlink(missing_ok=True)
+        raise UploadValidationError(
+            f"File content is text, not {declared_type.value} data; it cannot be a '{Path(safe_name).suffix}' file."
+        )
     if sniffed is not None and sniffed is not declared_type:
         target.unlink(missing_ok=True)
         raise UploadValidationError(

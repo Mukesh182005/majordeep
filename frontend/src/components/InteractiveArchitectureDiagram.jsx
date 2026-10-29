@@ -31,7 +31,7 @@ export function InteractiveArchitectureDiagram() {
           inputs: 'Raw Binary Byte Stream (multipart/form-data)',
           outputs: 'Validated MIME Container, File Size, Stream Pointer',
           formula: 'MIME(f) ∈ {JPEG, PNG, WEBP, MP4, WAV} ∧ MagicBytes(f) == Header',
-          standard: 'RFC 2046 / ISO/IEC 27037:2012 §6.3',
+          standard: 'RFC 2046 (media types)',
           complexity: 'O(1) Header Inspection',
         },
         {
@@ -57,7 +57,7 @@ export function InteractiveArchitectureDiagram() {
           inputs: 'Raw Bitstream Bytes B',
           outputs: 'SHA-256 Digest (64-char Hex), SHA-512, MD5',
           formula: 'H = SHA-256(B) || SHA-512(B)',
-          standard: 'NIST FIPS 180-4 / ISO/IEC 27037 Chain of Custody',
+          standard: 'NIST FIPS 180-4 (SHA-256)',
           complexity: 'O(n) Hashing Throughput ~450 MB/s',
         },
         {
@@ -197,7 +197,7 @@ export function InteractiveArchitectureDiagram() {
           inputs: 'Set of Detector Scores S = {s_cfa, s_prnu, s_ela, s_vit, s_effnet}',
           outputs: 'Corroboration Count C ≥ 2, Primary Technical Blurb, Finding Classification',
           formula: 'C = ∑_{i=1}^k 𝕀(s_i > τ_i ∧ Independent(s_i, s_j)) ≥ 2',
-          standard: 'Daubert Standard for Scientific Evidence Reliability',
+          standard: 'Corroboration rule (project design; not a legal standard)',
           complexity: 'O(k) Decision Tree',
         },
         {
@@ -217,8 +217,8 @@ export function InteractiveArchitectureDiagram() {
     },
     {
       id: 'tier-output',
-      name: 'Tier 5: Court-Admissible Output & API Delivery',
-      badge: 'Legal Exhibits & Telemetry',
+      name: 'Tier 5: Report Output & API Delivery',
+      badge: 'Reports & Telemetry',
       color: '#ec4899', // Pink
       borderColor: 'border-l-pink-500',
       badgeStyle: 'bg-pink-500/10 text-pink-700 dark:text-pink-300 border-pink-500/30',
@@ -227,27 +227,27 @@ export function InteractiveArchitectureDiagram() {
       nodes: [
         {
           id: 'OUT-01',
-          name: 'ISO/IEC 27037 Tamper-Proof Audit Manifest',
+          name: 'Tamper-Evident Audit Manifest',
           subsystem: 'custody',
           subsystemName: 'Custody Ledger',
           file: 'app/services/custody_service.py:generate_manifest',
           description: 'Generates immutable JSON audit log containing cryptographic timestamps, engine versions, model SHA-256 weights, and detector telemetry.',
           inputs: 'Full Execution Context & Decision Payload',
-          outputs: 'ISO 27037 JSON Audit Manifest with HMAC Signature',
-          formula: 'Manifest_HMAC = HMAC_{K_{court}}(Digest || Timestamp || Evidence)',
-          standard: 'ISO/IEC 27037:2012 §8.4 Chain of Custody Report',
+          outputs: 'JSON Audit Manifest with HMAC Signature',
+          formula: 'Manifest_HMAC = HMAC_{K}(Digest || Timestamp || Evidence)',
+          standard: 'SHA-256 hashes and HMAC (no standards certification)',
           complexity: 'O(1) Serialization',
         },
         {
           id: 'OUT-02',
-          name: 'Court-Admissible PDF Forensic Dossier',
+          name: 'PDF Analysis Report',
           subsystem: 'custody',
-          subsystemName: 'Legal Document Engine',
+          subsystemName: 'Report Engine',
           file: 'app/services/report_generator.py',
-          description: 'Compiles technical findings into a multi-page PDF exhibit with Daubert-standard scientific methodology, detector charts, and examiner signature lines.',
+          description: 'Compiles the technical findings into a multi-page PDF with the methodology, detector charts, file hashes and the automated-assessment disclaimer.',
           inputs: 'Analysis Result, Telemetry Graphs, Case Identifiers',
           outputs: 'Vector PDF Document with Embedded Cryptographic Signatures',
-          formula: 'ReportLab.build_court_exhibit(case_id, evidence_dossier)',
+          formula: 'ReportLab.build_report(case_id, evidence)',
           standard: 'Federal Rules of Evidence 901 & 902 / ISO 27037',
           complexity: '180ms PDF Compilation',
         },
@@ -505,13 +505,13 @@ export function InteractiveArchitectureDiagram() {
         <div className="flex items-center gap-2">
           <CheckCircle size={15} className="text-emerald-500 shrink-0" />
           <span>
-            <strong>Authentic Software Architecture:</strong> Formally verified across 27 modular stages in FastAPI, PyTorch, Librosa, and OpenCV.
+            <strong>Software Architecture:</strong> 27 modular stages in FastAPI, PyTorch, Librosa, and OpenCV, covered by automated tests (not formally verified).
           </span>
         </div>
         <div className="flex items-center gap-3 self-start sm:self-auto text-[0.6875rem] font-mono text-ink-muted">
-          <span>Daubert Admissible</span>
+          <span>Automated assessment only</span>
           <span>•</span>
-          <span>ISO/IEC 27037:2012 §8.4</span>
+          <span>Not legal evidence</span>
         </div>
       </div>
     </div>

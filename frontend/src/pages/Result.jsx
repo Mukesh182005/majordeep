@@ -353,7 +353,7 @@ export default function Result() {
             <button onClick={handleExportJSON} className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5">
               <Download size={13} /> JSON Telemetry
             </button>
-            <a href={reportUrl || (typeof api.reportUrl === 'function' ? api.reportUrl(result.id) : `/api/jobs/${result.id}/report`)} target="_blank" rel="noreferrer" className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5">
+            <a href={reportUrl || `/api/jobs/${result.id}/report`} target="_blank" rel="noreferrer" className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5">
               <FileText size={13} /> Forensic Report (PDF)
             </a>
           </div>

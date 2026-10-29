@@ -661,8 +661,8 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
                   <span className="font-mono text-ink-secondary">50 - 300 ms</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-ink-muted">Forensic Admissibility:</span>
-                  <span className="font-bold text-emerald-500">ISO 27042 / NIST</span>
+                  <span className="text-ink-muted">Report status:</span>
+                  <span className="font-bold text-amber-500">Automated assessment, not legal evidence</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-ink-muted">Sampling Resolution:</span>
@@ -684,7 +684,7 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
         </div>
       </div>
 
-      {/* ── 5. Linear Court-Admissible Forensic Audit Trail ───────────────────── */}
+      {/* ── 5. Linear Forensic Audit Trail ───────────────────── */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           <div>

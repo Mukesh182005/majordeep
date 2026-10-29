@@ -661,8 +661,8 @@ export default function PipelineAuditVisualizer({
               <span className="text-[0.625rem] font-black uppercase tracking-wider text-ink-muted">Forensic Quality Benchmark</span>
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-ink-muted">Admissibility:</span>
-                  <span className="font-bold text-emerald-500">ISO 27042 / NIST</span>
+                  <span className="text-ink-muted">Report status:</span>
+                  <span className="font-bold text-amber-500">Automated assessment, not legal evidence</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-ink-muted">Calibration:</span>
@@ -688,7 +688,7 @@ export default function PipelineAuditVisualizer({
         </div>
       </div>
 
-      {/* ── 5. Linear Court-Admissible Forensic Audit Trail ───────────────────── */}
+      {/* ── 5. Linear Forensic Audit Trail ───────────────────── */}
       <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
           <div>

@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { clearSession } from '../lib/api'
+import { api, clearSession } from '../lib/api'
 import { useAuth } from '../lib/useAuth'
 import { useTheme } from '../lib/theme'
 import { Moon, ShieldCheck, Sun } from './ui/Icons'
@@ -51,7 +51,14 @@ export default function Layout() {
   const { user, setUser } = useAuth()
   const navigate = useNavigate()
 
-  function signOut() {
+  async function signOut() {
+    // The session is an httpOnly cookie only the server can clear; without this call the
+    // next page load signed the user straight back in.
+    try {
+      await api.logout()
+    } catch {
+      /* already signed out or offline: clear the local state anyway */
+    }
     clearSession()
     setUser(null)
     navigate('/')

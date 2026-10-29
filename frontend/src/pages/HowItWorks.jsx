@@ -81,7 +81,7 @@ export default function HowItWorks() {
           </h1>
           
           <p className="text-base sm:text-lg text-ink-secondary leading-relaxed max-w-3xl">
-            A comprehensive, court-ready digital forensics platform engineering 27 modular stages across spatial, acoustic, temporal, and cryptographic dimensions. Designed under strict evidentiary principles where raw neural scores are rigorously separated from final forensic determinations.
+            An automated media-analysis platform with 27 modular stages across spatial, acoustic, temporal, and cryptographic dimensions. Designed under strict evidentiary principles where raw neural scores are rigorously separated from final forensic determinations.
           </p>
 
           {/* Quick Platform Metrics */}
@@ -118,7 +118,7 @@ export default function HowItWorks() {
             <h2 className="text-2xl sm:text-3xl font-black text-ink-primary tracking-tight">End-to-End Forensic Workflow</h2>
           </div>
           <p className="text-xs text-ink-muted max-w-md">
-            From secure byte ingestion and polyglot container inspection to calibrated orthogonal evidence fusion and court-ready PDF generation.
+            From secure byte ingestion and polyglot container inspection to calibrated orthogonal evidence fusion and PDF report generation.
           </p>
         </div>
 
@@ -526,15 +526,15 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      {/* ── SECTION 8: CHAIN OF CUSTODY & COURT ADMISSIBILITY ─────────────── */}
+      {/* ── SECTION 8: CHAIN OF CUSTODY & REPORTS AND LIMITS ─────────────── */}
       <section id="chain-of-custody" className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <span className="text-[0.6875rem] font-black uppercase tracking-widest text-[#00E5FF]">Legal Admissibility</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-ink-primary tracking-tight">Chain of Custody & Court-Ready Dossiers</h2>
+            <span className="text-[0.6875rem] font-black uppercase tracking-widest text-[#00E5FF]">Integrity &amp; Limits</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-ink-primary tracking-tight">Chain of Custody &amp; PDF Reports</h2>
           </div>
           <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-surface-2 border border-subtle text-ink-secondary">
-            ISO/IEC 27037 • Daubert Standard
+            Hashes recorded • No legal certification
           </span>
         </div>
 
@@ -548,9 +548,9 @@ export default function HowItWorks() {
           </div>
           <div className="p-5 rounded-2xl border border-subtle bg-surface-1 space-y-2.5">
             <span className="font-mono font-black text-xl text-accent">02</span>
-            <h3 className="text-sm font-extrabold text-ink-primary">Court-Ready PDF Dossier</h3>
+            <h3 className="text-sm font-extrabold text-ink-primary">PDF Analysis Report</h3>
             <p className="text-xs text-ink-secondary leading-relaxed">
-              Automated compilation of legal forensic exhibits, including Grad-CAM neural attention overlays, ELA differential plates, sensor noise variance, and calibrated fusion math.
+              Automated compilation of the analysis, including Grad-CAM neural attention overlays, ELA differential plates, sensor noise variance, and calibrated fusion math.
             </p>
           </div>
           <div className="p-5 rounded-2xl border border-subtle bg-surface-1 space-y-2.5">
@@ -637,7 +637,7 @@ export default function HowItWorks() {
           <div className="space-y-2">
             <strong className="text-ink-primary block">Investigative Lead, Not Legal Opinion</strong>
             <p>
-              This system provides an automated technical forensic evaluation. In judicial proceedings, findings should be reviewed and corroborated by a certified digital forensics expert witness in accordance with ISO/IEC 27037 standards.
+              This system provides an automated technical forensic evaluation. In judicial proceedings, findings should be reviewed and corroborated by a qualified digital forensics examiner.
             </p>
           </div>
         </div>

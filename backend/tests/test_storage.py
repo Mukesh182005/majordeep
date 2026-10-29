@@ -129,3 +129,18 @@ class TestSaveUpload:
         )
         assert stored.path.name == "job6.png"
         assert stored.path.parent == tmp_path
+
+
+class TestTextPosingAsMedia:
+    """A text file renamed to a media extension is refused at upload (found by the browser tests)."""
+
+    def test_text_renamed_to_jpg_is_rejected(self, tmp_path):
+        with pytest.raises(UploadValidationError, match="text"):
+            save_upload(io.BytesIO(b"This is a text file, not a JPEG image.\n"), "photo.jpg", "image/jpeg",
+                        "job-text", destination_dir=tmp_path)
+        assert not list(tmp_path.iterdir())
+
+    def test_binary_media_without_a_known_signature_is_still_accepted(self, tmp_path):
+        aiff = b"FORM" + bytes([0, 0, 0, 40]) + b"AIFFCOMM" + bytes(range(40))
+        stored = save_upload(io.BytesIO(aiff), "clip.aiff", "audio/aiff", "job-aiff", destination_dir=tmp_path)
+        assert stored.size_bytes == len(aiff)

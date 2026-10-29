@@ -1,0 +1,4 @@
+e2e/fixtures/*
+!e2e/fixtures/make_fixtures.py
+test-results/
+playwright-report/

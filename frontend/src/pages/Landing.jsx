@@ -565,7 +565,7 @@ export default function Landing() {
               </h2>
               <p className="mt-4 leading-relaxed text-ink-secondary"
                  style={{ fontSize: 'clamp(0.875rem, 1vw, 1.0625rem)', maxWidth: '42ch' }}>
-                From raw media ingestion to court-admissible attestation — every step is deterministic, logged, and independently verifiable.
+                From raw media ingestion to the PDF report — every step is logged, and the report records file hashes so it can be checked.
               </p>
 
               {/* Terminal readout */}

@@ -137,8 +137,8 @@ class Settings(BaseSettings):
     # (ml/training/finetune_commfor.py, calibrated on its validation split). Path relative to
     # checkpoint_dir; it is skipped if the file is missing. Used together with the original
     # at equal weight, a rule fixed before scoring the test sets (evaluation/COMMFOR-FT-01):
-    # the combination flagged none of 1,069 real test photos, the fine-tuned model alone 5.7 %
-    # of COCO photos.
+    # the combination called none of the 1,009 real test photos MANIPULATED (evaluation/E2E-02); without the original the fine-tuned
+    # model scored 6.4 % of COCO test photos as AI (old_v3.json).
     commfor_ft_checkpoint: str = "commfor_ft_v3/model.safetensors"
     commfor_ft_weight: float = 4.0
     # Without camera metadata nothing positively shows an image came from a camera, so a

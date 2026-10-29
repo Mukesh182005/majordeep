@@ -71,6 +71,14 @@
 - **Description:** pellav2 is a pretrained detector whose training data is not published. On an ASVspoof 5 eval sample (`evaluation/AUDIO-PELLAV2-01-ASVSPOOF5/results.json`) its EER is 18.5 %; at its threshold it flags 17.3 % of genuine speech and misses 19.5 % of fakes. Genuine speech passed through the EnCodec neural codec is flagged 58-68 % of the time (C04, C07), and 9-22 % after narrowband codecs (C08-C10). It catches 7 % of attack A27, 21 % of A32 and 47 % of A30. On re-encoded ASVspoof 2019 LA eval clips it flags 14 % of genuine speech after AAC at 32 kbit/s (`evaluation/AUDIO-PELLAV2-01/results.json`, `codec_robustness`). Only the first 32 s of a clip are scored.
 - **Impact:** A verdict on phone-call, VoIP or neural-codec audio is much less reliable than the ASVspoof 2019 figures suggest; the scope note on every audio result says so. Because the training data is unknown, the ASVspoof 2019 figures may be optimistic if it was trained on that set. It has not been measured on the team's own phone and WhatsApp recordings (`--data` in `scripts/eval_audio_detector.py`).
 
+### 17. The newest image generators are mostly INCONCLUSIVE, not flagged
+- **Description:** On held-out test images (`evaluation/E2E-02/summary.json`, `sets.image_newest_generators`) the image verdict calls 44.0 % of FLUX.2 / GPT Image 2 / Nano Banana 2 / Qwen Image 2.1 images MANIPULATED, 44.4 % INCONCLUSIVE and 11.6 % AUTHENTIC; GPT Image 2 46/195 and Nano Banana 2 8/192 are flagged. 19.3 % of that set's real photos are INCONCLUSIVE. The original Community Forensics scores these generators as real and outvotes the fine-tuned model; the fine-tuned model alone would flag more of them but scored 6.4 % of COCO test photos as AI (`evaluation/COMMFOR-FT-01/old_v3.json`).
+- **Impact:** An image from a current generator is usually reported as "cannot confirm", not as AI-generated. No real test photo was called MANIPULATED. More training data for these generators (`docs/models/RETRAINING_IMAGE.md`) is the route to improve it.
+
+### 18. Composites and local edits are not part of the image verdict
+- **Description:** The three AI detectors look at whole-image generation; an edited region pasted into a real photo is often scored as real. TruFor localises such edits (AUC 0.962 on controlled splices, `evaluation/TRUFOR-01/results.json`) but is shown, not used in the verdict, because it flags 10 % of re-compressed social-media photos in `accuracy_test`.
+- **Impact:** A composite with no AI-generated pixels can be reported "No manipulation detected"; the TruFor heatmap on the result page is then the evidence to check.
+
 ## Resolved Issues
 
 ### Untrained audio branches and standards claims in outputs (fixed 2026-10-22, branch `fix/p1-honest-outputs`)
@@ -82,6 +90,9 @@
 ### `checkpoints/audio_detector.pt` was trained on synthetic tones (retired 2026-10-22, branch `ml/audio-asvspoof`)
 - `scripts/run_audio_pipeline.ps1` trained it on NumPy-generated clips from `scripts/generate_massive_audio_dataset.py` (low-frequency modulation as "speech", high-frequency artefacts as "TTS"), which is why it reported AUC 1.0 and EER 0. Both scripts are in `scripts/archive/`, the audio steps were removed from `scripts/run_massive_training_pipeline.ps1`, and the backend no longer loads the checkpoint (the file is kept, unchanged).
 - The audio model is the LCNN trained on ASVspoof 2019 LA with the official protocols (`ml/training/train_asvspoof.py`); its eval results are in `results/audio_eval.json` and `paper_results/audio_asvspoof2019la/`.
+
+### AI images reported "Authentic Camera Photograph" (fixed 2026-10-29)
+- On the COCO + Synthbuster test half, AI images were called AUTHENTIC 21.5 % of the time and every low score was labelled an authentic camera photograph, though no test file carried camera metadata. Community Forensics now counts in the verdict (original plus a fine-tuned copy), and without camera metadata AUTHENTIC needs P(AI) < 0.02 and is labelled "No manipulation detected (origin unverified)". Same test half now: 0.1 % AI called AUTHENTIC, 98.4 % called MANIPULATED, no real photo called MANIPULATED (`evaluation/E2E-01` vs `evaluation/E2E-02`).
 
 ### AI images reported authentic; real photos reported manipulated (fixed 2026-10-05)
 - `umm-maybe/AI-image-detector` (AUC 0.469 on current generators, below chance) replaced by `haywoodsloan/ai-image-detector-deploy`; max-of-experts fusion (flagged 26–36% of real photos) replaced by log-odds fusion with `Organika/sdxl-detector` (AUC 0.984).

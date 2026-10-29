@@ -137,12 +137,50 @@ extra cost is in `paper_results/video_timing/timing.json`). Figure:
 
 ## 5. Image
 
-Not measured. `results/image_eval.json` records why: the 560-image held-out
-set (H560) is not on this machine, the independent test set T2 is not built,
-and the image configuration is not frozen, which must happen before any T2
-image is scored. `scripts/eval_image.py` computes AUC, the false-positive
-rate on real photos, recall per generator and the verdict confusion matrix
-(INCONCLUSIVE included) once per-image scores exist.
+Every file goes through `app.ml.pipeline.analyze`, the function the worker runs, with the final settings
+(commit `445c4ac`; Community Forensics original + fine-tuned at weight 4 each, haywoodsloan 0.75;
+AUTHENTIC without camera metadata only below 0.02). TruFor was switched off for this run: it does not change
+verdicts (`TRUFOR_IN_VERDICT=false`). None of these files carries camera metadata.
+
+Source: `evaluation/E2E-02/summary.json` (key `sets.<name>`), per-image rows in `evaluation/E2E-02/*.jsonl`,
+written by `backend/scripts/eval_end_to_end.py`. Datasets and splits: `DATASETS.md`. No setting was chosen on
+these test files.
+
+| Test set | real / AI | Real called MANIPULATED | AI called MANIPULATED | AI called AUTHENTIC | AI INCONCLUSIVE | Real INCONCLUSIVE | AUC |
+|---|---|---|---|---|---|---|---|
+| COCO + Synthbuster test half (9 generators) | 296 / 919 | 0 (0.0 %) | 98.4 % | 1 (0.1 %) | 1.5 % | 5.7 % | 1.000 |
+| FLUX.2, GPT Image 2, Nano Banana 2, Qwen Image 2.1 | 653 / 1481 | 0 (0.0 %) | 44.0 % | 172 (11.6 %) | 44.4 % | 19.3 % | 0.917 |
+| `accuracy_test` (256 px thumbnails) | 60 / 60 | 0 (0.0 %) | 38.3 % | 17 (28.3 %) | 33.3 % | 3.3 % | 0.920 |
+
+Per generator, AI images called MANIPULATED (`per_group`):
+
+- dalle2 106/106, dalle3 102/104, firefly 108/108, glide 90/95, midjourney-v5 102/104, stable-diffusion-1-3 99/99, stable-diffusion-1-4 94/94, stable-diffusion-2 103/108, stable-diffusion-xl 100/101.
+- FLUX.2 139/194, GPT_Image_2 46/195, Nano_Banana_2 8/192, Qwen_Image_2.1 458/900.
+
+Before these changes (`evaluation/E2E-01/summary.json`, `sets.image_test_commfor_w0`: same COCO + Synthbuster test
+half, Community Forensics at weight 0, any score below the band called AUTHENTIC): real called MANIPULATED 2.0 %, AI called MANIPULATED 74.5 %, AI called AUTHENTIC 21.5 %.
+
+The newest generators remain the weak point: GPT Image 2 and Nano Banana 2 are mostly INCONCLUSIVE rather than
+flagged, because the original Community Forensics scores them as real and outvotes the fine-tuned model. The
+fine-tuned model without the original flags more of them but also scored 6.4 % of COCO test photos as AI
+(`evaluation/COMMFOR-FT-01/old_v3.json`, `COMMFOR_WEIGHT=4.0`), which a forensic tool should not do. Model-level comparisons of the original,
+fine-tuned and combined detectors: `evaluation/COMMFOR-FT-01/`.
+
+Stage diagnosis (`stage_diagnosis`): apart from the AI-detection stage, no forensic stage separated real from AI
+images on these sets (balanced accuracy 0.5).
+
+## 5a. Audio verdicts end to end
+
+Same script, pellav2 deciding (`evaluation/E2E-01/summary.json`, `sets.audio_*`), 300 bona fide and 300 spoofed
+clips per set:
+
+| Set | Real called MANIPULATED | Fake called MANIPULATED | INCONCLUSIVE | AUC |
+|---|---|---|---|---|
+| ASVspoof 2019 LA eval | 0.3 % | 97.7 % | 0.0 % | 0.998 |
+| ASVspoof 5 eval sample | 15.0 % | 77.0 % | 5.7 % | 0.894 |
+
+On ASVspoof 5 the audio verdict wrongly calls 15 % of genuine speech AI-generated (KNOWN_ISSUES #16). As for
+images, only the model stage separated real from fake; the heuristic stages flagged nothing on either set.
 
 ## 6. Video
 

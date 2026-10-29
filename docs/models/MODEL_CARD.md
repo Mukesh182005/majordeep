@@ -21,7 +21,7 @@ How each choice was made, all on data the test sets never touched:
 - Community Forensics weight 4: dev half of COCO val2017 + Synthbuster (`evaluation/COMMFOR-02/scene_detector_eval_dev.json`).
 - `Organika/sdxl-detector` removed: on the newer-generator validation split it scored AUC 0.596, flagged 15.6 % of real images, and the fusion was unchanged without it (`evaluation/COMMFOR-FT-01/val_ft1.json`).
 - Fine-tuned model: `ml/training/finetune_commfor.py` (epoch chosen on validation AUC) and `ml/training/calibrate_commfor.py` (logit offset so ≤ 1 % of validation real images score ≥ 0.5). Training data: `docs/research/DATASETS.md`. Retraining procedure: `docs/models/RETRAINING_IMAGE.md`.
-- Original and fine-tuned at equal weight: fixed before scoring the test sets. Alone, the fine-tuned model flagged 5.7 % of held-out COCO photos as MANIPULATED; together, none of 1,069 real test photos.
+- Original and fine-tuned at equal weight: fixed before scoring the test sets. Without the original, the fine-tuned model scored 6.4 % of held-out COCO photos as AI (`evaluation/COMMFOR-FT-01/old_v3.json`); together, none of the real test photos was called MANIPULATED (`evaluation/E2E-02`).
 
 `umm-maybe/AI-image-detector` (an earlier primary model) scored below chance on current generators and was removed earlier.
 

@@ -1,0 +1,725 @@
+{
+ "script": "backend/scripts/eval_end_to_end.py",
+ "provenance": {
+  "utc_time": "2026-10-29T08:46:35+00:00",
+  "git_commit": "ff52b90f78515bffd8b2ec20943f54bdce3ca1ac",
+  "git_branch": "feat/image-audio-v4",
+  "tracked_changes": true,
+  "python": "3.11.9",
+  "torch": "2.12.0.dev20260408+cu128",
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5070",
+  "settings": {
+   "commfor_enabled": true,
+   "commfor_weight": 4.0,
+   "face_model_in_verdict": false,
+   "audio_pellav2_in_verdict": true,
+   "audio_model_source": "lcnn_asvspoof",
+   "fake_threshold": 0.5,
+   "uncertain_band": 0.15
+  }
+ },
+ "sets": {
+  "audio_asvspoof2019_la_eval": {
+   "n_real": 300,
+   "n_fake": 300,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 300,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0
+    },
+    "fake": {
+     "AUTHENTIC": 30,
+     "INCONCLUSIVE": 16,
+     "MANIPULATED": 254
+    }
+   },
+   "real_called_authentic": {
+    "k": 300,
+    "n": 300,
+    "rate": 1.0,
+    "ci95": [
+     0.9874,
+     1.0
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 0,
+    "n": 300,
+    "rate": 0.0,
+    "ci95": [
+     0.0,
+     0.0126
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 254,
+    "n": 300,
+    "rate": 0.8466666666666667,
+    "ci95": [
+     0.8015,
+     0.883
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 30,
+    "n": 300,
+    "rate": 0.1,
+    "ci95": [
+     0.0709,
+     0.1392
+    ]
+   },
+   "inconclusive": {
+    "k": 16,
+    "n": 600,
+    "rate": 0.02666666666666667,
+    "ci95": [
+     0.0165,
+     0.0429
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 554,
+    "n": 584,
+    "rate": 0.9486301369863014,
+    "ci95": [
+     0.9276,
+     0.9638
+    ]
+   },
+   "accuracy_all": {
+    "k": 554,
+    "n": 600,
+    "rate": 0.9233333333333333,
+    "ci95": [
+     0.8992,
+     0.942
+    ]
+   },
+   "latency_s": {
+    "p50": 1.2335,
+    "p95": 1.7561
+   },
+   "auc_final_probability": {
+    "auc": 0.9995555555555554,
+    "ci95": [
+     0.9989995833333334,
+     0.9999223611111111
+    ]
+   },
+   "per_group": {
+    "A07": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 24,
+     "n": 24
+    },
+    "A08": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 22,
+     "n": 23
+    },
+    "A09": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 23,
+     "n": 23
+    },
+    "A10": {
+     "label": 1,
+     "AUTHENTIC": 17,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 6,
+     "n": 23
+    },
+    "A11": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 23,
+     "n": 23
+    },
+    "A12": {
+     "label": 1,
+     "AUTHENTIC": 2,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 18,
+     "n": 23
+    },
+    "A13": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 22,
+     "n": 23
+    },
+    "A14": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 23,
+     "n": 23
+    },
+    "A15": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 23,
+     "n": 23
+    },
+    "A16": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 21,
+     "n": 23
+    },
+    "A17": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 22,
+     "n": 23
+    },
+    "A18": {
+     "label": 1,
+     "AUTHENTIC": 4,
+     "INCONCLUSIVE": 4,
+     "MANIPULATED": 15,
+     "n": 23
+    },
+    "A19": {
+     "label": 1,
+     "AUTHENTIC": 6,
+     "INCONCLUSIVE": 5,
+     "MANIPULATED": 12,
+     "n": 23
+    },
+    "bonafide": {
+     "label": 0,
+     "AUTHENTIC": 300,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0,
+     "n": 300
+    }
+   },
+   "stage_diagnosis": {
+    "1: File Hashes": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: Audio File DNA & Container Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Signal Intelligence & Acoustic Telemetry": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "4: Physiological Glottal Flow & VoiceRadar Physics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "5: Content & Phonemic Coarticulation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "6: Model Stage": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.8,
+     "balanced_accuracy": 0.9,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "7: Environmental & ENF Grid Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "8: Risk and Verdict": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.8466666666666667,
+     "balanced_accuracy": 0.9233333333333333,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "null": 300
+    },
+    "fake": {
+     "null": 300
+    }
+   },
+   "errors_unresolved": 0
+  },
+  "audio_asvspoof5_eval": {
+   "n_real": 300,
+   "n_fake": 300,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 280,
+     "INCONCLUSIVE": 8,
+     "MANIPULATED": 12
+    },
+    "fake": {
+     "AUTHENTIC": 122,
+     "INCONCLUSIVE": 16,
+     "MANIPULATED": 162
+    }
+   },
+   "real_called_authentic": {
+    "k": 280,
+    "n": 300,
+    "rate": 0.9333333333333333,
+    "ci95": [
+     0.8993,
+     0.9564
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 12,
+    "n": 300,
+    "rate": 0.04,
+    "ci95": [
+     0.023,
+     0.0686
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 162,
+    "n": 300,
+    "rate": 0.54,
+    "ci95": [
+     0.4835,
+     0.5955
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 122,
+    "n": 300,
+    "rate": 0.4066666666666667,
+    "ci95": [
+     0.3526,
+     0.4631
+    ]
+   },
+   "inconclusive": {
+    "k": 24,
+    "n": 600,
+    "rate": 0.04,
+    "ci95": [
+     0.027,
+     0.0588
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 442,
+    "n": 576,
+    "rate": 0.7673611111111112,
+    "ci95": [
+     0.7312,
+     0.8
+    ]
+   },
+   "accuracy_all": {
+    "k": 442,
+    "n": 600,
+    "rate": 0.7366666666666667,
+    "ci95": [
+     0.7,
+     0.7703
+    ]
+   },
+   "latency_s": {
+    "p50": 1.8445,
+    "p95": 2.2782999999999998
+   },
+   "auc_final_probability": {
+    "auc": 0.9004555555555557,
+    "ci95": [
+     0.8754713888888889,
+     0.9259016666666667
+    ]
+   },
+   "per_group": {
+    "A17": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 15,
+     "n": 19
+    },
+    "A18": {
+     "label": 1,
+     "AUTHENTIC": 15,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 1,
+     "n": 19
+    },
+    "A19": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A20": {
+     "label": 1,
+     "AUTHENTIC": 16,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 2,
+     "n": 19
+    },
+    "A21": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A22": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A23": {
+     "label": 1,
+     "AUTHENTIC": 13,
+     "INCONCLUSIVE": 4,
+     "MANIPULATED": 2,
+     "n": 19
+    },
+    "A24": {
+     "label": 1,
+     "AUTHENTIC": 2,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 16,
+     "n": 19
+    },
+    "A25": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 17,
+     "n": 19
+    },
+    "A26": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A27": {
+     "label": 1,
+     "AUTHENTIC": 19,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0,
+     "n": 19
+    },
+    "A28": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A29": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 17,
+     "n": 18
+    },
+    "A30": {
+     "label": 1,
+     "AUTHENTIC": 17,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 0,
+     "n": 18
+    },
+    "A31": {
+     "label": 1,
+     "AUTHENTIC": 15,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 2,
+     "n": 18
+    },
+    "A32": {
+     "label": 1,
+     "AUTHENTIC": 18,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0,
+     "n": 18
+    },
+    "bonafide": {
+     "label": 0,
+     "AUTHENTIC": 280,
+     "INCONCLUSIVE": 8,
+     "MANIPULATED": 12,
+     "n": 300
+    }
+   },
+   "per_codec": {
+    "-": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 20,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 40
+     }
+    },
+    "C01": {
+     "real": {
+      "AUTHENTIC": 23,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 2
+     },
+     "fake": {
+      "AUTHENTIC": 13,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 14
+     }
+    },
+    "C02": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 10,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 10
+     }
+    },
+    "C03": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 13,
+      "INCONCLUSIVE": 3,
+      "MANIPULATED": 6
+     }
+    },
+    "C04": {
+     "real": {
+      "AUTHENTIC": 18,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 5
+     },
+     "fake": {
+      "AUTHENTIC": 12,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 6
+     }
+    },
+    "C05": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 8,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 12
+     }
+    },
+    "C06": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 9,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 13
+     }
+    },
+    "C07": {
+     "real": {
+      "AUTHENTIC": 20,
+      "INCONCLUSIVE": 4,
+      "MANIPULATED": 1
+     },
+     "fake": {
+      "AUTHENTIC": 12,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 8
+     }
+    },
+    "C08": {
+     "real": {
+      "AUTHENTIC": 19,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 4
+     },
+     "fake": {
+      "AUTHENTIC": 6,
+      "INCONCLUSIVE": 5,
+      "MANIPULATED": 13
+     }
+    },
+    "C09": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 7,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 8
+     }
+    },
+    "C10": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 4,
+      "INCONCLUSIVE": 3,
+      "MANIPULATED": 17
+     }
+    },
+    "C11": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 8,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 15
+     }
+    }
+   },
+   "stage_diagnosis": {
+    "1: File Hashes": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: Audio File DNA & Container Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Signal Intelligence & Acoustic Telemetry": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "4: Physiological Glottal Flow & VoiceRadar Physics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "5: Content & Phonemic Coarticulation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "6: Model Stage": {
+     "flagged_real": 0.04,
+     "flagged_fake": 0.52,
+     "balanced_accuracy": 0.74,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "7: Environmental & ENF Grid Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "8: Risk and Verdict": {
+     "flagged_real": 0.04,
+     "flagged_fake": 0.54,
+     "balanced_accuracy": 0.75,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "null": 300
+    },
+    "fake": {
+     "null": 300
+    }
+   },
+   "errors_unresolved": 0
+  }
+ }
+}

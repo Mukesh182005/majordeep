@@ -69,6 +69,7 @@
 
 ### 16. pellav2 (the audio verdict model) fails on neural and narrowband codecs and some attacks
 - **Description:** pellav2 is a pretrained detector whose training data is not published. On an ASVspoof 5 eval sample (`evaluation/AUDIO-PELLAV2-01-ASVSPOOF5/results.json`) its EER is 18.5 %; at its threshold it flags 17.3 % of genuine speech and misses 19.5 % of fakes. Genuine speech passed through the EnCodec neural codec is flagged 58-68 % of the time (C04, C07), and 9-22 % after narrowband codecs (C08-C10). It catches 7 % of attack A27, 21 % of A32 and 47 % of A30. On re-encoded ASVspoof 2019 LA eval clips it flags 14 % of genuine speech after AAC at 32 kbit/s (`evaluation/AUDIO-PELLAV2-01/results.json`, `codec_robustness`). Only the first 32 s of a clip are scored.
+- **Tried:** a codec-augmented fine-tune cut false alarms on ASVspoof 5 genuine speech from 15.0 % to 4.0 % but also cut detected fakes from 77.0 % to 54.0 %, so it is not the default (`evaluation/E2E-03`, `docs/research/EVALUATION.md`).
 - **Impact:** A verdict on phone-call, VoIP or neural-codec audio is much less reliable than the ASVspoof 2019 figures suggest; the scope note on every audio result says so. Because the training data is unknown, the ASVspoof 2019 figures may be optimistic if it was trained on that set. It has not been measured on the team's own phone and WhatsApp recordings (`--data` in `scripts/eval_audio_detector.py`).
 
 ### 17. The newest image generators are mostly INCONCLUSIVE, not flagged

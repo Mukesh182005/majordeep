@@ -191,6 +191,16 @@ clips per set:
 On ASVspoof 5 the audio verdict wrongly calls 15 % of genuine speech AI-generated (KNOWN_ISSUES #16). As for
 images, only the model stage separated real from fake; the heuristic stages flagged nothing on either set.
 
+**A tried and rejected audio alternative.** `ml/training/finetune_pellav2.py` fine-tuned pellav2's top 4 encoder layers
+on ASVspoof 5 train/dev and ASVspoof 2019 LA train clips, each passed through random codecs (MP3, AAC, Opus, AMR,
+Speex, GSM, G.722, EnCodec; none from the eval sample), and calibrated it so 2 % of validation bona fide windows
+score >= 0.5. Same full-pipeline samples as above (`evaluation/E2E-03/summary.json`): ASVspoof 5 real called
+MANIPULATED 15.0 % -> 4.0 % (EnCodec C04 + C07: 30/50 -> 6/50), but fakes called MANIPULATED 77.0 % -> 54.0 %;
+ASVspoof 2019 fakes 97.7 % -> 84.7 % (real 0.3 % -> 0.0 %). The rule fixed before testing (fewer false alarms
+*and* at most a 5-point loss of detection, and >= 95 % on ASVspoof 2019) was not met, so the original pellav2
+stays the default. The fine-tuned model can be enabled with `AUDIO_PELLAV2_MODEL_ID=checkpoints/pellav2_ft_v1` and
+`AUDIO_PELLAV2_CONFIG_FILE=checkpoints/pellav2_ft_v1/pellav2_verdict_config.json`.
+
 ## 6. Video
 
 Not measured. FaceForensics++ and Celeb-DF v2 are not on this machine

@@ -220,6 +220,9 @@ def cmd_train(args) -> int:
     yva = np.array([int(r["label"]) for r in mva])
     loaded = build_pellav2(HUB_REPO, device="cuda")
     model, device = loaded.module, loaded.device
+    # LayerDrop skips encoder layers in train mode, which changes the number of hidden states the
+    # layer-weighted head expects; the authors' model only ran in eval mode, where it is off.
+    model.backbone.config.layerdrop = 0.0
     for p in model.parameters():
         p.requires_grad = False
     layers = model.backbone.encoder.layers

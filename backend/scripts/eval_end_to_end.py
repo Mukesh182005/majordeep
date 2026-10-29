@@ -10,6 +10,9 @@ versus fake files (whether its diagnosis carries information).
   score-audio  --asvspoof-root LA --per-class N --name NAME      (ASVspoof 2019 LA eval sample)
                --asvspoof5-root V5 --per-class N --name NAME     (ASVspoof 5 eval clips on disk)
                --data D --name NAME                              (D/real/<source>/, D/fake/<generator>/)
+  score-video  --data D --name NAME                              (D/real/<source>/, D/fake/<method>/ videos)
+               records the verdict plus GenD mean/max, the legacy face score and the face-frame count;
+               set GEND_IN_VERDICT=true or false in the environment to compare the two rules.
   summarise    reads every <name>.jsonl in --out-dir, writes summary.json, prints the tables.
 
 Scoring is resumable (rows already in <name>.jsonl are skipped; failures go to
@@ -74,6 +77,17 @@ def _record(media: str, item: dict, result, latency_s: float) -> dict:
         rec["commfor_weight"] = settings.commfor_weight
         rec["scene_model_scores"] = ev.get("scene_model_scores")
         rec["faces_detected"] = ev.get("faces_detected")
+    elif media == "video":
+        from app.config import settings
+
+        frames = ev.get("frame_scores") or []
+        legacy = [f["legacy_face_probability"] for f in frames if f.get("face_detected") and "legacy_face_probability" in f]
+        rec.update(gend_in_verdict=settings.gend_in_verdict, gend_face_mean=ev.get("gend_face_mean"),
+                   gend_face_max=ev.get("gend_face_max"), gend_faces_scored=ev.get("gend_faces_scored"),
+                   legacy_face_mean=float(sum(legacy) / len(legacy)) if legacy else None,
+                   legacy_face_max=max(legacy) if legacy else None,
+                   face_frames=sum(1 for f in frames if f.get("face_detected")), frames=len(frames),
+                   scene_ai=ev.get("vit_genai_prob"), scene_frames=len(ev.get("scene_frame_scores") or []))
     else:
         mo = ev.get("models_output") or {}
         rec["codec"] = item.get("codec")
@@ -109,7 +123,7 @@ def score(media: str, items: list[dict], out_dir: Path, name: str, shard: str | 
     done = set().union(*(_done(f) for f in [out_dir / f"{name}.jsonl", *out_dir.glob(f"{name}.s*.jsonl")]))
     todo = [i for i in items if i["id"] not in done]
     print(f"{name}: {len(items)} items, {len(done)} already scored, {len(todo)} to score", flush=True)
-    kind = MediaType.IMAGE if media == "image" else MediaType.AUDIO
+    kind = {"image": MediaType.IMAGE, "audio": MediaType.AUDIO, "video": MediaType.VIDEO}[media]
     for n, item in enumerate(todo, 1):
         with tempfile.TemporaryDirectory(prefix="ds-e2e-") as evidence_dir:
             t0 = time.perf_counter()
@@ -221,6 +235,13 @@ def summarise_set(rows: list[dict], seed: int = 0) -> dict:
         pos, neg = np.where(y == 1)[0], np.where(y == 0)[0]
         boots = [roc_auc(y[i], s[i]) for i in (np.r_[rng.choice(pos, pos.size), rng.choice(neg, neg.size)] for _ in range(1000))]
         out["auc_final_probability"] = {"auc": roc_auc(y, s), "ci95": [float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))]}
+    if any("gend_face_mean" in r for r in rows):  # video: face-model AUCs over videos with a scored face
+        face = [r for r in rows if r.get("gend_face_mean") is not None and r.get("legacy_face_mean") is not None]
+        yv = np.array([r["label"] for r in face])
+        out["face_models"] = {"videos_with_face": len(face), "videos_without_face": len(rows) - len(face)}
+        if 0 < yv.sum() < len(yv):
+            for key in ("gend_face_mean", "gend_face_max", "legacy_face_mean", "legacy_face_max"):
+                out["face_models"][f"auc_{key}"] = roc_auc(yv, np.array([r[key] for r in face], dtype=float))
     groups = {}
     for g in sorted({r["group"] for r in rows}):
         sub = [r for r in rows if r["group"] == g]
@@ -302,13 +323,15 @@ def main() -> int:
     group.add_argument("--asvspoof5-root", type=Path)
     group.add_argument("--data", type=Path)
     aud.add_argument("--per-class", type=int, default=300)
+    vid = sub.add_parser("score-video")
+    vid.add_argument("--data", type=Path, required=True)
     aud.add_argument("--seed", type=int, default=0)
-    for p in (img, aud):
+    for p in (img, aud, vid):
         p.add_argument("--name", required=True)
         p.add_argument("--split", default=None, help="score only manifest rows with this split")
         p.add_argument("--shard", default=None, help="K/N: score only shard K of N (parallel runs)")
     summ = sub.add_parser("summarise")
-    for p in (img, aud, summ):
+    for p in (img, aud, vid, summ):
         p.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
     args = parser.parse_args()
 
@@ -317,6 +340,16 @@ def main() -> int:
         if args.split:
             items = [i for i in items if i.get("split") == args.split]
         score("image", items, args.out_dir, args.name, args.shard)
+        return 0
+    if args.cmd == "score-video":
+        items = []
+        for split, label in (("real", 0), ("fake", 1)):
+            for group in sorted(d for d in (args.data / split).iterdir() if d.is_dir()):
+                for f in sorted(group.rglob("*")):
+                    if f.suffix.lower() in (".mp4", ".mov", ".avi", ".webm", ".mkv"):
+                        items.append({"id": f.relative_to(args.data).as_posix(), "path": f, "label": label,
+                                      "group": f"{split}/{group.name}"})
+        score("video", items, args.out_dir, args.name, args.shard)
         return 0
     if args.cmd == "score-audio":
         score("audio", audio_items(args), args.out_dir, args.name, args.shard)

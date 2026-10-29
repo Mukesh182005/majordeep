@@ -10,17 +10,27 @@ in verdicts (see below).
 
 | Property | Value |
 |---|---|
-| **Models** | `haywoodsloan/ai-image-detector-deploy` (SwinV2, weight 0.75); `Organika/sdxl-detector` (Swin, weight 0.25) |
-| **Source** | Hugging Face, downloaded on first use (~0.75 GB + ~0.33 GB cache) |
+| **Models** | `haywoodsloan/ai-image-detector-deploy` (SwinV2, weight 0.75); Community Forensics `OwensLab/commfor-model-384` (ViT-S/384, weight 4); the same model fine-tuned on FLUX.2, GPT Image 2 and Nano Banana 2 (`checkpoints/commfor_ft_v3/`, weight 4) |
 | **Fusion** | Weighted mean of log-odds; each model's P(AI) = 1 − P(its "real" class) |
 | **Input** | Whole image after screenshot / letterbox borders are cropped |
-| **Evaluation** | 560 held-out images: 200 real (COCO, Flickr), 360 AI (SD 2.1, SDXL, SD3, DALL-E 3, Midjourney v6, Flux.1-dev, Gemini Nano Banana / Pro) |
-| **AUC** | 0.984 original files · 0.975 resized JPEG · 0.983 screenshots (border-cropped) |
-| **Real photos ≥ 0.5** | 3.5% |
+| **Verdict** | MANIPULATED at P(AI) ≥ 0.58; without camera metadata AUTHENTIC only below 0.02, INCONCLUSIVE between |
+| **Evaluation** | `docs/research/EVALUATION.md` section 5; files in `evaluation/COMMFOR-02`, `evaluation/COMMFOR-FT-01`, `evaluation/E2E-02` |
 
-Model selection was measured, not taken from model cards: `umm-maybe/AI-image-detector`
-(previously the primary model) scored AUC 0.469 on current generators — below
-chance — and was removed; Organika alone flags 23% of real photos.
+How each choice was made, all on data the test sets never touched:
+
+- Community Forensics weight 4: dev half of COCO val2017 + Synthbuster (`evaluation/COMMFOR-02/scene_detector_eval_dev.json`).
+- `Organika/sdxl-detector` removed: on the newer-generator validation split it scored AUC 0.596, flagged 15.6 % of real images, and the fusion was unchanged without it (`evaluation/COMMFOR-FT-01/val_ft1.json`).
+- Fine-tuned model: `ml/training/finetune_commfor.py` (epoch chosen on validation AUC) and `ml/training/calibrate_commfor.py` (logit offset so ≤ 1 % of validation real images score ≥ 0.5). Training data: `docs/research/DATASETS.md`. Retraining procedure: `docs/models/RETRAINING_IMAGE.md`.
+- Original and fine-tuned at equal weight: fixed before scoring the test sets. Alone, the fine-tuned model flagged 5.7 % of held-out COCO photos as MANIPULATED; together, none of 1,069 real test photos.
+
+`umm-maybe/AI-image-detector` (an earlier primary model) scored below chance on current generators and was removed earlier.
+
+### Edit localisation: TruFor (shown, not in the verdict)
+
+TruFor (Guillaro et al., CVPR 2023; GRIP-UNINA licence, nonprofit use only) gives an integrity score and a
+heatmap of possibly edited regions. A region is reported at score ≥ 0.8, the lowest threshold flagging ≤ 2 % of
+real COCO dev photos (`evaluation/TRUFOR-01/results.json`). It is not in the verdict: it flags 10 % of re-compressed
+social-media photos in `accuracy_test`, and it does not detect fully generated images.
 
 ### Face-crop GAN classifier (informational)
 

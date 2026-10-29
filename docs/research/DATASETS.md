@@ -37,6 +37,34 @@ Every count below is read from the file named next to it.
   order, 3,004 in all. The file list and labels are in the results file (`files.asvspoof5_eval`).
 - **Labels:** `ASVspoof5.eval.track_1.tsv` (attack, codec, codec quality per clip).
 
+### COCO val2017 (real photos) and Synthbuster (AI images)
+
+- **Role:** image test set. Manifest `evaluation/E2E-01/image_manifest.csv`: 600 COCO val2017 photos and 200
+  images from each of Synthbuster's nine generators (seed 0), split 50/50 by image id into a **dev** half
+  (Community Forensics weight, the 0.02 authentic cut-off, TruFor's threshold, and training replay for the
+  fine-tuned model) and a **test** half used only for reporting.
+- **Sources and licences:** COCO (https://cocodataset.org; images keep their Flickr licences, annotations
+  CC BY 4.0); Synthbuster (Bammey 2023, Zenodo DOI 10.5281/zenodo.10066460, CC BY-NC-SA 4.0). No image is
+  redistributed in this repository.
+
+### MLLM-Generated Image Detection Dataset (newest generators)
+
+- **Role:** fine-tuning and testing on current generators (`evaluation/COMMFOR-FT-01`).
+- **Source and licence:** Hugging Face `zr-zhang/MLLM-Generated-Image-Detection-Dataset` (Zhang et al. 2026,
+  arXiv 2608.01258); Apache-2.0 metadata, and its card restricts use to research on AI-generated content
+  detection. Cite the paper.
+- **What was used:** a seeded subset of 1,000 images per generator (FLUX.2, GPT Image 2, Nano Banana 2,
+  Qwen Image 2.1) and 3,611 real photos (`subset.csv`), split 60/20/20 per generator and category;
+  **Qwen Image 2.1 is test only** (never trained on). 4,800 further GPT Image 2 / Nano Banana 2 images, disjoint
+  from the subset, are training only (`extra.csv`; one truncated file removed). Splits: `checkpoints/commfor_ft_v3/splits.csv`.
+- **Shortcut control:** its AI images are PNG and its real photos mostly JPEG, so every training and test
+  image is resized and re-encoded as JPEG before scoring.
+
+### TruFor splice test (made here)
+
+- 600 spliced copies of the COCO photos above (a feathered region from another photo of the same split, JPEG
+  q90, seed 0; `backend/scripts/eval_trufor.py`). A controlled test of local edits, not a public benchmark.
+
 ### 140k Real and Fake Faces (Kaggle)
 
 - **Role:** training data of the face-crop classifier
@@ -59,8 +87,7 @@ Every count below is read from the file named next to it.
 |---|---|---|
 | In-the-Wild (Müller et al., 2022) | Cross-dataset audio test | Licence conflict (Apache 2.0 vs CC BY-SA 4.0) unresolved; not downloaded. `results/pipeline_eval.json` records it as not run. |
 | H560 (internal, 560 images) | Development set for image settings | Not found on this machine; `results/image_eval.json` records it as not run. |
-| Synthbuster (Bammey, 2023) | AI-generated part of the image test set T2 | Downloaded and verified; not extracted; not scored. |
-| RAISE-1k, COCO | Real part of T2 | Not downloaded. |
+| RAISE-1k | Real photos matched to Synthbuster | Not downloaded (COCO val2017 is used instead). |
 | FaceForensics++ (c23), Celeb-DF v2 | Face-swap video training and test | Access not granted yet; `results/pipeline_eval.json` records the video sets as not run. |
 
 T2 is scored only after the image configuration is frozen

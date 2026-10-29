@@ -164,19 +164,23 @@ export async function pollJob(jobId, { intervalMs = 1500, timeoutMs = 15 * 60 * 
  * @param {function} opts.onError  - called on WS error before falling back to polling
  * @returns {Promise<object>}      - resolves with the final job result, rejects on failure
  */
-export function connectJobWs(jobId, { onTick, onError, timeoutMs = 15 * 60 * 1000 } = {}) {
-  return new Promise(async (resolve, reject) => {
-    const wsBase = (BASE || window.location.origin).replace(/^http/, 'ws')
-    let wsUrl
-    try {
-      const links = await api.jobLinks(jobId)
-      wsUrl = links.ws_url.startsWith('ws')
-        ? links.ws_url
-        : `${wsBase}${links.ws_url.startsWith('/') ? '' : '/'}${links.ws_url}`
-    } catch {
-      wsUrl = `${wsBase}/api/jobs/${jobId}/ws`
-    }
+async function jobWsUrl(jobId) {
+  const wsBase = (BASE || window.location.origin).replace(/^http/, 'ws')
+  try {
+    const links = await api.jobLinks(jobId)
+    return links.ws_url.startsWith('ws')
+      ? links.ws_url
+      : `${wsBase}${links.ws_url.startsWith('/') ? '' : '/'}${links.ws_url}`
+  } catch {
+    return `${wsBase}/api/jobs/${jobId}/ws`
+  }
+}
 
+export async function connectJobWs(jobId, { onTick, onError, timeoutMs = 15 * 60 * 1000 } = {}) {
+  // The signed link is fetched before the Promise, so the executor is synchronous and an
+  // exception in it rejects the Promise instead of being lost (no-async-promise-executor).
+  const wsUrl = await jobWsUrl(jobId)
+  return new Promise((resolve, reject) => {
     let ws
     try {
       ws = new WebSocket(wsUrl)

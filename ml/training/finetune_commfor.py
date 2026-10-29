@@ -56,7 +56,8 @@ UNSEEN_GENERATOR = "Qwen Image 2.1"
 MEAN, STD = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
 
 
-def build_splits(mllm_root: Path, e2e_manifest: Path, e2e_root: Path, extra_root: Path | None = None) -> list[dict]:
+def build_splits(mllm_root: Path, e2e_manifest: Path, e2e_root: Path, extra_roots: list[Path] | None = None,
+                 extra_manifest: Path | None = None) -> list[dict]:
     rows = list(csv.DictReader(open(mllm_root / "subset.csv", newline="", encoding="utf-8")))
     rng = random.Random(0)
     out = []
@@ -74,7 +75,11 @@ def build_splits(mllm_root: Path, e2e_manifest: Path, e2e_root: Path, extra_root
                 split = "train" if i < 0.6 * n else ("val" if i < 0.8 * n else "test")
             out.append({"path": str(mllm_root / r["path"]), "label": int(gen != "Real"), "source": f"mllm/{gen}",
                         "category": cat, "split": split})
-    if extra_root is not None:  # extra images of the hardest generators: training only, never in the subset
+    if extra_manifest is not None:  # any further images: path, label, source, split (train or val; never test)
+        for r in csv.DictReader(open(extra_manifest, newline="", encoding="utf-8")):
+            assert r["split"] in ("train", "val"), r
+            out.append({"path": r["path"], "label": int(r["label"]), "source": r["source"], "category": "", "split": r["split"]})
+    for extra_root in extra_roots or []:  # extra images of the hardest generators: training only, never in the subset
         for r in csv.DictReader(open(extra_root / "extra.csv", newline="", encoding="utf-8")):
             out.append({"path": str(extra_root / r["path"]), "label": 1, "source": f"mllm/{r['generator']}",
                         "category": r["category"], "split": "train"})
@@ -178,7 +183,8 @@ def main() -> int:
     ap.add_argument("--e2e-root", type=Path, required=True)
     ap.add_argument("--e2e-manifest", type=Path, default=REPO / "evaluation/E2E-01/image_manifest.csv")
     ap.add_argument("--out", type=Path, required=True)
-    ap.add_argument("--extra-root", type=Path, default=None, help="folder with extra.csv: more training images")
+    ap.add_argument("--extra-root", type=Path, nargs="*", default=[], help="folders with extra.csv: more training images")
+    ap.add_argument("--extra-manifest", type=Path, default=None, help="CSV path,label,source,split (train/val)")
     ap.add_argument("--strong-aug", action="store_true", help="add blur / resampling / double-JPEG damage in training")
     ap.add_argument("--epochs", type=int, default=4)
     ap.add_argument("--batch", type=int, default=32)
@@ -188,7 +194,7 @@ def main() -> int:
 
     torch.manual_seed(0); random.seed(0); np.random.seed(0)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    rows = build_splits(args.mllm_root, args.e2e_manifest, args.e2e_root, args.extra_root)
+    rows = build_splits(args.mllm_root, args.e2e_manifest, args.e2e_root, args.extra_root, args.extra_manifest)
     args.out.mkdir(parents=True, exist_ok=True)
     with open(args.out / "splits.csv", "w", newline="", encoding="utf-8") as h:
         w = csv.DictWriter(h, fieldnames=["path", "label", "source", "category", "split"]); w.writeheader(); w.writerows(rows)
@@ -238,7 +244,8 @@ def main() -> int:
             "best_val_auc": best[0], "history": history, "train_n": len(train), "val_n": len(val),
             "train_generators": list(TRAIN_GENERATORS), "unseen_test_generator": UNSEEN_GENERATOR,
             "replay": "evaluation/E2E-01/image_manifest.csv dev half", "shortcut_control": "random resize + JPEG q60-95 on every image",
-            "extra_root": str(args.extra_root) if args.extra_root else None, "strong_aug": args.strong_aug,
+            "extra_root": [str(x) for x in args.extra_root], "extra_manifest": str(args.extra_manifest) if args.extra_manifest else None,
+            "strong_aug": args.strong_aug,
             "lr": args.lr, "epochs": args.epochs, "batch": args.batch, "git_commit": commit,
             "utc_time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "data_licence": "zr-zhang/MLLM-Generated-Image-Detection-Dataset: research use only"}

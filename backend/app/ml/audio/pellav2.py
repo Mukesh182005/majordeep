@@ -207,6 +207,15 @@ def build_pellav2(source: str | Path, device: str | None = None, backbone_config
         "backbone": BACKBONE_ID,
         "licence": "MIT",
     }
+    # A fine-tuned checkpoint may carry a calibration in metadata.json next to it: a logit
+    # offset fitted on its validation split (ml/training/finetune_pellav2.py).
+    meta_path = weights.parent / "metadata.json"
+    if meta_path.is_file():
+        import json
+
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        metadata["logit_bias"] = float((meta.get("calibration") or {}).get("logit_bias", 0.0))
+        metadata["fine_tuned_from"] = meta.get("base")
     logger.info("Loaded %s from %s on %s", MODEL_LABEL, weights, device)
     return LoadedPellav2(module=module, device=device, metadata=metadata)
 
@@ -311,7 +320,7 @@ def _window_logits(loaded: LoadedPellav2, windows: np.ndarray) -> np.ndarray:
         torch.backends.cuda.matmul.allow_tf32 = False
         with torch.inference_mode(), torch.autocast(device_type=device_type, enabled=False), \
                 torch.backends.cudnn.flags(enabled=True, benchmark=False, deterministic=True, allow_tf32=False):
-            logits = loaded.module(batch).float().cpu().numpy()
+            logits = loaded.module(batch).float().cpu().numpy() - loaded.metadata.get("logit_bias", 0.0)
     finally:
         torch.backends.cuda.matmul.allow_tf32 = previous_tf32
     return np.atleast_1d(logits)

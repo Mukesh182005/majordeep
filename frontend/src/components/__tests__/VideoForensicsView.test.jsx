@@ -109,3 +109,23 @@ describe('VideoForensicsView', () => {
   })
 })
 
+
+describe('VideoForensicsView with GenD', () => {
+  it('shows the GenD mean / max and whether it is in the verdict', () => {
+    const result = {
+      ...realVideoFaceswapResult,
+      evidence: { ...realVideoFaceswapResult.evidence, gend_face_mean: 0.82, gend_face_max: 0.97, gend_faces_scored: 24,
+                  gend_in_verdict: true, scene_frame_scores: Array.from({ length: 8 }, (_, i) => ({ frame_index: i, scene_ai_prob: 0.1 })) },
+    }
+    render(<VideoForensicsView result={result} activeSubTab="summary" setActiveSubTab={() => {}} />)
+    const row = screen.getByTestId('gend-face-score')
+    expect(row).toHaveTextContent(/GenD face-swap \(in verdict\), mean \/ max over 24 faces/)
+    expect(row).toHaveTextContent('82% / 97%')
+  })
+
+  it('says not applicable when GenD found no face', () => {
+    const result = { ...realVideoFaceswapResult, evidence: { ...realVideoFaceswapResult.evidence, gend_face_mean: null, gend_face_max: null } }
+    render(<VideoForensicsView result={result} activeSubTab="summary" setActiveSubTab={() => {}} />)
+    expect(screen.getByTestId('gend-face-score')).toHaveTextContent(/No face found: not applicable/)
+  })
+})

@@ -113,12 +113,13 @@ Glottal-flow, voice-quality, mains-hum (ENF), splice-timeline, container and wat
 
 | Property | Value |
 |---|---|
-| **Architecture** | Frame-aggregated (uses image detector per frame) |
-| **Task** | Video deepfake detection via temporal + spatial analysis |
-| **Input** | Video file, sampled at configurable FPS (default: 1.0) |
-| **Output** | Aggregated probability + per-frame scores + temporal evidence |
-| **Max frames** | 32 (configurable) |
-| **Framework** | PyTorch 2 + OpenCV |
+| **Face-swap model** | GenD (CLIP ViT-L/14 with a layer-norm-tuned linear head; Yermakov et al., WACV 2026; MIT; Hugging Face `yermandy/GenD_CLIP_L_14`), pretrained by its authors on FaceForensics++, not trained here |
+| **Face crop** | MTCNN detection box, enlarged 1.3x and squared, as the authors crop (`app/ml/gend.py`) |
+| **Face score** | Mean GenD P(fake) over the sampled face frames (the paper's video protocol); the worst frame is shown, not used |
+| **Scene AI** | The image scene detectors on 8 evenly spaced frames, averaged |
+| **Input** | Video sampled at 1 fps (default), up to 32 frames |
+| **Evaluation** | `docs/research/EVALUATION.md` section 6: face AUC 0.941 on 400 DFD videos; verdicts on 80 held-out DFD videos: 72.5 % of face swaps and 2.5 % of real videos called MANIPULATED |
+| **Not used in verdicts** | rPPG, LipForensics, generator profile match, optical flow and the StyleGAN face checkpoint are shown as unvalidated context |
 
 ### Supplementary Analysis
 

@@ -2,6 +2,35 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased] — 2026-10-29
+
+Every number below is from a file in `evaluation/`; details in `docs/research/EVALUATION.md`.
+
+### Added
+- Images: Community Forensics (original + a copy fine-tuned on FLUX.2 / GPT Image 2 / Nano Banana 2) in the scene
+  ensemble; TruFor edit-localisation heatmap (shown, not in the verdict). COCO + Synthbuster test half: AI images
+  called MANIPULATED 74.5 % -> 98.4 %, called AUTHENTIC 21.5 % -> 0.1 %, real photos called MANIPULATED 2.0 % -> 0 %.
+- Audio: pellav2 (pretrained, w2v-BERT 2.0) decides the verdict; the ASVspoof LCNN is the fallback.
+- Video: GenD face-swap detector (pretrained, MIT) in the verdict, mean over face frames; per-frame timeline follows
+  GenD; scene AI detectors on 8 frames instead of 1. 80 held-out DFD videos: face swaps called MANIPULATED
+  2.5 % -> 72.5 %, real videos 0 -> 1 of 40.
+- Browser end-to-end tests (Playwright, `npm run e2e`); whole-pipeline evaluator for image, audio and video
+  (`backend/scripts/eval_end_to_end.py`).
+
+### Fixed
+- Video: unvalidated heuristics (LipForensics, generator profile match) forced 26 of 60 real DFD videos to
+  MANIPULATED; they now only label.
+- An image with no camera metadata is no longer called an "Authentic Camera Photograph"; AUTHENTIC needs
+  P(AI) < 0.02, otherwise INCONCLUSIVE. Video likewise says "No manipulation detected (origin unverified)".
+- Sign-out did not clear the httpOnly session cookie; a reload signed the user back in.
+- A text file renamed to .jpg was accepted for analysis.
+- Unbacked legal and standards claims (Daubert, ISO/IEC 27037/27042, "court-ready") removed from the site.
+- Evidence and PDFs showed a local Windows path for the fine-tuned image model.
+
+### Tried and not adopted
+- A larger image fine-tune (v4) and a codec-augmented audio fine-tune: each improved one test set and made another
+  worse, against rules fixed before testing (`evaluation/COMMFOR-FT-02`, `evaluation/E2E-03`).
+
 ## [Unreleased] — 2026-10-05
 
 Image detection rebuilt on measurement. On 560 held-out images (200 real

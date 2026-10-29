@@ -60,6 +60,15 @@ Every count below is read from the file named next to it.
 - **Shortcut control:** its AI images are PNG and its real photos mostly JPEG, so every training and test
   image is resized and re-encoded as JPEG before scoring.
 
+### DeepFake Detection (DFD) videos (Google / Jigsaw)
+
+- **Role:** video test set (`evaluation/VIDEO-GEND-01`): 200 real and 200 face-swapped clips of paid, consenting
+  actors. 120 (60 + 60, seed 0) were used to diagnose the video rules; 80 other videos (40 + 40, seed 1) are the
+  held-out verdict test; all 400 for the face-model comparison.
+- **Source and licence:** the official release is part of FaceForensics++ under its terms of use. The copy used
+  here is the Hugging Face mirror `angads24/deepfake-video` (labelled CC BY-SA 4.0 by its uploader), because the
+  official forms and Kaggle were not available. Used for evaluation only; no video is redistributed.
+
 ### TruFor splice test (made here)
 
 - 600 spliced copies of the COCO photos above (a feathered region from another photo of the same split, JPEG

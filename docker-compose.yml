@@ -87,6 +87,11 @@ services:
       # cached in the worker's HF cache volume.
       TRUFOR_ENABLED: ${TRUFOR_ENABLED:-true}
       TRUFOR_IN_VERDICT: ${TRUFOR_IN_VERDICT:-false}
+      COMMFOR_FT_CHECKPOINT: ${COMMFOR_FT_CHECKPOINT:-commfor_ft_v3/model.safetensors}
+      # GenD video face-swap detector (~3 GB with CLIP, cached in the HF volume).
+      GEND_ENABLED: ${GEND_ENABLED:-true}
+      GEND_IN_VERDICT: ${GEND_IN_VERDICT:-true}
+      VIDEO_SCENE_FRAMES: ${VIDEO_SCENE_FRAMES:-8}
       TRUFOR_CACHE_DIR: /app/.cache/huggingface/trufor
     volumes:
       # Shared with the worker: the API writes uploads, the worker reads them
@@ -107,6 +112,7 @@ services:
       sh -c "python -c 'from app.ml.image_pipeline import get_scene_detector; get_scene_detector()' &&
              python -c 'from app.config import settings; from app.ml.audio.pellav2 import get_pellav2; settings.audio_pellav2_enabled and get_pellav2()' &&
              python -c 'from app.ml.trufor import get_trufor; get_trufor()' &&
+             python -c 'from app.ml.gend import get_gend; get_gend()' &&
              celery -A app.worker.celery_app.celery_app worker --loglevel=info --concurrency=1"
     environment:
       <<: *backend_env

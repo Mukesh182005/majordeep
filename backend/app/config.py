@@ -105,8 +105,10 @@ class Settings(BaseSettings):
     # GenD face-swap detector (app/ml/gend.py; pretrained by its authors, WACV 2026, MIT).
     gend_enabled: bool = True
     gend_model_id: str = "yermandy/GenD_CLIP_L_14"
-    # True only after scripts/eval_video_detector.py has measured it; until then shown, not in the verdict.
-    gend_in_verdict: bool = False
+    # On after measurement (evaluation/VIDEO-GEND-01, 80 held-out DFD videos): face swaps called
+    # MANIPULATED 2.5 % -> 72.5 %, real videos 0 -> 1 of 40. Accepted by the project owner on
+    # 2026-10-29 although it exceeds the pre-set +2-point limit by one video.
+    gend_in_verdict: bool = True
     video_scene_frames: int = 8  # frames scored by the scene AI detectors per video (was 1)
     # Audio model stage. "lcnn_asvspoof" (default): the ASVspoof 2019 LA-trained
     # LCNN chosen on dev, with the dev-fitted calibration and checkpoint hash in

@@ -37,14 +37,6 @@
 - **Description:** `checkpoints/image_detector.pt` was trained on the 140k Real and Fake Faces dataset (FFHQ vs StyleGAN) and filtered copies of it. On real photos with faces it flagged 21% of real faces and 15% of AI faces.
 - **Impact:** Its score is reported but excluded from image and video verdicts (`FACE_MODEL_IN_VERDICT=false`). Retrain on real photos plus genuine current-generator images (`scripts/expand_training_dataset.py --extra <labelled.csv>`) and validate before re-enabling.
 
-### 10. No trained face-swap detector
-- **Description:** The face-region heuristic (noise / sharpness / catchlight comparisons) fired on 30% of real portraits in evaluation, the same rate as on AI images.
-- **Impact:** Reported as an unvalidated indicator only. Face-swap deepfakes on otherwise real photos are not reliably detected.
-
-### 11. Video segment timeline uses face-model frame scores
-- **Description:** The per-segment "fake probability" timeline in video results is still drawn from face-model frame scores.
-- **Impact:** Display only — the video verdict no longer uses those scores — but the timeline can show spikes on real footage.
-
 ### 12. Jobs analysed before 2026-10-05 keep their old verdicts
 - **Description:** Stored results are not recomputed; a few contain `NaN` face scores from the old half-precision bug.
 - **Impact:** Re-upload media to get the corrected analysis.
@@ -75,7 +67,14 @@
 - **Description:** The three AI detectors look at whole-image generation; an edited region pasted into a real photo is often scored as real. TruFor localises such edits (AUC 0.962 on controlled splices, `evaluation/TRUFOR-01/results.json`) but is shown, not used in the verdict, because it flags 10 % of re-compressed social-media photos in `accuracy_test`.
 - **Impact:** A composite with no AI-generated pixels can be reported "No manipulation detected"; the TruFor heatmap on the result page is then the evidence to check.
 
+### 19. Video: heuristic stages are unvalidated; fully generated video is not measured
+- **Description:** On DFD (`evaluation/VIDEO-GEND-01/summary.json`, `stage_diagnosis`) rPPG flags 70-80 % of real and of fake videos and LipForensics 78-90 %; neither separates them (balanced accuracy 0.44-0.52). They are shown as context and no longer force verdicts. GenD was measured on face-swap video only (DFD); fully AI-generated video, talking-head generators and phone or WhatsApp recordings have no labelled test here.
+- **Impact:** A fully generated video is judged by the scene AI detectors averaged over 8 frames, which were measured on still images, not video. With GenD in the verdict, 1 of 40 held-out real DFD videos was called MANIPULATED.
+
 ## Resolved Issues
+
+### No trained face-swap detector; video timeline used the StyleGAN face model (fixed 2026-10-29; were #10, #11)
+- GenD (pretrained, MIT) scores face frames; the mean over frames is in the video verdict and the per-frame timeline plots GenD scores. On 400 DFD videos its face AUC is 0.941 against 0.533 for the old checkpoint (`evaluation/VIDEO-GEND-01/results.json`). The StyleGAN face checkpoint (#9) is still shown for images.
 
 ### JWT tokens stored in localStorage (fixed 2026-10-29; was #2)
 - Login sets an httpOnly, SameSite=Lax cookie (`backend/app/routers/auth.py`); the frontend sends it on every request (`credentials: 'include'` in `frontend/src/lib/api.js`, `xhr.withCredentials` for uploads, `AuthedImage.jsx` for evidence images) and stores no token. Report downloads and the live-status WebSocket use the signed 5-minute links from `POST /api/jobs/{id}/links`. Only the non-secret user profile is cached in localStorage. Checked by uploading through the site and downloading every PDF via the signed link.

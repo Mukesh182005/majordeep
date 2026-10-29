@@ -89,6 +89,12 @@ def damage(img: Image.Image, rng: random.Random) -> Image.Image:
     """Training-only degradations seen in real uploads: blur, screenshot-style resampling, a second JPEG pass."""
     from PIL import ImageFilter
 
+    if rng.random() < 0.25:
+        # Thumbnail: shrunk to 128-320 px on the short side (it is enlarged again at inference).
+        w, h = img.size
+        f = rng.uniform(128, 320) / min(w, h)
+        if f < 1:
+            img = img.resize((max(32, round(w * f)), max(32, round(h * f))), Image.BICUBIC)
     if rng.random() < 0.3:
         img = img.filter(ImageFilter.GaussianBlur(rng.uniform(0.3, 1.5)))
     if rng.random() < 0.3:
@@ -126,7 +132,9 @@ class Images(Dataset):
         self.rows, self.train, self.strong = rows, train, strong
         norm = [transforms.ToTensor(), transforms.Normalize(MEAN, STD)]
         self.tf = transforms.Compose(
-            ([transforms.RandomCrop(384, pad_if_needed=True), transforms.RandomHorizontalFlip()] if train
+            # Training sees images at the inference scale (short side 440, as in app/ml/commfor.py),
+            # so small uploads are enlarged in training exactly as they are at inference.
+            ([transforms.Resize(440), transforms.RandomCrop(384), transforms.RandomHorizontalFlip()] if train
              else [transforms.Resize(440), transforms.CenterCrop(384)]) + norm)
 
     def __len__(self):

@@ -47,7 +47,7 @@ test('result and how-it-works pages make no unbacked claims', async ({ page }) =
   for (const route of ['/', '/how-it-works', '/privacy']) {
     await page.goto(route)
     const text = await page.locator('body').innerText()
-    for (const claim of [/WavLM/i, /Whisper/i, /SWGDE/, /Daubert/, /court[- ]ready/i, /ISO\/IEC 2703[78]/]) {
+    for (const claim of [/WavLM/i, /Whisper/i, /SWGDE/, /Daubert/, /court[- ]ready/i, /ISO(\/IEC)? ?2703[78]/, /Zero Bias/i]) {
       expect(text, `${route} mentions ${claim}`).not.toMatch(claim)
     }
   }

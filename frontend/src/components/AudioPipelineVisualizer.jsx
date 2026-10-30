@@ -15,28 +15,28 @@ export const AUDIO_PHASES = [
     phaseId: 1,
     name: 'Ingestion & Container',
     stages: [1, 2],
-    color: '#00E5FF',
+    color: '#23f871',
     desc: 'Cryptographic vault ingestion & RIFF/WAV bitstream integrity'
   },
   {
     phaseId: 2,
     name: 'Acoustic Signal & Physics',
     stages: [3, 4],
-    color: '#3B82F6',
+    color: '#57c690',
     desc: 'Signal intelligence, LFCC filterbank & glottal flow aerodynamic modeling'
   },
   {
     phaseId: 3,
     name: 'Linguistics & Neural Inference',
     stages: [5, 6],
-    color: '#8B5CF6',
+    color: '#43b6a1',
     desc: 'Phonemic coarticulation prosody & trained-model acoustic classification'
   },
   {
     phaseId: 4,
     name: 'Sensor ENF & Risk Fusion',
     stages: [7, 8],
-    color: '#10B981',
+    color: '#23f871',
     desc: 'Electric Network Frequency grid tracking & conformal decision rule consensus'
   }
 ]
@@ -181,14 +181,14 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
       case 'AI_FLAGGED':
       case 'ANOMALY_DETECTED':
       case 'FAILED':
-        return '#ef4444' // Rose / Red
+        return '#ff4d3d' // Rose / Red
       case 'SUSPICIOUS':
       case 'INCONCLUSIVE':
       case 'SKIPPED':
-        return '#f59e0b' // Amber
+        return '#ffb020' // Amber
       case 'PASSED':
       default:
-        return '#10b981' // Emerald
+        return '#23f871' // Emerald
     }
   }
 
@@ -353,7 +353,7 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
               style={{
                 background: flaggedCount > 0 ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
                 color: flaggedCount > 0 ? 'var(--status-critical)' : 'var(--status-good)',
-                borderColor: flaggedCount > 0 ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'
+                borderColor: flaggedCount > 0 ? 'rgba(255,77,61,0.3)' : 'rgba(35,248,113,0.3)'
               }}
             >
               {evidence.threat_code || result.verdict || 'AUTHENTIC'}
@@ -435,7 +435,7 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
                           isCurrent ? 'ring-4 ring-accent/30 shadow-md' : ''
                         }`}
                         style={{
-                          background: isBad ? 'rgba(239,68,68,0.12)' : isWarn ? 'rgba(245,158,11,0.12)' : 'var(--surface-1)',
+                          background: isBad ? 'rgba(255,77,61,0.12)' : isWarn ? 'rgba(255,176,32,0.12)' : 'var(--surface-1)',
                           borderColor: isCurrent ? 'var(--accent)' : color,
                           color: color
                         }}

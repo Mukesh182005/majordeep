@@ -38,11 +38,11 @@ export default function Login() {
   return (
     <div className="mx-auto max-w-md animate-in py-6">
       <div className="mb-6 text-center">
-        <span className="mx-auto grid h-11 w-11 place-items-center rounded-xl text-white"
-              style={{ background: 'var(--accent)' }}>
-          <ShieldCheck size={22} />
+        <span className="mx-auto grid h-14 w-14 -rotate-6 place-items-center rounded-md border-2 border-[#191919] text-[#191919]"
+              style={{ background: 'var(--acid)', boxShadow: '4px 4px 0 var(--pop)' }}>
+          <ShieldCheck size={26} />
         </span>
-        <h1 className="mt-4 text-[1.625rem] font-bold tracking-tight text-ink-primary">
+        <h1 className="wide mt-6 text-[2.25rem] font-black uppercase leading-none tracking-tight text-ink-primary">
           {isRegister ? 'Create your account' : 'Welcome back'}
         </h1>
         <p className="mt-2 text-[0.875rem] text-ink-secondary">

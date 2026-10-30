@@ -14,6 +14,7 @@ import AudioForensicsView from '../components/AudioForensicsView'
 import VideoForensicsView, { VIDEO_PIPELINE_STAGES } from '../components/VideoForensicsView'
 import ImageForensicsView from '../components/ImageForensicsView'
 import OriginView from '../components/OriginView'
+import VerdictHero from '../components/VerdictHero'
 
 function TerminalLogStream({ pipeline, evidence }) {
   const [logs, setLogs] = useState([])
@@ -66,14 +67,14 @@ function TerminalLogStream({ pipeline, evidence }) {
 
   return (
     <div className="h-52 bg-[#050505] border-t p-4 overflow-y-auto font-mono text-[0.65rem] text-[#A1A1AA] flex flex-col no-print shrink-0 shadow-inner" style={{ borderColor: 'var(--border-subtle)' }}>
-      <div className="flex items-center gap-2 text-[#00E5FF] mb-3 font-bold uppercase tracking-widest text-[0.55rem] border-b border-white/5 pb-2 sticky top-0 bg-[#050505]/90 backdrop-blur">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
+      <div className="flex items-center gap-2 text-[#23f871] mb-3 font-bold uppercase tracking-widest text-[0.55rem] border-b border-white/5 pb-2 sticky top-0 bg-[#050505]/90 backdrop-blur">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#23f871] animate-pulse" />
         Live Telemetry & Evidentiary Log Stream
       </div>
       <div className="space-y-1 mt-1">
         {logs.map((log, i) => {
           let colorClass = "text-[#A1A1AA]"
-          if (log.includes('[DONE]')) colorClass = "text-[#00E5FF] font-bold"
+          if (log.includes('[DONE]')) colorClass = "text-[#23f871] font-bold"
           if (log.includes('SUSPICIOUS') || log.includes('ANOMALY') || log.includes('FAILED')) colorClass = "text-[#FF3D00] font-bold"
           if (log.includes('[STAGE')) colorClass = "text-white font-bold"
           if (log.includes('[EXTRACT]')) colorClass = "text-zinc-500"
@@ -83,7 +84,7 @@ function TerminalLogStream({ pipeline, evidence }) {
             </div>
           )
         })}
-        <div ref={bottomRef} className="text-[#00E5FF] animate-pulse mt-1">_</div>
+        <div ref={bottomRef} className="text-[#23f871] animate-pulse mt-1">_</div>
       </div>
     </div>
   )
@@ -281,7 +282,7 @@ export default function Result() {
   // Confidence & Risk Semantics
   const confidencePct = percent(result.confidence || 0.5)
   const riskScore = evidence.risk_score ?? riskEngine.overall_risk_score ?? Math.round((result.fake_probability || 0) * 100)
-  const riskColor = riskScore >= 70 ? 'var(--status-warn)' : riskScore >= 40 ? '#f59e0b' : 'var(--status-good)'
+  const riskColor = riskScore >= 70 ? 'var(--status-warn)' : riskScore >= 40 ? '#ffb020' : 'var(--status-good)'
   const untrained = result.weights_status && result.weights_status !== 'trained'
 
   // Human Review State
@@ -322,6 +323,15 @@ export default function Result() {
         </Notice>
       )}
 
+      <VerdictHero
+        result={result}
+        meta={meta}
+        mediaLabel={isAudio ? 'Audio' : isVideo ? 'Video' : 'Image'}
+        reportUrl={reportUrl}
+        onExportJSON={handleExportJSON}
+        experimental={isExperimentalAudio}
+      />
+
       {/* ── TOP WORKBENCH HEADER & CASE AUDIT BAR ── */}
       <div className="rounded-t-2xl border-t border-x px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-surface-2"
            style={{ borderColor: 'var(--border-subtle)' }}>
@@ -342,8 +352,8 @@ export default function Result() {
         <div className="flex items-center gap-3">
           <div className="px-3 py-1 rounded-full border text-[0.6875rem] font-bold uppercase tracking-wider flex items-center gap-1.5"
                style={{ 
-                 borderColor: reviewState === 'REVIEW RECOMMENDED' ? 'rgba(245,158,11,0.4)' : 'var(--border-subtle)',
-                 background: reviewState === 'REVIEW RECOMMENDED' ? 'rgba(245,158,11,0.08)' : 'var(--surface-1)',
+                 borderColor: reviewState === 'REVIEW RECOMMENDED' ? 'rgba(255,176,32,0.4)' : 'var(--border-subtle)',
+                 background: reviewState === 'REVIEW RECOMMENDED' ? 'rgba(255,176,32,0.08)' : 'var(--surface-1)',
                  color: reviewState === 'REVIEW RECOMMENDED' ? 'var(--status-warn)' : 'var(--text-secondary)'
                }}>
             <span className={`h-1.5 w-1.5 rounded-full ${reviewState === 'REVIEW RECOMMENDED' ? 'bg-amber-400 animate-pulse' : 'bg-slate-400'}`} />
@@ -523,8 +533,8 @@ export default function Result() {
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className="flex items-center gap-1.5 px-4 py-2.5 rounded-t-xl text-[0.75rem] font-bold transition-all whitespace-nowrap flex-shrink-0"
                   style={{
-                    borderBottom: active ? '2px solid #00E5FF' : '2px solid transparent',
-                    color: active ? '#00E5FF' : 'var(--text-muted)',
+                    borderBottom: active ? '2px solid #23f871' : '2px solid transparent',
+                    color: active ? '#23f871' : 'var(--text-muted)',
                     background: active ? 'var(--surface-1)' : 'transparent',
                     marginBottom: -1,
                   }}>
@@ -587,7 +597,7 @@ export default function Result() {
                 <div id="evidence-corroboration" className="rounded-2xl border p-6 bg-surface-1" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#00E5FF]">Corroboration Architecture</span>
+                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#23f871]">Corroboration Architecture</span>
                       <h3 className="text-lg font-black text-ink-primary">Evidence Corroboration & Signal Consensus</h3>
                     </div>
                     <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-surface-2 text-ink-secondary border border-subtle">
@@ -616,7 +626,7 @@ export default function Result() {
                     </div>
                     <div className="p-3.5 rounded-xl border bg-surface-2" style={{ borderColor: 'var(--border-subtle)' }}>
                       <span className="text-[0.6rem] font-black uppercase tracking-wider text-ink-muted block">Corroboration State</span>
-                      <span className="text-sm font-black font-mono mt-1 block truncate text-[#00E5FF]">
+                      <span className="text-sm font-black font-mono mt-1 block truncate text-[#23f871]">
                         {isSingleSignal ? 'LIMITED' : 'CONSENSUS'}
                       </span>
                       <span className="text-[0.65rem] text-ink-muted">Multi-model audit</span>
@@ -669,7 +679,7 @@ export default function Result() {
                 <div id="model-signals" className="rounded-2xl border p-6 bg-surface-1 space-y-4" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#00E5FF]">Section B</span>
+                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#23f871]">Section B</span>
                       <h3 className="text-lg font-black text-ink-primary">Individual Model & Detector Signals</h3>
                     </div>
                     <span className="text-[0.65rem] font-mono px-2 py-1 rounded bg-surface-2 text-ink-secondary border border-subtle">
@@ -795,7 +805,7 @@ export default function Result() {
                 <div id="input-quality" className="rounded-2xl border p-6 bg-surface-1 space-y-4" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#00E5FF]">Analyzability & Reliability</span>
+                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#23f871]">Analyzability & Reliability</span>
                       <h3 className="text-lg font-black text-ink-primary">Input Quality & Processing Conditions</h3>
                     </div>
                     <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-surface-2 text-ink-secondary border border-subtle">
@@ -837,7 +847,7 @@ export default function Result() {
                     </div>
                     <div className="p-3 rounded-xl border border-subtle bg-surface-2">
                       <span className="text-[0.6rem] uppercase tracking-wider text-ink-muted block">Analyzability</span>
-                      <span className="font-mono font-bold text-ink-primary mt-1 block text-[#00E5FF]">
+                      <span className="font-mono font-bold text-ink-primary mt-1 block text-[#23f871]">
                         {inputQualityGrade}
                       </span>
                     </div>
@@ -846,7 +856,7 @@ export default function Result() {
                   {/* Social Media / WhatsApp Safe UX Callout */}
                   <div className="p-4 rounded-xl border border-subtle bg-surface-2 text-xs text-ink-muted leading-relaxed space-y-2">
                     <div className="flex items-center gap-2 text-ink-primary font-bold">
-                      <Info size={14} className="text-[#00E5FF]" />
+                      <Info size={14} className="text-[#23f871]" />
                       Source / Processing Condition Notice:
                     </div>
                     <p>
@@ -862,7 +872,7 @@ export default function Result() {
                 <div className="rounded-2xl border p-6 bg-surface-1 space-y-4" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#00E5FF]">Forensic Synthesis</span>
+                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#23f871]">Forensic Synthesis</span>
                       <h3 className="text-lg font-black text-ink-primary">Forensic Evidence Matrix</h3>
                     </div>
                     <span className="text-[0.65rem] font-mono text-ink-muted">7 Telemetry Vectors</span>
@@ -897,14 +907,14 @@ export default function Result() {
                         <tr>
                           <td className="py-3 pr-4 font-bold text-ink-primary">Camera Sensor CFA Periodicity</td>
                           <td className="py-3 px-4 font-mono">{cameraStats.cfa_periodicity_ratio ? cameraStats.cfa_periodicity_ratio.toFixed(2) : '1.81'} ratio</td>
-                          <td className="py-3 px-4"><span className="px-2 py-0.5 rounded text-[0.65rem] font-bold bg-surface-2 text-[#00E5FF]">Moderate</span></td>
+                          <td className="py-3 px-4"><span className="px-2 py-0.5 rounded text-[0.65rem] font-bold bg-surface-2 text-[#23f871]">Moderate</span></td>
                           <td className="py-3 px-4 text-ink-secondary">Signal Forensics</td>
                           <td className="py-3 pl-4 text-ink-muted">Physical Bayer demosaicing periodicity detected; consistent with camera sensor.</td>
                         </tr>
                         <tr>
                           <td className="py-3 pr-4 font-bold text-ink-primary">Sensor Noise Residual (PRNU)</td>
                           <td className="py-3 px-4 font-mono">{cameraStats.sensor_noise_std ? cameraStats.sensor_noise_std.toFixed(2) : '6.92'} std</td>
-                          <td className="py-3 px-4"><span className="px-2 py-0.5 rounded text-[0.65rem] font-bold bg-surface-2 text-[#00E5FF]">Moderate</span></td>
+                          <td className="py-3 px-4"><span className="px-2 py-0.5 rounded text-[0.65rem] font-bold bg-surface-2 text-[#23f871]">Moderate</span></td>
                           <td className="py-3 px-4 text-ink-secondary">Wavelet Analysis</td>
                           <td className="py-3 pl-4 text-ink-muted">High-frequency noise variance consistent with optical silicon sensors.</td>
                         </tr>
@@ -939,7 +949,7 @@ export default function Result() {
                   <div className="rounded-2xl border p-6 bg-surface-1 space-y-4" style={{ borderColor: 'var(--border-subtle)' }}>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#00E5FF]">Optical Examination</span>
+                        <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#23f871]">Optical Examination</span>
                         <h3 className="text-lg font-black text-ink-primary">Forensic Image Viewer & Evidence Overlays</h3>
                       </div>
                       <div className="flex items-center gap-2">
@@ -966,7 +976,7 @@ export default function Result() {
                           onClick={() => setActivePlateKind(plate.id)}
                           className={`px-3 py-1.5 rounded-lg font-bold border transition whitespace-nowrap ${
                             activePlateKind === plate.id
-                              ? 'border-[#00E5FF] text-[#00E5FF] bg-surface-2'
+                              ? 'border-[#23f871] text-[#23f871] bg-surface-2'
                               : 'border-subtle text-ink-muted hover:text-ink-secondary bg-surface-1'
                           }`}
                         >
@@ -1005,7 +1015,7 @@ export default function Result() {
                 <div className="rounded-2xl border p-6 bg-surface-1 space-y-4" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#00E5FF]">Structured Rationale</span>
+                      <span className="text-[0.625rem] font-black uppercase tracking-widest text-[#23f871]">Structured Rationale</span>
                       <h3 className="text-lg font-black text-ink-primary">Why This Result?</h3>
                     </div>
                     <span className="text-[0.65rem] font-mono text-ink-muted">Evidence Provenance Breakdown</span>
@@ -1041,7 +1051,7 @@ export default function Result() {
                     ].map((item, idx) => (
                       <div key={idx} className="p-4 rounded-xl border border-subtle bg-surface-2 text-xs space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-surface-1 text-[#00E5FF] text-[0.625rem] border border-subtle">
+                          <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-surface-1 text-[#23f871] text-[0.625rem] border border-subtle">
                             {item.tag}
                           </span>
                           <span className="font-bold text-ink-primary">{item.title}</span>
@@ -1062,27 +1072,27 @@ export default function Result() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-ink-muted">
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00E5FF]">•</span>
+                      <span className="text-[#23f871]">•</span>
                       <span>It does not establish who created or transmitted the media.</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00E5FF]">•</span>
+                      <span className="text-[#23f871]">•</span>
                       <span>It does not establish the original camera device or software source.</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00E5FF]">•</span>
+                      <span className="text-[#23f871]">•</span>
                       <span>It does not establish malicious intent or fraudulent purpose.</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00E5FF]">•</span>
+                      <span className="text-[#23f871]">•</span>
                       <span>It does not establish that metadata absence equates to AI generation.</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00E5FF]">•</span>
+                      <span className="text-[#23f871]">•</span>
                       <span>It does not establish that social-media compression equates to manipulation.</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00E5FF]">•</span>
+                      <span className="text-[#23f871]">•</span>
                       <span>It does not establish coordination with other cases or external campaigns.</span>
                     </div>
                   </div>
@@ -1129,8 +1139,8 @@ export default function Result() {
                           }}
                           className="cursor-pointer rounded-xl border p-3 flex flex-col justify-between transition hover:border-accent hover:shadow-xs"
                           style={{
-                            borderColor: isBad ? 'rgba(239,68,68,0.35)' : isWarn ? 'rgba(245,158,11,0.35)' : 'var(--border-subtle)',
-                            background: isBad ? 'rgba(239,68,68,0.04)' : isWarn ? 'rgba(245,158,11,0.04)' : 'var(--surface-2)',
+                            borderColor: isBad ? 'rgba(255,77,61,0.35)' : isWarn ? 'rgba(255,176,32,0.35)' : 'var(--border-subtle)',
+                            background: isBad ? 'rgba(255,77,61,0.04)' : isWarn ? 'rgba(255,176,32,0.04)' : 'var(--surface-2)',
                           }}
                         >
                           <div className="flex items-center justify-between gap-2">
@@ -1138,7 +1148,7 @@ export default function Result() {
                               <span
                                 className="flex h-5 w-5 items-center justify-center rounded-full text-[0.625rem] font-black"
                                 style={{
-                                  background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(245,158,11,0.15)' : 'var(--status-good-bg)',
+                                  background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(255,176,32,0.15)' : 'var(--status-good-bg)',
                                   color: isBad ? 'var(--status-critical)' : isWarn ? 'var(--status-warn)' : 'var(--status-good)',
                                 }}
                               >
@@ -1151,7 +1161,7 @@ export default function Result() {
                             <span
                               className="text-[0.5625rem] font-bold uppercase px-1.5 py-0.5 rounded mono"
                               style={{
-                                background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(245,158,11,0.15)' : 'var(--status-good-bg)',
+                                background: isBad ? 'var(--status-crit-bg)' : isWarn ? 'rgba(255,176,32,0.15)' : 'var(--status-good-bg)',
                                 color: isBad ? 'var(--status-critical)' : isWarn ? 'var(--status-warn)' : 'var(--status-good)',
                               }}
                             >
@@ -1175,7 +1185,7 @@ export default function Result() {
                     className="w-full p-4 flex items-center justify-between text-left hover:bg-surface-2 transition cursor-pointer"
                   >
                     <div className="flex items-center gap-2">
-                      <Cpu size={16} className="text-[#00E5FF]" />
+                      <Cpu size={16} className="text-[#23f871]" />
                       <span className="text-xs font-black uppercase tracking-wider text-ink-primary">
                         Technical Model & Pipeline Details (Auditor Depth)
                       </span>

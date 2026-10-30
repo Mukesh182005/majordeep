@@ -19,8 +19,8 @@ export default function Privacy() {
           <Lock size={12} className="text-accent" />
           Data Governance & Integrity
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-ink-primary">
-          Privacy & Data Retention Policy
+        <h1 className="wide font-black uppercase text-ink-primary" style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)', lineHeight: 0.92, letterSpacing: '-0.055em' }}>
+          Privacy &amp; Data <span className="serif-i normal-case text-gradient">Retention</span> Policy
         </h1>
         <p className="text-sm sm:text-base text-ink-secondary leading-relaxed max-w-2xl">
           Complete disclosure on how media is processed, what artifacts are stored, our automated retention lifecycle, and your rights to immediate permanent deletion.
@@ -129,7 +129,7 @@ export default function Privacy() {
                 <span>Automated Assessment Only — Not Legal Evidence</span>
               </div>
               <p className="text-[0.6875rem] text-ink-secondary leading-relaxed">
-                Findings produced by Veritas are automated technical evaluations intended solely for investigative triage. They do <strong>not</strong> constitute certified forensic expert opinions, legal evidence, or court-admissible testimony.
+                Findings produced by DeepSentinel are automated technical evaluations intended solely for investigative triage. They do <strong>not</strong> constitute certified forensic expert opinions, legal evidence, or court-admissible testimony.
               </p>
             </div>
             <p>

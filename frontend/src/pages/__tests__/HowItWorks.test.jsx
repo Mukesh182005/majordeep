@@ -11,6 +11,6 @@ describe('HowItWorks Page Rendering', () => {
         <HowItWorks />
       </MemoryRouter>
     )
-    expect(screen.getByText(/Veritas Multi-Modal Forensic Engine/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /DeepSentinel Multi-Modal Forensic Engine/i })).toBeInTheDocument()
   })
 })

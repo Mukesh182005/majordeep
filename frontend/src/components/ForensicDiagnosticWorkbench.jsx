@@ -95,7 +95,7 @@ export function ForensicDiagnosticWorkbench() {
     // Plot line
     ctx.beginPath()
     ctx.lineWidth = 2
-    ctx.strokeStyle = cfaMode === 'genuine' ? '#10b981' : '#f43f5e'
+    ctx.strokeStyle = cfaMode === 'genuine' ? '#23f871' : '#f43f5e'
 
     const pts = 30
     for (let i = 0; i < pts; i++) {
@@ -165,7 +165,7 @@ export function ForensicDiagnosticWorkbench() {
     // Measured spectrum curve
     ctx.beginPath()
     ctx.lineWidth = 2.5
-    ctx.strokeStyle = fftMode === 'natural' ? '#00E5FF' : '#f59e0b'
+    ctx.strokeStyle = fftMode === 'natural' ? '#00E5FF' : '#ffb020'
 
     const steps = 60
     for (let i = 0; i <= steps; i++) {
@@ -196,7 +196,7 @@ export function ForensicDiagnosticWorkbench() {
 
     if (fftMode === 'synthetic') {
       // Highlight checkerboard anomaly
-      ctx.fillStyle = '#f59e0b'
+      ctx.fillStyle = '#ffb020'
       ctx.font = '9px monospace'
       ctx.fillText('▲ GAN/DIFFUSION CHECKERBOARD PEAK', margin + plotW * 0.4, margin + plotH * 0.35)
     }
@@ -232,7 +232,7 @@ export function ForensicDiagnosticWorkbench() {
       // Waveform path
       ctx.beginPath()
       ctx.lineWidth = 2
-      ctx.strokeStyle = audioMode === 'human' ? '#10B981' : '#EC4899'
+      ctx.strokeStyle = audioMode === 'human' ? '#23f871' : '#EC4899'
 
       const points = 200
       for (let i = 0; i < points; i++) {
@@ -622,7 +622,7 @@ export function ForensicDiagnosticWorkbench() {
                     rx={isSyncAligned ? 22 : 14}
                     ry={isSyncAligned ? 12 : 6}
                     fill="none"
-                    stroke={isSyncAligned ? '#10B981' : '#F43F5E'}
+                    stroke={isSyncAligned ? '#23f871' : '#F43F5E'}
                     strokeWidth="2"
                     className="transition-all duration-300"
                   />
@@ -631,7 +631,7 @@ export function ForensicDiagnosticWorkbench() {
                     y1="138"
                     x2="130"
                     y2="138"
-                    stroke={isSyncAligned ? '#10B981' : '#F43F5E'}
+                    stroke={isSyncAligned ? '#23f871' : '#F43F5E'}
                     strokeWidth="1.5"
                   />
 

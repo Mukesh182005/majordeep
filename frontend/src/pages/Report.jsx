@@ -95,8 +95,8 @@ export default function Report() {
         <span>Automated assessment only. Not forensic or legal evidence.</span>
       </div>
       <div>
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-ink-primary">
-          Forensic report ready
+        <h1 className="wide font-black uppercase text-ink-primary" style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)', lineHeight: 0.92, letterSpacing: '-0.055em' }}>
+          Forensic report <span className="serif-i normal-case text-gradient">ready</span>
         </h1>
         <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-secondary">
           Attach this PDF to a complaint filed with your local cybercrime unit or national

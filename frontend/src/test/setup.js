@@ -21,3 +21,12 @@ global.ResizeObserver ??= class ResizeObserver {
   unobserve() {}
   disconnect() {}
 }
+
+// Scroll-triggered reveals (framer-motion whileInView) need this; nothing
+// ever intersects in jsdom, so content renders in its initial state.
+global.IntersectionObserver ??= class IntersectionObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() { return [] }
+}

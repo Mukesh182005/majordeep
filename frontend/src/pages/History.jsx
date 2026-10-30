@@ -47,7 +47,7 @@ export default function History() {
   return (
     <div className="mx-auto max-w-5xl animate-in space-y-5">
       <div>
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-ink-primary">Scan history</h1>
+        <h1 className="wide font-black uppercase text-ink-primary" style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)', lineHeight: 0.92, letterSpacing: '-0.055em' }}>Scan <span className="serif-i normal-case text-gradient">history</span></h1>
         <p className="mt-1.5 text-[0.9375rem] text-ink-secondary">
           {loading ? 'Loading…' : `${page.total} ${page.total === 1 ? 'scan' : 'scans'}.`}{' '}
           Deleting a scan also erases the stored media, its evidence images and any report.

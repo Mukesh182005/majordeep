@@ -30,6 +30,12 @@ Every number below is from a file in `evaluation/`; details in `docs/research/EV
 ### Tried and not adopted
 - A larger image fine-tune (v4) and a codec-augmented audio fine-tune: each improved one test set and made another
   worse, against rules fixed before testing (`evaluation/COMMFOR-FT-02`, `evaluation/E2E-03`).
+- A second audio fine-tune with more genuine speech: fewer false alarms, but fakes caught fell 14 points
+  (`evaluation/AUDIO-FT2-01`).
+
+### Measured
+- Fully AI-generated video (Veo 3, HunyuanVideo): 14 of 80 called MANIPULATED (`evaluation/VIDEO-AIGEN-01`).
+- Two video notes no longer say "confirmed" for unvalidated checks (camera sensor pattern, rPPG pulse).
 
 ## [Unreleased] — 2026-10-05
 

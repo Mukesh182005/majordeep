@@ -1,0 +1,262 @@
+{
+ "script": "backend/scripts/eval_end_to_end.py",
+ "provenance": {
+  "utc_time": "2026-10-30T05:27:17+00:00",
+  "git_commit": "3f867299d4d3a533bd4400e0152c0c82ed79f4e1",
+  "git_branch": "feat/accuracy-round2",
+  "tracked_changes": true,
+  "python": "3.11.9",
+  "torch": "2.12.0.dev20260408+cu128",
+  "device": "cpu",
+  "gpu": "NVIDIA GeForce RTX 5070",
+  "settings": {
+   "commfor_enabled": true,
+   "commfor_weight": 4.0,
+   "face_model_in_verdict": false,
+   "audio_pellav2_in_verdict": true,
+   "audio_model_source": "lcnn_asvspoof",
+   "fake_threshold": 0.5,
+   "uncertain_band": 0.08
+  }
+ },
+ "sets": {
+  "video_aigen_veo3_hunyuan": {
+   "n_real": 40,
+   "n_fake": 80,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 39,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 1
+    },
+    "fake": {
+     "AUTHENTIC": 55,
+     "INCONCLUSIVE": 11,
+     "MANIPULATED": 14
+    }
+   },
+   "real_called_authentic": {
+    "k": 39,
+    "n": 40,
+    "rate": 0.975,
+    "ci95": [
+     0.8712,
+     0.9956
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 1,
+    "n": 40,
+    "rate": 0.025,
+    "ci95": [
+     0.0044,
+     0.1288
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 14,
+    "n": 80,
+    "rate": 0.175,
+    "ci95": [
+     0.1072,
+     0.2726
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 55,
+    "n": 80,
+    "rate": 0.6875,
+    "ci95": [
+     0.5793,
+     0.7785
+    ]
+   },
+   "inconclusive": {
+    "k": 11,
+    "n": 120,
+    "rate": 0.09166666666666666,
+    "ci95": [
+     0.052,
+     0.1567
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 53,
+    "n": 109,
+    "rate": 0.48623853211009177,
+    "ci95": [
+     0.3945,
+     0.5789
+    ]
+   },
+   "accuracy_all": {
+    "k": 53,
+    "n": 120,
+    "rate": 0.44166666666666665,
+    "ci95": [
+     0.356,
+     0.531
+    ]
+   },
+   "latency_s": {
+    "p50": 12.85,
+    "p95": 48.50135
+   },
+   "auc_final_probability": {
+    "auc": 0.6821875,
+    "ci95": [
+     0.58903125,
+     0.7753359375000001
+    ]
+   },
+   "face_models": {
+    "videos_with_face": 56,
+    "videos_without_face": 64,
+    "auc_gend_face_mean": 0.8531250000000001,
+    "auc_gend_face_max": 0.33906249999999993,
+    "auc_legacy_face_mean": 0.24609374999999997,
+    "auc_legacy_face_max": 0.16953125
+   },
+   "per_group": {
+    "fake/hunyuanvideo": {
+     "label": 1,
+     "AUTHENTIC": 35,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 4,
+     "n": 40
+    },
+    "fake/veo3": {
+     "label": 1,
+     "AUTHENTIC": 20,
+     "INCONCLUSIVE": 10,
+     "MANIPULATED": 10,
+     "n": 40
+    },
+    "real/dfd_actors": {
+     "label": 0,
+     "AUTHENTIC": 39,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 1,
+     "n": 40
+    }
+   },
+   "stage_diagnosis": {
+    "1: Container & Bitstream Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: Scene & Shot Boundary Segmentation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Spatial Neural & Generative AI Backbone": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.2375,
+     "balanced_accuracy": 0.61875,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED"
+     ]
+    },
+    "4: 28-Module Image Forensic Engine": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "5: Temporal Jitter & Facial Dynamics": {
+     "flagged_real": 0.175,
+     "flagged_fake": 0.0375,
+     "balanced_accuracy": 0.43124999999999997,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "6: Remote Photoplethysmography (rPPG) Biometrics": {
+     "flagged_real": 0.7,
+     "flagged_fake": 1.0,
+     "balanced_accuracy": 0.65,
+     "statuses": [
+      "AI_FLAGGED",
+      "INCONCLUSIVE",
+      "PASSED"
+     ]
+    },
+    "7: Spatio-Temporal 4D Tensor Dynamics": {
+     "flagged_real": 0.125,
+     "flagged_fake": 0.275,
+     "balanced_accuracy": 0.575,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "8: LipForensics Articulatory Kinematics": {
+     "flagged_real": 0.9,
+     "flagged_fake": 0.9875,
+     "balanced_accuracy": 0.54375,
+     "statuses": [
+      "AI_FLAGGED",
+      "INSUFFICIENT_FACE_FRAMES",
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "9: Optical Flow Motion Decomposition": {
+     "flagged_real": 0.025,
+     "flagged_fake": 0.7,
+     "balanced_accuracy": 0.8374999999999999,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "10: Acoustic Speech & Cross-Modal Lip-Sync": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.1875,
+     "balanced_accuracy": 0.59375,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "11: Generator Profile Match (unvalidated)": {
+     "flagged_real": 0.325,
+     "flagged_fake": 0.6125,
+     "balanced_accuracy": 0.64375,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "NO_MANIPULATION_DETECTED": 38,
+     "DEEPFAKE_FACE_SWAP": 1,
+     "AI_GENERATED_VIDEO": 1
+    },
+    "fake": {
+     "NO_MANIPULATION_DETECTED": 53,
+     "AI_GENERATED_VIDEO": 14,
+     "INCONCLUSIVE": 8,
+     "DEEPFAKE_FACE_SWAP": 3,
+     "AI_LIP_SYNC_REENACTMENT": 2
+    }
+   },
+   "errors_unresolved": 0
+  }
+ }
+}

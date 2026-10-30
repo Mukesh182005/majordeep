@@ -69,6 +69,18 @@ Every count below is read from the file named next to it.
   here is the Hugging Face mirror `angads24/deepfake-video` (labelled CC BY-SA 4.0 by its uploader), because the
   official forms and Kaggle were not available. Used for evaluation only; no video is redistributed.
 
+### AI-generated videos: Veo 3 and HunyuanVideo
+
+- **Role:** video test only (`evaluation/VIDEO-AIGEN-01`): 40 clips per generator, seed 0, against the DFD real
+  clips above.
+- **Source and licence:** Hugging Face `34data/gen-videos-veo3` and `34data/gen-videos-hunyuanvideo`. Their
+  licence was not checked; used for evaluation only, nothing is redistributed.
+
+### LibriSpeech dev-clean (genuine speech)
+
+- **Role:** extra bona fide training clips for the rejected second audio fine-tune (`evaluation/AUDIO-FT2-01`).
+- **Source and licence:** openslr.org resource 12, CC BY 4.0.
+
 ### TruFor splice test (made here)
 
 - 600 spliced copies of the COCO photos above (a feathered region from another photo of the same split, JPEG

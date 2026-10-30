@@ -147,6 +147,14 @@ def cmd_prepare(args) -> int:
 
     exe = ffmpeg_exe()
     train = read_v5(args.v5_root, "train_sample", "train") + read_la_train(args.la_root, args.la_per_class, 0)
+    if args.extra_bonafide:
+        # More genuine speech (e.g. LibriSpeech dev-clean, CC BY 4.0), training only: the first fine-tune had
+        # 309 bona fide clips against 2,490 spoofed ones and lost detection to suppress false alarms.
+        extra = sorted(p for p in args.extra_bonafide.rglob("*") if p.suffix.lower() in (".flac", ".wav"))
+        rng = random.Random(0)
+        extra = rng.sample(extra, min(args.extra_bonafide_n, len(extra)))
+        train += [{"id": f"extra_{i}_{p.stem}", "path": str(p), "label": 0, "attack": "bonafide",
+                   "source": "extra_bonafide"} for i, p in enumerate(extra)]
     # The ASVspoof 5 dev sample is split by a hash of the speaker: half joins training, half is validation.
     dev = read_v5(args.v5_root, "dev_sample", "dev")
     speaker = {r["file_id"]: r["speaker"] for r in csv.DictReader(open(args.v5_root / "dev_sample" / "sample.tsv", encoding="utf-8"), delimiter="	")}
@@ -308,6 +316,8 @@ def main() -> int:
     p.add_argument("--v5-root", type=Path, required=True)
     p.add_argument("--la-root", type=Path, required=True)
     p.add_argument("--la-per-class", type=int, default=1000)
+    p.add_argument("--extra-bonafide", type=Path, default=None, help="folder of genuine speech (training only)")
+    p.add_argument("--extra-bonafide-n", type=int, default=2000)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--workers", type=int, default=16)
     t = sub.add_parser("train")

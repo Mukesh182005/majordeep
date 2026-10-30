@@ -201,6 +201,12 @@ ASVspoof 2019 fakes 97.7 % -> 84.7 % (real 0.3 % -> 0.0 %). The rule fixed befor
 stays the default. The fine-tuned checkpoint was deleted to free disk space; `finetune_pellav2.py prepare` and
 `train` rebuild it from the same samples.
 
+**A second rejected audio fine-tune.** The same procedure plus 2,500 LibriSpeech dev-clean clips of genuine speech
+(clean and two random codecs each), because the first attempt had few bona fide clips
+(`evaluation/AUDIO-FT2-01/`). ASVspoof 5 sample as above: real called MANIPULATED 15.0 % -> 4.7 %, fakes called
+MANIPULATED 77.0 % -> 62.7 %, AUC 0.894 -> 0.914. Detection fell by more than the 5 points the rule allows, so the
+original pellav2 stays; ASVspoof 2019 was not run for this checkpoint.
+
 ## 6. Video
 
 Test data: the Google/Jigsaw DeepFake Detection (DFD) videos, 200 real and 200 face-swapped clips of paid,
@@ -229,7 +235,13 @@ verdicts, and the change was measured on 80 other DFD videos (40 + 40) that no d
 measuring allowed GenD into the verdict if real videos called MANIPULATED rose by at most 2 points; it rose by 2.5
 points (one video of 40), and the project owner accepted it. Median latency per video: 20.7 s (GenD on, RTX 5070).
 
-Not measured: fully AI-generated video (no labelled set here), and real videos from phones or WhatsApp.
+**Fully AI-generated video** (`evaluation/VIDEO-AIGEN-01/summary.json`, same script and settings): 40 Veo 3 and
+40 HunyuanVideo clips against the 40 held-out real DFD clips. Real called MANIPULATED 1/40; AI videos called
+MANIPULATED 14/80 (Veo 3 10/40, HunyuanVideo 4/40), INCONCLUSIVE 11/80; verdict AUC 0.682. The pipeline does not
+reliably detect fully generated video: GenD only scores faces, and the scene detectors are image models. The real
+and AI clips come from different sources, so these numbers are indicative only.
+
+Not measured: real videos from phones or WhatsApp.
 
 ## 7. Audio: pellav2 compared with the LCNN
 

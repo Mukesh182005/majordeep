@@ -202,7 +202,7 @@ def fuse_video_forensics(
     if image_forensics:
         cfa = image_forensics.get("camera_cfa", {})
         if cfa.get("synthetic_sensor_detected"):
-            signals.append("Image Forensics: Camera sensor artifacts missing (synthetic AI generation confirmed)")
+            signals.append("Image Forensics (unvalidated): camera sensor pattern not found on the keyframe")
         fourier_slope = cfa.get("fourier_spectral_slope")
         if fourier_slope and fourier_slope > 2.4:
             signals.append(f"Image Forensics: Steep Fourier azimuthal spectral slope alpha={fourier_slope:.2f}")
@@ -226,7 +226,7 @@ def fuse_video_forensics(
         if rppg_info.get("is_synthetic_biometric_void"):
             signals.append(f"Cardiovascular rPPG Void: Absence of physiological blood volume pulse (Cardiac SNR: {rppg_info.get('cardiac_snr_db')} dB)")
         elif rppg_info.get("biometric_pulse_detected"):
-            signals.append(f"Cardiovascular rPPG: Authentic biological capillary pulse confirmed at {rppg_info.get('estimated_heart_rate_bpm')} BPM (Cardiac SNR: {rppg_info.get('cardiac_snr_db')} dB)")
+            signals.append(f"rPPG (unvalidated): pulse-like signal at {rppg_info.get('estimated_heart_rate_bpm')} BPM (Cardiac SNR: {rppg_info.get('cardiac_snr_db')} dB)")
 
     if spatiotemporal_info and spatiotemporal_info.get("spatiotemporal_anomaly_score", 0.0) >= 0.45:
         for f in spatiotemporal_info.get("findings", []):

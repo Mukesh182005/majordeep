@@ -1,0 +1,458 @@
+{
+ "script": "backend/scripts/eval_end_to_end.py",
+ "provenance": {
+  "utc_time": "2026-10-30T06:04:13+00:00",
+  "git_commit": "3f867299d4d3a533bd4400e0152c0c82ed79f4e1",
+  "git_branch": "feat/accuracy-round2",
+  "tracked_changes": true,
+  "python": "3.11.9",
+  "torch": "2.12.0.dev20260408+cu128",
+  "device": "cpu",
+  "gpu": "NVIDIA GeForce RTX 5070",
+  "settings": {
+   "commfor_enabled": true,
+   "commfor_weight": 4.0,
+   "face_model_in_verdict": false,
+   "audio_pellav2_in_verdict": true,
+   "audio_model_source": "lcnn_asvspoof",
+   "fake_threshold": 0.5,
+   "uncertain_band": 0.08
+  }
+ },
+ "sets": {
+  "audio_asvspoof5_eval": {
+   "n_real": 300,
+   "n_fake": 300,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 274,
+     "INCONCLUSIVE": 12,
+     "MANIPULATED": 14
+    },
+    "fake": {
+     "AUTHENTIC": 92,
+     "INCONCLUSIVE": 20,
+     "MANIPULATED": 188
+    }
+   },
+   "real_called_authentic": {
+    "k": 274,
+    "n": 300,
+    "rate": 0.9133333333333333,
+    "ci95": [
+     0.876,
+     0.9402
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 14,
+    "n": 300,
+    "rate": 0.04666666666666667,
+    "ci95": [
+     0.028,
+     0.0768
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 188,
+    "n": 300,
+    "rate": 0.6266666666666667,
+    "ci95": [
+     0.5707,
+     0.6795
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 92,
+    "n": 300,
+    "rate": 0.30666666666666664,
+    "ci95": [
+     0.2572,
+     0.361
+    ]
+   },
+   "inconclusive": {
+    "k": 32,
+    "n": 600,
+    "rate": 0.05333333333333334,
+    "ci95": [
+     0.038,
+     0.0743
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 462,
+    "n": 568,
+    "rate": 0.8133802816901409,
+    "ci95": [
+     0.7793,
+     0.8433
+    ]
+   },
+   "accuracy_all": {
+    "k": 462,
+    "n": 600,
+    "rate": 0.77,
+    "ci95": [
+     0.7347,
+     0.8019
+    ]
+   },
+   "latency_s": {
+    "p50": 3.1665,
+    "p95": 6.4274499999999986
+   },
+   "auc_final_probability": {
+    "auc": 0.9140277777777778,
+    "ci95": [
+     0.8901523611111111,
+     0.9364995833333333
+    ]
+   },
+   "per_group": {
+    "A17": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 17,
+     "n": 19
+    },
+    "A18": {
+     "label": 1,
+     "AUTHENTIC": 10,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 8,
+     "n": 19
+    },
+    "A19": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A20": {
+     "label": 1,
+     "AUTHENTIC": 11,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 5,
+     "n": 19
+    },
+    "A21": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A22": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A23": {
+     "label": 1,
+     "AUTHENTIC": 9,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 7,
+     "n": 19
+    },
+    "A24": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 2,
+     "MANIPULATED": 16,
+     "n": 19
+    },
+    "A25": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A26": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A27": {
+     "label": 1,
+     "AUTHENTIC": 19,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0,
+     "n": 19
+    },
+    "A28": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 18,
+     "n": 19
+    },
+    "A29": {
+     "label": 1,
+     "AUTHENTIC": 0,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 17,
+     "n": 18
+    },
+    "A30": {
+     "label": 1,
+     "AUTHENTIC": 15,
+     "INCONCLUSIVE": 2,
+     "MANIPULATED": 1,
+     "n": 18
+    },
+    "A31": {
+     "label": 1,
+     "AUTHENTIC": 7,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 8,
+     "n": 18
+    },
+    "A32": {
+     "label": 1,
+     "AUTHENTIC": 15,
+     "INCONCLUSIVE": 2,
+     "MANIPULATED": 1,
+     "n": 18
+    },
+    "bonafide": {
+     "label": 0,
+     "AUTHENTIC": 274,
+     "INCONCLUSIVE": 12,
+     "MANIPULATED": 14,
+     "n": 300
+    }
+   },
+   "per_codec": {
+    "-": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 17,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 42
+     }
+    },
+    "C01": {
+     "real": {
+      "AUTHENTIC": 23,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 2
+     },
+     "fake": {
+      "AUTHENTIC": 11,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 15
+     }
+    },
+    "C02": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 7,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 11
+     }
+    },
+    "C03": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 11,
+      "INCONCLUSIVE": 3,
+      "MANIPULATED": 8
+     }
+    },
+    "C04": {
+     "real": {
+      "AUTHENTIC": 19,
+      "INCONCLUSIVE": 3,
+      "MANIPULATED": 3
+     },
+     "fake": {
+      "AUTHENTIC": 11,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 6
+     }
+    },
+    "C05": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 6,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 13
+     }
+    },
+    "C06": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 8,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 13
+     }
+    },
+    "C07": {
+     "real": {
+      "AUTHENTIC": 20,
+      "INCONCLUSIVE": 4,
+      "MANIPULATED": 1
+     },
+     "fake": {
+      "AUTHENTIC": 10,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 8
+     }
+    },
+    "C08": {
+     "real": {
+      "AUTHENTIC": 17,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 7
+     },
+     "fake": {
+      "AUTHENTIC": 1,
+      "INCONCLUSIVE": 2,
+      "MANIPULATED": 21
+     }
+    },
+    "C09": {
+     "real": {
+      "AUTHENTIC": 22,
+      "INCONCLUSIVE": 3,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 2,
+      "INCONCLUSIVE": 3,
+      "MANIPULATED": 11
+     }
+    },
+    "C10": {
+     "real": {
+      "AUTHENTIC": 23,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 1
+     },
+     "fake": {
+      "AUTHENTIC": 3,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 21
+     }
+    },
+    "C11": {
+     "real": {
+      "AUTHENTIC": 25,
+      "INCONCLUSIVE": 0,
+      "MANIPULATED": 0
+     },
+     "fake": {
+      "AUTHENTIC": 5,
+      "INCONCLUSIVE": 1,
+      "MANIPULATED": 19
+     }
+    }
+   },
+   "stage_diagnosis": {
+    "1: File Hashes": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: Audio File DNA & Container Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Signal Intelligence & Acoustic Telemetry": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "4: Physiological Glottal Flow & VoiceRadar Physics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "5: Content & Phonemic Coarticulation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "6: Model Stage": {
+     "flagged_real": 0.03666666666666667,
+     "flagged_fake": 0.5966666666666667,
+     "balanced_accuracy": 0.78,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "7: Environmental & ENF Grid Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "8: Risk and Verdict": {
+     "flagged_real": 0.04666666666666667,
+     "flagged_fake": 0.6266666666666667,
+     "balanced_accuracy": 0.79,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "null": 300
+    },
+    "fake": {
+     "null": 300
+    }
+   },
+   "errors_unresolved": 0
+  }
+ }
+}

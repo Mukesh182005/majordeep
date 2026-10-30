@@ -153,6 +153,11 @@ class Settings(BaseSettings):
     # model scored 6.4 % of COCO test photos as AI (old_v3.json).
     commfor_ft_checkpoint: str = "commfor_ft_v3/model.safetensors"
     commfor_ft_weight: float = 4.0
+    # Newer-generator rule: call an image MANIPULATED when the fine-tuned model alone scores it >= this.
+    # Off (None) by default: at 0.97 (chosen on validation) newest-generator images called MANIPULATED rose
+    # from 44 % to 69 %, but real COCO test photos called MANIPULATED from 0 to 7 of 296
+    # (evaluation/QUICK-GUARDS-01/image_ft_override.json).
+    image_ft_override_at: float | None = None
     # Without camera metadata nothing positively shows an image came from a camera, so a
     # low score only means no detector fired. AUTHENTIC then needs a fused P(AI) below
     # this; between it and the decision band the verdict is INCONCLUSIVE. Chosen on the

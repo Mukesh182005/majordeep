@@ -312,3 +312,30 @@ class TestAuthenticNeedsEvidence:
         monkeypatch.setattr(ip, "score_scene", _fixed_scene(0.10))
         result = ip.analyze_image(self._plain_image(tmp_path, "Canon"), tmp_path / "evidence", "camera-job")
         assert result.evidence["threat_code"] != "INCONCLUSIVE_UNVERIFIED_ORIGIN"
+
+
+class TestNewerGeneratorRule:
+    """IMAGE_FT_OVERRIDE_AT: off by default; when set, the fine-tuned model alone can flag an image."""
+
+    @staticmethod
+    def _scene(ft: float):
+        return lambda image: {"scene_ai_prob": 0.05, "model_scores": {"haywood": 0.01, "commfor_ft_v3": ft}}
+
+    def test_off_by_default(self, tmp_path, monkeypatch):
+        import app.ml.image_pipeline as ip
+
+        monkeypatch.setattr(ip, "score_scene", self._scene(0.99))
+        source = tmp_path / "x.png"
+        Image.new("RGB", (128, 128), (90, 60, 30)).save(source)
+        assert ip.analyze_image(source, tmp_path / "ev", "ft-off").verdict is not Verdict.MANIPULATED
+
+    def test_when_set_a_confident_fine_tuned_score_flags(self, tmp_path, monkeypatch):
+        import app.ml.image_pipeline as ip
+
+        monkeypatch.setattr(settings, "image_ft_override_at", 0.97)
+        monkeypatch.setattr(ip, "score_scene", self._scene(0.99))
+        source = tmp_path / "x.png"
+        Image.new("RGB", (128, 128), (90, 60, 30)).save(source)
+        result = ip.analyze_image(source, tmp_path / "ev", "ft-on")
+        assert result.verdict is Verdict.MANIPULATED
+        assert "newer-generator" in result.evidence["dominant_threat"]

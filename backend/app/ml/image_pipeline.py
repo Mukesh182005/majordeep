@@ -455,6 +455,18 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         dominant_threat = "Authentic Camera Photograph"
         threat_code = "AUTHENTIC_PHOTOGRAPH"
 
+    ft_score = next((p for k, p in scene["model_scores"].items() if "commfor_ft" in k), None)
+    if (settings.image_ft_override_at is not None and ft_score is not None
+            and ft_score >= settings.image_ft_override_at and final_fake_prob < 0.50):
+        final_fake_prob = max(final_fake_prob, float(ft_score))
+        dominant_threat = "Synthetic AI Generation (newer-generator detector)"
+        threat_code = "SYNTHETIC_AI_GENERATION"
+        notes.append(
+            f"Flagged by the detector fine-tuned on newer generators alone ({ft_score * 100:.1f}% >= "
+            f"{settings.image_ft_override_at * 100:.0f}%); it wrongly flags about 2% of real photos "
+            "(IMAGE_FT_OVERRIDE_AT, evaluation/QUICK-GUARDS-01)."
+        )
+
     if settings.trufor_in_verdict and trufor_flagged and final_fake_prob < 0.50:
         final_fake_prob = max(final_fake_prob, trufor_res["score"])
         dominant_threat = "Possible Local Edit / Splice (TruFor)"

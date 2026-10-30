@@ -131,6 +131,10 @@ class Settings(BaseSettings):
     # cannot run. Default since it measured better on every test set: ASVspoof 2019 LA eval, its
     # re-encoded copies and ASVspoof 5 eval (evaluation/AUDIO-PELLAV2-01*). False: the LCNN decides.
     audio_pellav2_in_verdict: bool = True
+    # True: narrowband (phone / VoIP) audio that pellav2 calls fake is reported INCONCLUSIVE. Off: measured
+    # on ASVspoof 5 it removed few false alarms and many detections (evaluation/QUICK-GUARDS-01). The
+    # reliability note is shown either way.
+    audio_narrowband_guard: bool = False
     audio_pellav2_max_windows: int = 8  # 8 x 4 s = the first 32 s of audio
     audio_pellav2_model_id: str = "Sadanie/pellav2-audio-deepfake-detector"  # or a local .pt / folder
     audio_pellav2_config_file: Path = ROOT_DIR / "paper" / "config" / "pellav2_verdict_config.json"

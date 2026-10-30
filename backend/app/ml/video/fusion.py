@@ -255,7 +255,8 @@ def fuse_video_forensics(
     profile_says_ai = bool(attribution_info and attribution_info.get("is_ai_generated"))
 
     if is_synthetic_ai:
-        dominant_threat = f"AI-Generated Video Media (unvalidated profile match: {predicted_platform})"
+        dominant_threat = (f"AI-Generated Video Media (scene detectors, not validated on video; "
+                           f"unvalidated profile match: {predicted_platform})")
         threat_code = "AI_GENERATED_VIDEO"
         category_name = "AI Generated Video"
         final_prob = max(final_prob, 0.88)
@@ -365,6 +366,13 @@ def fuse_video_forensics(
     ]
     if signals:
         notes.append(f"Corroborating indicators: {'; '.join(signals[:3])}")
+    # Fully generated video has no labelled test set here (KNOWN_ISSUES #19): say so whenever the
+    # scene detectors, measured on still images, are what the verdict rests on.
+    if vit_genai_prob >= 0.50 and spatial_prob < 0.50:
+        notes.append(
+            "AI-generated video detection rests on the image scene detectors averaged over sampled frames; "
+            "they were measured on still images, not on video, so this result is not validated for video."
+        )
 
     return {
         "final_probability": final_prob,

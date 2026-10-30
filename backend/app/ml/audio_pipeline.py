@@ -20,7 +20,7 @@ from app.models import Verdict
 from app.ml.preprocessing import load_audio, normalize_waveform
 from app.ml.registry import TRAINED, UNTRAINED
 from app.ml.audio import run_comprehensive_audio_forensics
-from app.ml.audio.codec_guard import guard_note, guarded_family
+from app.ml.audio.codec_guard import NARROWBAND_CUTOFF_DB, NARROWBAND_NOTE, guard_note, guarded_family, high_band_db
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +95,15 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     guarded = guarded_family(path) if verdict_source == "lcnn_asvspoof" else None
     if guarded:
         notes.insert(0, guard_note(guarded))
+    # Narrowband (phone / VoIP) audio is flagged with a reliability note. Withholding a 'fake' verdict
+    # on it (AUDIO_NARROWBAND_GUARD) was measured and is off: on ASVspoof 5 it cut real voices called
+    # MANIPULATED only from 15.0 % to 11.7 % but fakes caught from 77.0 % to 49.0 %.
+    hb_db = high_band_db(waveform, sample_rate)
+    narrowband = hb_db is not None and hb_db < NARROWBAND_CUTOFF_DB
+    narrowband_guard = (narrowband and verdict_source == "pellav2"
+                        and fusion.get("final_verdict") == "AI_GENERATED" and settings.audio_narrowband_guard)
+    if narrowband:
+        notes.insert(0, NARROWBAND_NOTE)
     if not experimental:
         notes.append(
             "The verdict is the trained model's alone. Glottal, mains-hum, splice, container and watermark "
@@ -194,6 +203,9 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         "is_inconclusive": fusion.get("is_inconclusive"),
     }
     evidence_payload["codec_guard"] = {"codec_family": guarded, "setting": "AUDIO_CODEC_GUARD"} if guarded else None
+    evidence_payload["bandwidth"] = {"high_band_db": None if hb_db is None else round(hb_db, 2),
+                                     "narrowband": narrowband, "guard_applied": narrowband_guard,
+                                     "setting": "AUDIO_NARROWBAND_GUARD"}
     if fusion.get("verdict_source") in ("lcnn_asvspoof", "pellav2"):
         evidence_payload["decision_threshold"] = fusion["decision_threshold"]
         evidence_payload["uncertain_band"] = fusion["uncertain_band"]
@@ -211,7 +223,8 @@ def analyze_audio(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
             evidence=evidence_payload,
             # The audio thresholds were frozen on ASVspoof dev and differ from the
             # platform-wide FAKE_THRESHOLD, so the verdict is set from them here.
-            verdict_override=Verdict.INCONCLUSIVE if guarded else _AUDIO_VERDICT.get(fusion.get("final_verdict")),
+            verdict_override=(Verdict.INCONCLUSIVE if guarded or narrowband_guard
+                              else _AUDIO_VERDICT.get(fusion.get("final_verdict"))),
         )
     return AnalysisResult(
         fake_probability=round(final_fake_prob, 4),

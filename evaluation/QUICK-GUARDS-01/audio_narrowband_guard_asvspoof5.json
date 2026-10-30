@@ -1,0 +1,5412 @@
+{
+"metric": "10*log10(mean power 4.3-7.5 kHz / mean power 0.3-3.4 kHz)",
+"threshold_db": -41.0,
+"threshold_rule": "2nd percentile of 300 clean+wideband-coded ASVspoof 5 dev clips (60 clips x clean, Opus WB, AMR-WB, MP3, AAC)",
+"dev": {
+"wideband_below": 0.016666666666666666,
+"narrowband_caught": 0.8583333333333333
+},
+"test_source": "evaluation/E2E-01 audio_asvspoof5_eval rows (pellav2 deciding); guard applied post hoc",
+"rows": [
+{
+"id": "E_0000000034",
+"label": 1,
+"codec": "-",
+"cutoff_db": -35.79,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000000168",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -29.12,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000000287",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -25.01,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000000395",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -28.39,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000000465",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -9.09,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000000469",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -88.25,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000000638",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -21.5,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000000863",
+"label": 0,
+"codec": "-",
+"cutoff_db": -12.14,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000000926",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -21.54,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000000990",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -16.79,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000001033",
+"label": 1,
+"codec": "-",
+"cutoff_db": -9.96,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000001071",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -82.02,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000001092",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -18.25,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000001147",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -28.76,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000001155",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -80.36,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000001350",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -77.55,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000001365",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -33.69,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000001435",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -70.41,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000001453",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -13.31,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000001578",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -77.77,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000001622",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -27.24,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000001660",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -81.58,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000001753",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -20.72,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000001823",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -21.0,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000001850",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -16.77,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000001893",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -16.44,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000002089",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -22.56,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000002137",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -19.19,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000002171",
+"label": 0,
+"codec": "-",
+"cutoff_db": -8.45,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000002226",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -82.15,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000002353",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -25.56,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000002384",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -85.56,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000002462",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -83.37,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000002571",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -21.49,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000002586",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -70.91,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000002643",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -85.92,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000002651",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -68.34,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000002699",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -19.12,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000003140",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -31.84,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000003142",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -72.87,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000003155",
+"label": 1,
+"codec": "-",
+"cutoff_db": -14.71,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000003199",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -82.67,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000003230",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -68.48,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000003444",
+"label": 1,
+"codec": "-",
+"cutoff_db": -24.51,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000003524",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -82.55,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000003978",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -19.21,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000004056",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -78.83,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000004248",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -77.59,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000004332",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -18.47,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000004363",
+"label": 0,
+"codec": "-",
+"cutoff_db": -13.2,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000004401",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -19.85,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000004411",
+"label": 1,
+"codec": "-",
+"cutoff_db": -20.23,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000004444",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -24.38,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000004587",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -79.15,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000004649",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -20.8,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000004811",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -87.27,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000004971",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -80.63,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000005034",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -17.08,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000005090",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -26.07,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000005248",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -70.89,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000005294",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -15.72,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000005417",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -13.74,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000005421",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -13.21,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000005615",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -29.61,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000005953",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -15.46,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000006148",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -82.23,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000006278",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -18.62,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000006439",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -64.68,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000006484",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -83.58,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000006519",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -60.71,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000006601",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -25.61,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000006641",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -22.81,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000006679",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -84.98,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000006707",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -86.49,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000006788",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -27.17,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000006848",
+"label": 0,
+"codec": "-",
+"cutoff_db": -12.04,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000006887",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -23.65,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000006892",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -74.61,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000006933",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -11.89,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000006967",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -16.12,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000007006",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -73.89,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000007116",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -76.79,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000007169",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -78.33,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000007367",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -33.01,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000007505",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -25.43,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000007515",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -85.84,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000007661",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -72.31,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000007662",
+"label": 0,
+"codec": "-",
+"cutoff_db": -18.31,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000007751",
+"label": 1,
+"codec": "-",
+"cutoff_db": -18.51,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000007824",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -22.06,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000007868",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -83.65,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000007981",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -24.14,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008051",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -19.77,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008098",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -21.63,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008116",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -24.64,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000008135",
+"label": 1,
+"codec": "-",
+"cutoff_db": -11.96,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008142",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -19.91,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008145",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -17.81,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008172",
+"label": 1,
+"codec": "-",
+"cutoff_db": -21.25,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008383",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -20.09,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000008518",
+"label": 1,
+"codec": "-",
+"cutoff_db": -18.14,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008568",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -84.83,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000008582",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -18.57,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008603",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -12.61,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008633",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -14.55,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000008682",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -24.81,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000008851",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -23.48,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000008913",
+"label": 1,
+"codec": "-",
+"cutoff_db": -24.91,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000009066",
+"label": 1,
+"codec": "-",
+"cutoff_db": -21.19,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000009226",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -30.27,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000009241",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -84.36,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000009305",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -67.92,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000009507",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -12.04,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000009721",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -24.06,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000009759",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -82.67,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000009772",
+"label": 0,
+"codec": "-",
+"cutoff_db": -14.97,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000009977",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -25.31,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000010075",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -25.62,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000010122",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -43.9,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000010125",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -23.54,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000010290",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -22.24,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000010323",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -25.32,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000010572",
+"label": 1,
+"codec": "-",
+"cutoff_db": -12.77,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000010749",
+"label": 1,
+"codec": "-",
+"cutoff_db": -11.08,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000010988",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -23.85,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000011027",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -69.11,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000011031",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -31.59,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000011055",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -17.11,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000011183",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -83.99,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000011270",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -74.62,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000011418",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -28.9,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000011553",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -12.62,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000011644",
+"label": 1,
+"codec": "-",
+"cutoff_db": -16.82,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000011681",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -83.7,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000011700",
+"label": 1,
+"codec": "-",
+"cutoff_db": -21.61,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000011792",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -60.71,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000011814",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -14.2,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000011947",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -84.53,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012062",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -68.51,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012257",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -79.93,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012303",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -12.24,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000012374",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -27.33,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000012457",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -81.1,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012538",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -18.28,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000012684",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -46.41,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012697",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -41.19,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012721",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -18.89,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000012728",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -20.52,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000012748",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -80.7,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000012866",
+"label": 1,
+"codec": "-",
+"cutoff_db": -30.16,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012918",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -84.07,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000012997",
+"label": 1,
+"codec": "-",
+"cutoff_db": -16.73,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000013006",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -74.07,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000013140",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -7.9,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000013244",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -20.39,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000013283",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -83.3,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000013336",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -19.17,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000014358",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -67.13,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000014426",
+"label": 0,
+"codec": "-",
+"cutoff_db": -25.85,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000014791",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -80.14,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000014992",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -22.7,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000016175",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -22.92,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000016353",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -69.82,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000017324",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -24.06,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000017678",
+"label": 1,
+"codec": "-",
+"cutoff_db": -21.0,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000017720",
+"label": 1,
+"codec": "-",
+"cutoff_db": -28.41,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000017740",
+"label": 1,
+"codec": "-",
+"cutoff_db": -23.84,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000018385",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -14.89,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000019972",
+"label": 1,
+"codec": "-",
+"cutoff_db": -15.03,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000020196",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -28.54,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000020503",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -30.4,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000020678",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -15.33,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021431",
+"label": 0,
+"codec": "-",
+"cutoff_db": -15.71,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022470",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -22.74,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024122",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -15.24,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000024162",
+"label": 0,
+"codec": "-",
+"cutoff_db": -13.83,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024537",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -21.6,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000025328",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -84.84,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000025971",
+"label": 0,
+"codec": "-",
+"cutoff_db": -20.1,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000026397",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -29.27,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000027676",
+"label": 1,
+"codec": "-",
+"cutoff_db": -16.28,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000027913",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -18.31,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000029483",
+"label": 1,
+"codec": "-",
+"cutoff_db": -14.24,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000029564",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -12.87,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000030173",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -78.95,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000030654",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -13.0,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000031300",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -26.63,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000031453",
+"label": 1,
+"codec": "-",
+"cutoff_db": -24.62,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000032342",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -85.14,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000033178",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -13.19,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000035684",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -79.99,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000044919",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -22.73,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000047883",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -72.96,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000049179",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -19.78,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000051824",
+"label": 0,
+"codec": "C05",
+"cutoff_db": 3.41,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000054145",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -82.52,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000054859",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -67.89,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000056666",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -26.0,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000069838",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -18.14,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000069900",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -84.32,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000071878",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -83.78,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000073835",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -72.48,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000079061",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -22.74,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000079212",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -21.55,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000086883",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -11.64,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000086995",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -23.02,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000093959",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -82.68,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000096209",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -27.99,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000104267",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -22.75,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000110193",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -17.68,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000112620",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -30.33,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000115634",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -82.46,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000115791",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -20.14,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000115995",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -19.97,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000122610",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -18.39,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000122899",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -16.37,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000128650",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -83.18,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000139036",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -78.64,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000139254",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -83.5,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000139434",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -85.05,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000013500",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -77.07,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000013683",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -71.49,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000013780",
+"label": 0,
+"codec": "-",
+"cutoff_db": -12.48,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000013881",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -63.18,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000014149",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -86.39,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000014312",
+"label": 1,
+"codec": "-",
+"cutoff_db": -16.89,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000014518",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -66.87,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000014602",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -17.87,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000014610",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -86.62,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000015153",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -87.22,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000015235",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -76.49,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000015618",
+"label": 0,
+"codec": "-",
+"cutoff_db": -18.03,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000015948",
+"label": 1,
+"codec": "-",
+"cutoff_db": -11.64,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000016165",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -13.65,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000016344",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -85.67,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000016350",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -23.35,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000017321",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -82.18,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000017764",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -85.69,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000017799",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -19.3,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000018004",
+"label": 0,
+"codec": "-",
+"cutoff_db": -14.52,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000018284",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -20.54,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000018466",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -80.77,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000018671",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -17.12,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000018854",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -80.85,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000019631",
+"label": 1,
+"codec": "-",
+"cutoff_db": -27.68,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000019859",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -24.89,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000020114",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -88.15,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000020564",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -77.85,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000020737",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -79.84,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000021070",
+"label": 1,
+"codec": "-",
+"cutoff_db": -23.57,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021560",
+"label": 1,
+"codec": "-",
+"cutoff_db": -6.38,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021605",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -83.35,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000021879",
+"label": 1,
+"codec": "-",
+"cutoff_db": -19.29,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022029",
+"label": 0,
+"codec": "-",
+"cutoff_db": -24.71,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022109",
+"label": 1,
+"codec": "-",
+"cutoff_db": -20.51,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000022446",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -24.96,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000022564",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -15.47,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023134",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -86.6,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000023458",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -39.79,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023664",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -14.79,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023690",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -26.64,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000023772",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -74.69,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000023796",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -66.17,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024250",
+"label": 1,
+"codec": "-",
+"cutoff_db": -14.25,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000024354",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -26.01,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024430",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -64.49,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000024514",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -56.09,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024559",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -79.41,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000025033",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -65.04,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000025452",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -81.24,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000025684",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -41.14,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000025812",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -17.2,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000026185",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -12.26,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000026537",
+"label": 1,
+"codec": "-",
+"cutoff_db": -18.01,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000026840",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -26.7,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000027630",
+"label": 1,
+"codec": "-",
+"cutoff_db": -19.43,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000027656",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -18.73,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000027838",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -73.34,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000027872",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -22.95,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000028015",
+"label": 1,
+"codec": "-",
+"cutoff_db": -11.66,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000028103",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -39.42,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000028852",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -80.06,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000029040",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -77.22,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000029290",
+"label": 1,
+"codec": "-",
+"cutoff_db": -25.45,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000029324",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -75.73,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000029577",
+"label": 1,
+"codec": "-",
+"cutoff_db": -17.98,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000029862",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -80.21,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000029898",
+"label": 0,
+"codec": "-",
+"cutoff_db": -44.94,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000029907",
+"label": 0,
+"codec": "-",
+"cutoff_db": -14.61,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000030117",
+"label": 0,
+"codec": "-",
+"cutoff_db": -13.81,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000030744",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -26.41,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000031171",
+"label": 1,
+"codec": "-",
+"cutoff_db": -24.67,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000032245",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -16.24,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000033352",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -19.78,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000034307",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -16.03,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000034826",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -17.5,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000034956",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -32.96,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000035134",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -81.4,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000035759",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -35.93,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000037814",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -84.06,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000039032",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -82.33,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000040945",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -6.32,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000045525",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -11.26,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000048453",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -20.69,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000054972",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -82.47,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000055205",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -36.96,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000055304",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -19.79,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000055631",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -85.8,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000057838",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -84.94,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000058349",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -26.0,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000059131",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -80.58,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000059920",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -85.72,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000060584",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -19.05,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000061610",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -18.83,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000063573",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -72.33,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000063652",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -87.21,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000064995",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -76.75,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000065198",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -28.01,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000065331",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -83.51,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000067266",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -30.72,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000067458",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -28.6,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000071390",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -32.48,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000076626",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -17.94,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000078426",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -84.71,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000079350",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -74.12,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000082058",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -22.09,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000082845",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -18.33,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000083262",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -23.35,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000085663",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -77.76,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000086432",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -82.52,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000087199",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -22.32,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000088262",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -23.71,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000089552",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -20.49,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000089757",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -19.91,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000092018",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -19.41,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000092325",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -24.14,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000094076",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -78.76,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000095132",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -18.46,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000096732",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -16.61,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000097016",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -80.12,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000097334",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -68.73,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000100503",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -16.49,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000100507",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -26.43,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000101553",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -25.9,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000101617",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -20.4,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000103722",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -77.26,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000103846",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -14.56,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000104147",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -84.25,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000111870",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -21.52,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000114705",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -79.57,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000117272",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -12.19,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000117428",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -16.88,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000117826",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -80.73,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000118083",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -18.92,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000119204",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -14.79,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000119769",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -82.01,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000120236",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -19.97,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000120593",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -3.11,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000122846",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -18.07,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000123001",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -18.44,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000123612",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -26.52,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000125059",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -68.84,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000125523",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -76.76,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000126497",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -79.45,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000128706",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -21.02,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000130851",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -15.13,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000131397",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -19.77,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000132947",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -17.68,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000137391",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -83.89,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000140990",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -5.79,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000142177",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -17.75,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000144000",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -8.41,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000013361",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -23.93,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000013667",
+"label": 1,
+"codec": "-",
+"cutoff_db": -10.43,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000013714",
+"label": 1,
+"codec": "-",
+"cutoff_db": -5.72,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000013864",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -77.9,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000014262",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -11.7,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000014537",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -86.28,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000014549",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -71.57,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000014636",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -17.04,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000014877",
+"label": 0,
+"codec": "-",
+"cutoff_db": -8.0,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000015084",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -23.55,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000015118",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -38.55,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000015573",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -13.85,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000015592",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -15.22,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000015780",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -18.7,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000016014",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -9.81,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000016630",
+"label": 1,
+"codec": "-",
+"cutoff_db": -20.53,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000016706",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -75.82,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000016821",
+"label": 1,
+"codec": "-",
+"cutoff_db": -26.72,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000016996",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -33.47,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000017243",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -78.41,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000017335",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -22.65,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000017572",
+"label": 0,
+"codec": "-",
+"cutoff_db": -25.16,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000017663",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -72.15,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000017707",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -47.38,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000018143",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -66.36,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000018347",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -88.67,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000018591",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -22.19,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000018593",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -34.6,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000018611",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -28.53,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000018690",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -24.33,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000018920",
+"label": 1,
+"codec": "-",
+"cutoff_db": -20.16,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000019114",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -24.08,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000019207",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -22.21,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000019289",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -27.55,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000019525",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -76.26,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000019774",
+"label": 1,
+"codec": "-",
+"cutoff_db": -20.7,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000019898",
+"label": 0,
+"codec": "-",
+"cutoff_db": -14.74,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000020149",
+"label": 1,
+"codec": "-",
+"cutoff_db": -13.81,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000020276",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -20.6,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000020283",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -17.12,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000020319",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -85.09,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000020649",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -27.92,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000020704",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -84.27,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000021257",
+"label": 1,
+"codec": "-",
+"cutoff_db": -16.46,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021292",
+"label": 1,
+"codec": "-",
+"cutoff_db": -32.97,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021324",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -23.03,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021529",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -30.63,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000021567",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -79.03,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000021608",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -31.14,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021865",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -16.13,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000021949",
+"label": 0,
+"codec": "-",
+"cutoff_db": -13.93,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022007",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -84.97,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022106",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -32.1,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022138",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -10.95,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000022241",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -26.02,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000022527",
+"label": 1,
+"codec": "-",
+"cutoff_db": -19.7,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000022581",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -63.63,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022740",
+"label": 0,
+"codec": "-",
+"cutoff_db": -20.51,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000022869",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -52.78,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000022940",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -31.67,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023040",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -68.57,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000023220",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -12.32,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000023266",
+"label": 1,
+"codec": "-",
+"cutoff_db": -12.07,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023279",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -16.57,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023348",
+"label": 1,
+"codec": "C10",
+"cutoff_db": -72.71,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000023572",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -25.62,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000023616",
+"label": 1,
+"codec": "C03",
+"cutoff_db": -17.61,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023623",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -24.23,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023678",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -11.3,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023737",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -13.59,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000023990",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -81.11,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000023993",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -22.73,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000024002",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -82.31,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024052",
+"label": 1,
+"codec": "-",
+"cutoff_db": -13.36,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000024086",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -20.4,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024214",
+"label": 1,
+"codec": "-",
+"cutoff_db": -12.94,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000024285",
+"label": 0,
+"codec": "-",
+"cutoff_db": -22.57,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000024413",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -21.36,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000024725",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -86.81,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000024862",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -16.97,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000024941",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -34.77,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000025043",
+"label": 1,
+"codec": "-",
+"cutoff_db": -19.86,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000025086",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -18.29,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000025177",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -16.28,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000025324",
+"label": 0,
+"codec": "-",
+"cutoff_db": -6.24,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000025379",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -81.7,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000025506",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -84.99,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000025631",
+"label": 1,
+"codec": "C06",
+"cutoff_db": -13.73,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000025670",
+"label": 1,
+"codec": "-",
+"cutoff_db": -17.66,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000025672",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -20.4,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000025688",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -22.72,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000026033",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -17.62,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000026138",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -84.99,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000026228",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -15.92,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000026464",
+"label": 1,
+"codec": "-",
+"cutoff_db": -22.45,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000026618",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -25.58,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000026709",
+"label": 1,
+"codec": "C09",
+"cutoff_db": -86.15,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000026795",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -14.16,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000026879",
+"label": 1,
+"codec": "C11",
+"cutoff_db": -79.23,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000027153",
+"label": 1,
+"codec": "C05",
+"cutoff_db": -23.65,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000027262",
+"label": 1,
+"codec": "C04",
+"cutoff_db": -23.7,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000027294",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -20.23,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000027713",
+"label": 1,
+"codec": "-",
+"cutoff_db": -19.74,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000028811",
+"label": 1,
+"codec": "C07",
+"cutoff_db": -20.61,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000028968",
+"label": 1,
+"codec": "-",
+"cutoff_db": -18.96,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000029581",
+"label": 1,
+"codec": "-",
+"cutoff_db": -23.63,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000029731",
+"label": 1,
+"codec": "-",
+"cutoff_db": -13.37,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000029799",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -19.6,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000030216",
+"label": 1,
+"codec": "C02",
+"cutoff_db": -11.22,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000030346",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -28.12,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000031075",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -3.43,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000031807",
+"label": 1,
+"codec": "C01",
+"cutoff_db": -35.43,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000031825",
+"label": 0,
+"codec": "-",
+"cutoff_db": -6.73,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000032015",
+"label": 1,
+"codec": "-",
+"cutoff_db": -40.84,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000032628",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -2.37,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000032632",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -15.07,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000032926",
+"label": 1,
+"codec": "-",
+"cutoff_db": -18.36,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000033415",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -15.16,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000034084",
+"label": 1,
+"codec": "-",
+"cutoff_db": -33.96,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000034812",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -13.92,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000034914",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -17.85,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000035372",
+"label": 1,
+"codec": "C08",
+"cutoff_db": -78.76,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000035585",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -21.78,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000035784",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -15.95,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000036588",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -76.14,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000036951",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -21.56,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000038197",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -14.5,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000038236",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -86.87,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000038393",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -83.32,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000039295",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -80.53,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000039873",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -62.28,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000040601",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -84.05,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000040731",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -77.96,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000042395",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -20.47,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000043757",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -84.87,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000045755",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -78.78,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000047261",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -84.29,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000048493",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -13.08,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000049848",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -17.37,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000051321",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -7.26,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000052251",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -73.77,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000052256",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -20.58,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000053366",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -20.11,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000057876",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -22.21,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000057906",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -85.44,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000058874",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -20.8,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000059700",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -6.35,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000061148",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -18.95,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000061802",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -16.46,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000061875",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -69.3,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000062677",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -17.76,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000063834",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -10.26,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000064005",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -83.56,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000064442",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -61.64,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000065129",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -23.38,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000066141",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -60.39,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000066679",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -15.62,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000067341",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -13.71,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000067779",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -16.47,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000068531",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -34.68,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000069777",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -14.73,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000069951",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -82.44,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000070361",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -20.94,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000071143",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -22.14,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000071770",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -21.33,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000074797",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -84.32,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000075488",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -86.13,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000075760",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -16.11,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000075883",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -9.33,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000076608",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -16.02,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000076907",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -10.94,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000077133",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -78.87,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000077234",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -12.36,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000077322",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -81.04,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000078148",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -76.67,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000078361",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -21.96,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000080348",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -19.94,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000084249",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -21.84,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000085019",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -25.13,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000087144",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -22.2,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000088056",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -8.74,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000088378",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -24.92,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000091926",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -43.02,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000092052",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -12.56,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000092416",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -84.91,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000092616",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -16.72,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000093444",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -76.38,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000093577",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -86.01,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000093696",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -81.41,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000093838",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -12.69,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000093929",
+"label": 0,
+"codec": "C07",
+"cutoff_db": -17.34,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000093943",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -13.21,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000094343",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -29.87,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000100237",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -21.96,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000101423",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -84.05,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000101648",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -31.04,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000102844",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -3.36,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000102961",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -24.57,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000103883",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -74.03,
+"narrowband": true,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000104876",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -86.04,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000105595",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -76.07,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000106230",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -18.04,
+"narrowband": false,
+"verdict_before": "MANIPULATED",
+"verdict_after": "MANIPULATED"
+},
+{
+"id": "E_0000106695",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -76.52,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000107255",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -80.05,
+"narrowband": true,
+"verdict_before": "MANIPULATED",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000110041",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -20.08,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000110600",
+"label": 0,
+"codec": "C04",
+"cutoff_db": -37.98,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000113940",
+"label": 0,
+"codec": "C08",
+"cutoff_db": -87.87,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000114458",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -18.58,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000116165",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -75.29,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000116193",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -76.88,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000116961",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -26.72,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000117268",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -16.19,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000118205",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -76.99,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000119192",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -26.37,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000121148",
+"label": 0,
+"codec": "C05",
+"cutoff_db": -23.53,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000123526",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -82.31,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000124319",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -21.13,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000125441",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -17.88,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000125692",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -24.66,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000126468",
+"label": 0,
+"codec": "C03",
+"cutoff_db": -14.74,
+"narrowband": false,
+"verdict_before": "INCONCLUSIVE",
+"verdict_after": "INCONCLUSIVE"
+},
+{
+"id": "E_0000126685",
+"label": 0,
+"codec": "C02",
+"cutoff_db": -24.29,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000127354",
+"label": 0,
+"codec": "C01",
+"cutoff_db": -22.99,
+"narrowband": false,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000127360",
+"label": 0,
+"codec": "C06",
+"cutoff_db": -72.64,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000127827",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -84.23,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000138323",
+"label": 0,
+"codec": "C10",
+"cutoff_db": -89.2,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000140560",
+"label": 0,
+"codec": "C11",
+"cutoff_db": -86.82,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000149042",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -85.0,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+},
+{
+"id": "E_0000149454",
+"label": 0,
+"codec": "C09",
+"cutoff_db": -80.87,
+"narrowband": true,
+"verdict_before": "AUTHENTIC",
+"verdict_after": "AUTHENTIC"
+}
+]
+}

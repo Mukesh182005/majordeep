@@ -16,6 +16,33 @@ never from the file name. If they cannot be read, no guard applies.
 
 from __future__ import annotations
 
+import numpy as np
+
+# Narrowband (telephone / VoIP) audio: the band above 4 kHz is cut off. Measured as the mean power at
+# 4.3-7.5 kHz relative to 0.3-3.4 kHz. The threshold is the 2nd percentile of 300 clean and wideband-coded
+# ASVspoof 5 dev clips; it catches 85.8 % of narrowband-coded dev clips
+# (evaluation/QUICK-GUARDS-01/audio_narrowband_guard_asvspoof5.json).
+NARROWBAND_CUTOFF_DB = -41.0
+NARROWBAND_NOTE = (
+    "Phone-quality (narrowband) audio: the band above 4 kHz is cut off, as after a phone call or VoIP codec. "
+    "The audio model is less reliable on such audio (KNOWN_ISSUES #16); treat the verdict with caution."
+)
+
+
+def high_band_db(waveform: np.ndarray, sample_rate: int) -> float | None:
+    """Mean power at 4.3-7.5 kHz relative to 0.3-3.4 kHz, in dB; ``None`` if too short or silent."""
+    x = np.asarray(waveform, dtype=np.float64)
+    if x.ndim > 1:
+        x = x.mean(axis=1)
+    if x.size < sample_rate // 4 or sample_rate < 16000:
+        return None
+    power = np.abs(np.fft.rfft(x - x.mean())) ** 2
+    freqs = np.fft.rfftfreq(x.size, 1.0 / sample_rate)
+    low = power[(freqs > 300) & (freqs < 3400)].mean()
+    if low <= 0:
+        return None
+    return float(10 * np.log10(power[(freqs > 4300) & (freqs < 7500)].mean() / low + 1e-20))
+
 import logging
 import re
 import subprocess

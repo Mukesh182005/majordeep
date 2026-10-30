@@ -3,8 +3,8 @@ import { Shield, Globe, CheckCircle } from './ui/Icons'
 
 const ConfidencePill = ({ level }) => {
   const map = {
-    HIGH:   { color: '#00E5FF', bg: 'rgba(0,229,255,0.1)' },
-    MEDIUM: { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+    HIGH:   { color: '#23f871', bg: 'rgba(35,248,113,0.1)' },
+    MEDIUM: { color: '#ffb020', bg: 'rgba(255,176,32,0.1)' },
     LOW:    { color: '#22c55e', bg: 'rgba(34,197,94,0.1)' },
   }
   const s = map[level] || map.MEDIUM
@@ -53,7 +53,7 @@ export default function OriginView({ mopci }) {
         style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-1)' }}>
         <div className="flex items-start gap-4">
           <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl"
-            style={{ background: 'rgba(0,229,255,0.12)', color: '#00E5FF' }}>
+            style={{ background: 'rgba(35,248,113,0.12)', color: '#23f871' }}>
             <Globe size={20} />
           </div>
           <div className="flex-1 min-w-0">
@@ -74,7 +74,7 @@ export default function OriginView({ mopci }) {
           <ul className="mt-4 pt-3 border-t border-subtle space-y-1">
             {gen.evidence.map((e, i) => (
               <li key={i} className="flex items-center gap-2 text-[0.75rem] text-ink-muted">
-                <span style={{ color: '#00E5FF', fontSize: '0.5rem' }}>◆</span> {e}
+                <span style={{ color: '#23f871', fontSize: '0.5rem' }}>◆</span> {e}
               </li>
             ))}
           </ul>
@@ -95,7 +95,7 @@ export default function OriginView({ mopci }) {
             <div key={i} className="flex items-center justify-between py-1.5 border-b last:border-0" style={{ borderColor: 'var(--border-subtle)' }}>
               <span className="text-[0.75rem] text-ink-muted">{row.label}</span>
               <span className="text-[0.75rem] font-bold mono"
-                style={{ color: row.ok === true ? '#00E5FF' : 'var(--text-secondary)' }}>
+                style={{ color: row.ok === true ? '#23f871' : 'var(--text-secondary)' }}>
                 {row.value}
               </span>
             </div>

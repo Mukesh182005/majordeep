@@ -14,6 +14,7 @@ import History from './pages/History'
 import HowItWorks from './pages/HowItWorks'
 import Login from './pages/Login'
 import Privacy from './pages/Privacy'
+import ReferencesPage from './pages/ReferencesPage'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="jobs/:jobId/report" element={<Report />} />
             <Route path="how-it-works" element={<HowItWorks />} />
             <Route path="privacy" element={<Privacy />} />
+            <Route path="references" element={<ReferencesPage />} />
             <Route path="login" element={<Login />} />
             <Route
               path="history"

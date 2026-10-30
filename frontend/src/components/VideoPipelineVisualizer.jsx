@@ -15,21 +15,21 @@ export const VIDEO_PHASES = [
     phaseId: 1,
     name: 'Ingestion & Container',
     stages: [1, 2],
-    color: '#00E5FF',
+    color: '#23f871',
     desc: 'ISO bitstream box inspection & temporal shot boundary cutting'
   },
   {
     phaseId: 2,
     name: 'Neural Spatial Vision',
     stages: [3, 4],
-    color: '#3B82F6',
+    color: '#57c690',
     desc: 'Facial EfficientNet-B4 + ViT scene diffusion & CFA Bayer periodicity'
   },
   {
     phaseId: 3,
     name: 'Biometrics & 4D Tensors',
     stages: [5, 6, 7],
-    color: '#8B5CF6',
+    color: '#43b6a1',
     desc: 'Ocular landmark acceleration, rPPG pulse extraction & space-time tensors'
   },
   {
@@ -43,7 +43,7 @@ export const VIDEO_PHASES = [
     phaseId: 5,
     name: 'Audio & Attribution',
     stages: [10, 11],
-    color: '#F59E0B',
+    color: '#ffb020',
     desc: 'LCNN acoustic voice sync & zero-watermark generator diffusion matching (unvalidated heuristic)'
   }
 ]
@@ -221,9 +221,9 @@ export default function VideoPipelineVisualizer({
   const passedCount = stages.filter(s => s.status === 'PASSED').length
 
   const getStatusColor = (st) => {
-    if (['AI_FLAGGED', 'ANOMALY_DETECTED', 'SUSPICIOUS', 'FAILED'].includes(st)) return '#ef4444'
-    if (['INCONCLUSIVE', 'INSUFFICIENT_FACE_FRAMES', 'INSUFFICIENT_FACE_SAMPLES', 'SKIPPED'].includes(st)) return '#f59e0b'
-    return '#10b981'
+    if (['AI_FLAGGED', 'ANOMALY_DETECTED', 'SUSPICIOUS', 'FAILED'].includes(st)) return '#ff4d3d'
+    if (['INCONCLUSIVE', 'INSUFFICIENT_FACE_FRAMES', 'INSUFFICIENT_FACE_SAMPLES', 'SKIPPED'].includes(st)) return '#ffb020'
+    return '#23f871'
   }
 
   // Waterfall Chart Data
@@ -333,7 +333,7 @@ export default function VideoPipelineVisualizer({
               style={{
                 background: flaggedCount > 0 ? 'var(--status-crit-bg)' : 'var(--status-good-bg)',
                 color: flaggedCount > 0 ? 'var(--status-critical)' : 'var(--status-good)',
-                borderColor: flaggedCount > 0 ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'
+                borderColor: flaggedCount > 0 ? 'rgba(255,77,61,0.3)' : 'rgba(35,248,113,0.3)'
               }}
             >
               {evidence.threat_code || result.verdict || 'AUTHENTIC'}
@@ -415,7 +415,7 @@ export default function VideoPipelineVisualizer({
                           isCurrent ? 'ring-4 ring-accent/30 shadow-md' : ''
                         }`}
                         style={{
-                          background: isBad ? 'rgba(239,68,68,0.12)' : isWarn ? 'rgba(245,158,11,0.12)' : 'var(--surface-1)',
+                          background: isBad ? 'rgba(255,77,61,0.12)' : isWarn ? 'rgba(255,176,32,0.12)' : 'var(--surface-1)',
                           borderColor: isCurrent ? 'var(--accent)' : color,
                           color: color
                         }}
@@ -696,7 +696,7 @@ export default function VideoPipelineVisualizer({
                   isSelected ? 'ring-2 ring-accent border-accent bg-surface-2' : 'hover:bg-surface-2 bg-surface-1'
                 }`}
                 style={{
-                  borderColor: isSelected ? 'var(--accent)' : isBad ? 'rgba(239,68,68,0.3)' : isWarn ? 'rgba(245,158,11,0.3)' : 'var(--border-subtle)',
+                  borderColor: isSelected ? 'var(--accent)' : isBad ? 'rgba(255,77,61,0.3)' : isWarn ? 'rgba(255,176,32,0.3)' : 'var(--border-subtle)',
                 }}
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">

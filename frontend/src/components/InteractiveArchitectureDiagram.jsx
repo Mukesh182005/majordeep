@@ -15,7 +15,7 @@ export function InteractiveArchitectureDiagram() {
       id: 'tier-ingestion',
       name: 'Tier 1: Evidence Ingestion & Cryptographic Custody',
       badge: 'Security & Integrity',
-      color: '#0284c7', // Sky
+      color: '#2e9f6a', // Sky
       borderColor: 'border-l-sky-500',
       badgeStyle: 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/30',
       numBg: 'bg-sky-500 text-white',
@@ -79,7 +79,7 @@ export function InteractiveArchitectureDiagram() {
       id: 'tier-orchestration',
       name: 'Tier 2: Async Orchestration & GPU Task Dispatch',
       badge: 'Concurrency Engine',
-      color: '#3b82f6', // Blue
+      color: '#57c690', // Blue
       borderColor: 'border-l-blue-500',
       badgeStyle: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30',
       numBg: 'bg-blue-500 text-white',
@@ -117,7 +117,7 @@ export function InteractiveArchitectureDiagram() {
       id: 'tier-engines',
       name: 'Tier 3: Tri-Modal Forensic Analysis Engines (27 Stages)',
       badge: 'Core Neural & Physical Probes',
-      color: '#8b5cf6', // Purple
+      color: '#43b6a1', // Purple
       borderColor: 'border-l-purple-500',
       badgeStyle: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30',
       numBg: 'bg-purple-500 text-white',
@@ -133,7 +133,7 @@ export function InteractiveArchitectureDiagram() {
           inputs: 'RGB Image Tensor (H × W × 3)',
           outputs: 'CFA Ratio, Fourier Slope, ELA Heatmap, ViT Feature Vector, Calibrated Score',
           formula: 'R_{CFA} = P_{peak} / μ_{noise} > 1.5 ∧ α = -∂ log E(f)/∂ log f',
-          standard: 'Popescu & Farid CFA Corroboration / ISO 27037',
+          standard: 'Popescu & Farid CFA Corroboration',
           complexity: '120ms - 280ms GPU Ingestion',
         },
         {
@@ -168,7 +168,7 @@ export function InteractiveArchitectureDiagram() {
       id: 'tier-governance',
       name: 'Tier 4: Provenance, Corroboration & Evidentiary Policy',
       badge: 'Phase 31.6 False-Positive Safe Policy',
-      color: '#10b981', // Emerald
+      color: '#23f871', // Emerald
       borderColor: 'border-l-emerald-500',
       badgeStyle: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
       numBg: 'bg-emerald-500 text-white',
@@ -184,7 +184,7 @@ export function InteractiveArchitectureDiagram() {
           inputs: 'Media Container Bitstream',
           outputs: 'C2PA Manifest Status, CA Signer Validity, Provenance Edit Tree',
           formula: 'VerifySignature(C2PA_JUMBF, Root_CA) ∧ ValidateHashBinding(MediaHash)',
-          standard: 'C2PA Technical Specification v1.3 / ISO 27037',
+          standard: 'C2PA Technical Specification v1.3',
           complexity: 'O(1) JUMBF Box Traversal',
         },
         {
@@ -248,7 +248,7 @@ export function InteractiveArchitectureDiagram() {
           inputs: 'Analysis Result, Telemetry Graphs, Case Identifiers',
           outputs: 'Vector PDF Document with Embedded Cryptographic Signatures',
           formula: 'ReportLab.build_report(case_id, evidence)',
-          standard: 'Federal Rules of Evidence 901 & 902 / ISO 27037',
+          standard: 'SHA-256 file hash recorded in the report',
           complexity: '180ms PDF Compilation',
         },
       ],
@@ -292,7 +292,7 @@ export function InteractiveArchitectureDiagram() {
               { id: 'image', label: 'Spatial (Image)' },
               { id: 'audio', label: 'Acoustic (Audio)' },
               { id: 'video', label: 'Temporal (Video)' },
-              { id: 'custody', label: 'ISO 27037 Custody' },
+              { id: 'custody', label: 'File hash' },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -342,9 +342,9 @@ export function InteractiveArchitectureDiagram() {
           <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30 z-0">
             <defs>
               <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0284c7" stopOpacity="0.8" />
-                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
+                <stop offset="0%" stopColor="#2e9f6a" stopOpacity="0.8" />
+                <stop offset="50%" stopColor="#43b6a1" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#23f871" stopOpacity="0.8" />
               </linearGradient>
             </defs>
             <path

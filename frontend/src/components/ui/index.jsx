@@ -4,14 +4,16 @@ import { useState } from 'react'
 /** Panel with an optional title and subtitle. */
 export function Card({ title, subtitle, action, children, className = '', pad = true }) {
   return (
-    <section className={`corner-bracket tethered-bento border-none relative bg-surface-1 shadow-lg ${pad ? 'p-6' : ''} ${className}`}>
-      {/* 1px SVG wire connecting cards */}
-      <div className="tether-line tether-line-bottom"></div>
-      
+    <section className={`card relative ${pad ? 'p-6' : ''} ${className}`}>
       {(title || action) && (
-        <header className={`flex items-start justify-between gap-4 ${children ? 'mb-4 border-b pb-4' : ''}`} style={{ borderColor: 'var(--border-subtle)' }}>
+        <header className={`flex items-start justify-between gap-4 ${children ? 'mb-4 border-b-2 pb-4' : ''}`} style={{ borderColor: 'var(--border-subtle)' }}>
           <div>
-            {title && <h2 className="text-sm font-bold tracking-tight text-ink-primary font-mono uppercase">{title}</h2>}
+            {title && (
+              <h2 className="flex items-center gap-2 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-ink-primary">
+                <span className="h-2 w-2" style={{ background: 'var(--acid)' }} />
+                {title}
+              </h2>
+            )}
             {subtitle && <p className="text-xs text-ink-muted mt-1">{subtitle}</p>}
           </div>
           {action}
@@ -171,10 +173,10 @@ export function SplitLoupeOverlay({ url, alt, inspectZoom }) {
       </div>
 
       <div 
-        className="absolute top-0 bottom-0 w-px bg-accent pointer-events-none drop-shadow-[0_0_8px_rgba(0,229,255,0.8)] z-20"
+        className="absolute top-0 bottom-0 w-px bg-accent pointer-events-none drop-shadow-[0_0_8px_rgba(35,248,113,0.8)] z-20"
         style={{ left: `calc(${sliderPos}%)` }}
       >
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-accent bg-black/40 backdrop-blur-md flex items-center justify-center cursor-ew-resize pointer-events-auto shadow-[0_0_15px_rgba(0,229,255,0.5)]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-accent bg-black/40 backdrop-blur-md flex items-center justify-center cursor-ew-resize pointer-events-auto shadow-[0_0_15px_rgba(35,248,113,0.5)]">
            <div className="w-0.5 h-3 bg-accent rounded-full"></div>
         </div>
       </div>

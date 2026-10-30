@@ -15,21 +15,21 @@ export const IMAGE_PHASES = [
     phaseId: 1,
     name: 'Ingestion & Ledger',
     stages: [1, 2],
-    color: '#00E5FF',
+    color: '#23f871',
     desc: 'Format MIME validation & SHA-256 / pHash cryptographic bind'
   },
   {
     phaseId: 2,
     name: 'Metadata & Sensor Physics',
     stages: [3, 4],
-    color: '#3B82F6',
+    color: '#57c690',
     desc: 'EXIF timeline consistency, PRNU sensor noise & CFA Bayer demosaicing'
   },
   {
     phaseId: 3,
     name: 'Structural Tampering & Stego',
     stages: [5, 7],
-    color: '#8B5CF6',
+    color: '#43b6a1',
     desc: 'Copy-move keypoint matching, boundary splicing & LSB entropy'
   },
   {
@@ -186,18 +186,18 @@ export default function PipelineAuditVisualizer({
       case 'ANOMALY_DETECTED':
       case 'FAILED':
         return {
-          color: '#ef4444',
-          bg: 'rgba(239, 68, 68, 0.12)',
-          border: 'rgba(239, 68, 68, 0.35)',
+          color: '#ff4d3d',
+          bg: 'rgba(255,77,61, 0.12)',
+          border: 'rgba(255,77,61, 0.35)',
           badge: 'AI FLAGGED',
           badgeBg: 'bg-rose-500/20 text-rose-500 dark:text-rose-400 border-rose-500/30'
         }
       case 'SUSPICIOUS':
       case 'INCONCLUSIVE':
         return {
-          color: '#f59e0b',
-          bg: 'rgba(245, 158, 11, 0.12)',
-          border: 'rgba(245, 158, 11, 0.35)',
+          color: '#ffb020',
+          bg: 'rgba(255,176,32, 0.12)',
+          border: 'rgba(255,176,32, 0.35)',
           badge: 'SUSPICIOUS',
           badgeBg: 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border-amber-500/30'
         }
@@ -212,9 +212,9 @@ export default function PipelineAuditVisualizer({
       case 'PASSED':
       default:
         return {
-          color: '#10b981',
-          bg: 'rgba(16, 185, 129, 0.12)',
-          border: 'rgba(16, 185, 129, 0.35)',
+          color: '#23f871',
+          bg: 'rgba(35,248,113, 0.12)',
+          border: 'rgba(35,248,113, 0.35)',
           badge: 'PASSED',
           badgeBg: 'bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 border-emerald-500/30'
         }

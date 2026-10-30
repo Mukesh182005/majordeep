@@ -23,7 +23,7 @@ export const VIDEO_PIPELINE_STAGES = [
   { id: 11, stage: 11, name: 'AI Generator Attribution (unvalidated)',         desc: 'Intrinsic physical & latent diffusion matching (unvalidated heuristic: hand-set profiles, not tested on labelled video)' },
 ]
 
-function VideoScoreBar({ value = 0, color = '#ff3860', label, sub }) {
+function VideoScoreBar({ value = 0, color = '#ff4d3d', label, sub }) {
   const pct = Math.round(value * 100)
   return (
     <div>
@@ -205,7 +205,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                   const score = track.score ?? track.fake_probability ?? track.top_25_pct_mean ?? 0
                   const pct = Math.round(score * 100)
                   const isFlagged = score >= 0.50
-                  const color = isFlagged ? '#ff3860' : '#22c55e'
+                  const color = isFlagged ? '#ff4d3d' : '#22c55e'
                   const frames = track.frames_analyzed ?? track.frame_count ?? track.frames_tracked ?? track.frames?.length ?? '–'
                   const timeRange = (track.start_s != null && track.end_s != null)
                     ? `t=${track.start_s.toFixed(2)}s – ${track.end_s.toFixed(2)}s`
@@ -215,7 +215,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                     <div
                       key={tId}
                       className="p-3.5 rounded-xl border bg-surface-2 flex flex-col justify-between gap-2.5"
-                      style={{ borderColor: isFlagged ? 'rgba(255,56,96,0.35)' : 'var(--border-subtle)' }}
+                      style={{ borderColor: isFlagged ? 'rgba(255,77,61,0.35)' : 'var(--border-subtle)' }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -230,9 +230,9 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                         <span
                           className="px-2 py-0.5 rounded text-[0.625rem] font-black uppercase mono border"
                           style={{
-                            background: isFlagged ? 'rgba(255,56,96,0.15)' : 'rgba(34,197,94,0.15)',
+                            background: isFlagged ? 'rgba(255,77,61,0.15)' : 'rgba(34,197,94,0.15)',
                             color,
-                            borderColor: isFlagged ? 'rgba(255,56,96,0.3)' : 'rgba(34,197,94,0.3)',
+                            borderColor: isFlagged ? 'rgba(255,77,61,0.3)' : 'rgba(34,197,94,0.3)',
                           }}
                         >
                           {track.status || (isFlagged ? 'FLAGGED' : 'AUTHENTIC')}
@@ -330,8 +330,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
           {hasThreat && (
             <div className="p-5 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm"
                  style={{
-                   background: 'rgba(255,56,96,0.08)',
-                   borderColor: 'rgba(255,56,96,0.3)',
+                   background: 'rgba(255,77,61,0.08)',
+                   borderColor: 'rgba(255,77,61,0.3)',
                  }}>
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -346,9 +346,9 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
               <div className="flex items-center gap-3">
                 <span className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider mono border"
                       style={{
-                        background: 'rgba(255,56,96,0.15)',
-                        color: '#ff3860',
-                        borderColor: 'rgba(255,56,96,0.3)',
+                        background: 'rgba(255,77,61,0.15)',
+                        color: '#ff4d3d',
+                        borderColor: 'rgba(255,77,61,0.3)',
                       }}>
                   {threatCode}
                 </span>
@@ -520,8 +520,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                     onClick={() => setActiveSubTab('pipeline')}
                     className="cursor-pointer rounded-xl border p-3 flex flex-col justify-between transition hover:border-accent hover:shadow-sm"
                     style={{
-                      borderColor: isBad ? 'rgba(255,56,96,0.35)' : isWarn ? 'rgba(255,176,32,0.35)' : 'var(--border-subtle)',
-                      background: isBad ? 'rgba(255,56,96,0.04)' : isWarn ? 'rgba(255,176,32,0.04)' : 'var(--surface-2)',
+                      borderColor: isBad ? 'rgba(255,77,61,0.35)' : isWarn ? 'rgba(255,176,32,0.35)' : 'var(--border-subtle)',
+                      background: isBad ? 'rgba(255,77,61,0.04)' : isWarn ? 'rgba(255,176,32,0.04)' : 'var(--surface-2)',
                     }}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -680,19 +680,19 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                     className="px-2.5 py-1 rounded-md text-[0.625rem] font-black uppercase mono border"
                     style={{
                       background: rppg.biometric_pulse_detected
-                        ? 'rgba(143,230,42,0.15)'
+                        ? 'rgba(35,248,113,0.15)'
                         : rppg.is_synthetic_biometric_void
-                        ? 'rgba(255,56,96,0.15)'
+                        ? 'rgba(255,77,61,0.15)'
                         : 'rgba(234,179,8,0.15)',
                       color: rppg.biometric_pulse_detected
-                        ? '#8fe62a'
+                        ? '#23f871'
                         : rppg.is_synthetic_biometric_void
-                        ? '#ff3860'
+                        ? '#ff4d3d'
                         : '#eab308',
                       borderColor: rppg.biometric_pulse_detected
-                        ? 'rgba(143,230,42,0.3)'
+                        ? 'rgba(35,248,113,0.3)'
                         : rppg.is_synthetic_biometric_void
-                        ? 'rgba(255,56,96,0.3)'
+                        ? 'rgba(255,77,61,0.3)'
                         : 'rgba(234,179,8,0.3)',
                     }}
                   >
@@ -714,7 +714,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                 <span className="text-[0.625rem] font-bold uppercase text-ink-muted">Biological Plausibility</span>
                 <div
                   className="text-2xl font-black mono"
-                  style={{ color: rppg.biometric_pulse_detected ? '#8fe62a' : '#ff3860' }}
+                  style={{ color: rppg.biometric_pulse_detected ? '#23f871' : '#ff4d3d' }}
                 >
                   {Math.round((rppg.biological_plausibility_score ?? 0.5) * 100)}%
                 </div>
@@ -769,7 +769,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                     {/* Polyline */}
                     <polyline
                       fill="none"
-                      stroke={rppg.biometric_pulse_detected ? '#8fe62a' : '#ff3860'}
+                      stroke={rppg.biometric_pulse_detected ? '#23f871' : '#ff4d3d'}
                       strokeWidth="2.5"
                       points={rppg.pulse_waveform.map((pt, i, arr) => `${(i / Math.max(1, arr.length - 1)) * 500},${100 - pt.val}`).join(' ')}
                     />
@@ -933,7 +933,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                       const isWarn = s.fake_probability >= 0.35
                       const color = isBad ? 'var(--status-critical)' : isWarn ? 'var(--status-warn)' : 'var(--status-good)'
                       return (
-                        <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)', background: isWorst ? 'rgba(255,56,96,0.07)' : 'transparent' }}>
+                        <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)', background: isWorst ? 'rgba(255,77,61,0.07)' : 'transparent' }}>
                           <td className="px-3 py-2 mono font-semibold text-ink-secondary">
                             {isWorst && <span className="mr-1 text-red-500 font-bold">▶</span>}
                             #{s.frame_index}
@@ -1038,7 +1038,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
             <div className="mt-3 space-y-4">
               <VideoScoreBar
                 value={motion}
-                color={motion >= 0.40 ? '#ff3860' : motion >= 0.20 ? '#ffb020' : '#22c55e'}
+                color={motion >= 0.40 ? '#ff4d3d' : motion >= 0.20 ? '#ffb020' : '#22c55e'}
                 label="Motion Vector Boundary Divergence"
                 sub="High variance indicates discontinuous velocity vectors between synthesized face pixels and background scene."
               />
@@ -1051,7 +1051,7 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
 
           {evidence.heatmap_url && (
             <Card title="Grad-CAM Spatial Attribution — Worst Frame" subtitle={`Gradient activation on worst-scoring frame (t=${evidence.worst_frame_timestamp_s?.toFixed(2)}s)`}>
-              <div className="mt-3 overflow-hidden rounded-xl border relative select-none cursor-ew-resize group h-[480px]" style={{ borderColor: 'rgba(255,56,96,0.3)', background: 'black' }}>
+              <div className="mt-3 overflow-hidden rounded-xl border relative select-none cursor-ew-resize group h-[480px]" style={{ borderColor: 'rgba(255,77,61,0.3)', background: 'black' }}>
                 <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ filter: 'grayscale(100%) contrast(1.2) brightness(0.6)' }}>
                   <AuthedImage src={evidence.heatmap_url} alt="Structure" className="w-full h-full object-contain" />
                 </div>
@@ -1084,8 +1084,8 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
           <Card title="Physical Screen-Recording & Display Artifact Analysis" subtitle="High-frequency 2D FFT moiré harmonic peaks and window border clamping">
             <div className="mt-3 p-4 rounded-xl border flex items-center justify-between"
                  style={{
-                   background: container.screen_recording_analysis?.screen_recording_detected ? 'rgba(255,56,96,0.08)' : 'var(--surface-2)',
-                   borderColor: container.screen_recording_analysis?.screen_recording_detected ? 'rgba(255,56,96,0.3)' : 'var(--border-subtle)',
+                   background: container.screen_recording_analysis?.screen_recording_detected ? 'rgba(255,77,61,0.08)' : 'var(--surface-2)',
+                   borderColor: container.screen_recording_analysis?.screen_recording_detected ? 'rgba(255,77,61,0.3)' : 'var(--border-subtle)',
                  }}>
               <div>
                 <span className="text-[0.625rem] font-bold uppercase tracking-wider text-ink-muted">Display Capture Assessment</span>

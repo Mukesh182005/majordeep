@@ -1,0 +1,116 @@
+{
+ "base": "OwensLab/commfor-model-384",
+ "architecture": "vit_small_patch16_384",
+ "best_epoch": 10,
+ "best_val_auc": 0.9848406652766595,
+ "history": [
+  {
+   "epoch": 0,
+   "val_auc": 0.7983686913519081
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.7227381689180515,
+   "val_auc": 0.9626785390704384,
+   "minutes": 1.1436036149660747
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.3068757321434006,
+   "val_auc": 0.9752505338682338,
+   "minutes": 1.0062024156252543
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.25954246985759,
+   "val_auc": 0.9763675857687129,
+   "minutes": 1.0156619151433308
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.237649996049247,
+   "val_auc": 0.9762643674206195,
+   "minutes": 1.0136776963869731
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.20364916222798862,
+   "val_auc": 0.9781498225791283,
+   "minutes": 1.013944152990977
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.19323237888946218,
+   "val_auc": 0.9795902919703006,
+   "minutes": 1.0274068236351013
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.18032404439601676,
+   "val_auc": 0.9828107044308195,
+   "minutes": 1.0232759356498717
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.15754287195215272,
+   "val_auc": 0.9828863978860882,
+   "minutes": 1.019008719921112
+  },
+  {
+   "epoch": 9,
+   "train_loss": 0.14831866738401425,
+   "val_auc": 0.9822143317529459,
+   "minutes": 1.0216268261273702
+  },
+  {
+   "epoch": 10,
+   "train_loss": 0.135894415232314,
+   "val_auc": 0.9848406652766595,
+   "minutes": 1.0468909899393717
+  },
+  {
+   "epoch": 11,
+   "train_loss": 0.13512063631937626,
+   "val_auc": 0.9840653807954235,
+   "minutes": 1.0525819698969523
+  },
+  {
+   "epoch": 12,
+   "train_loss": 0.12744356141129204,
+   "val_auc": 0.9839117001438176,
+   "minutes": 1.060053296883901
+  }
+ ],
+ "train_n": 9955,
+ "val_n": 1326,
+ "train_generators": [
+  "FLUX.2",
+  "GPT Image 2",
+  "Nano Banana 2"
+ ],
+ "unseen_test_generator": "Qwen Image 2.1",
+ "replay": "evaluation/E2E-01/image_manifest.csv dev half",
+ "shortcut_control": "random resize + JPEG q60-95 on every image",
+ "extra_root": "C:\\deepsentinel_data\\MLLM_extra",
+ "strong_aug": true,
+ "lr": 2e-05,
+ "epochs": 12,
+ "batch": 32,
+ "git_commit": "0724a545c2dacc060e608d3afc5341a1214fa7ef",
+ "utc_time": "2026-10-29T07:16:16+00:00",
+ "data_licence": "zr-zhang/MLLM-Generated-Image-Detection-Dataset: research use only",
+ "calibration": {
+  "logit_bias": 5.201518030166624,
+  "rule": "at most 1% of validation real images >= 0.5",
+  "n_val_real": 723,
+  "n_val_ai": 603,
+  "val_before": {
+   "real_flagged": 0.1590594744121715,
+   "ai_caught": 0.9751243781094527
+  },
+  "val_after": {
+   "real_flagged": 0.011065006915629323,
+   "ai_caught": 0.835820895522388
+  }
+ }
+}

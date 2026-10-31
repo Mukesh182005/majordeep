@@ -402,6 +402,16 @@ export default function VideoForensicsView({ result, activeSubTab, setActiveSubT
                       {gendRan ? `${Math.round(gendMean * 100)}% / ${Math.round(gendMax * 100)}%` : 'No face found: not applicable'}
                     </span>
                   </div>
+                  {evidence.aivideo && (
+                    <div className="flex justify-between" data-testid="aivideo-score">
+                      <span className="text-ink-secondary">
+                        AI-video detector{evidence.aivideo.in_verdict ? '' : ' (shown only)'}:
+                      </span>
+                      <span className="mono font-bold text-ink-primary">
+                        {Math.round(evidence.aivideo.probability * 100)}% (threshold {Math.round(evidence.aivideo.threshold * 100)}%)
+                      </span>
+                    </div>
+                  )}
                   {Array.isArray(evidence.scene_frame_scores) && (
                     <div className="flex justify-between">
                       <span className="text-ink-secondary">Scene AI frames scored:</span>

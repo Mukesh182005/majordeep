@@ -24,6 +24,7 @@ import torch
 from PIL import Image
 
 from app.config import settings
+from app.ml.aivideo import score_video_frames
 from app.ml.base import AnalysisResult
 from app.ml.faces import extract_faces
 from app.ml.gend import score_faces, square_face_crop
@@ -186,6 +187,14 @@ def analyze_video(
                                        "scene_ai_prob": round(float(scene["scene_ai_prob"]), 4)})
     if scene_frame_scores:
         vit_genai_prob = float(np.mean([s["scene_ai_prob"] for s in scene_frame_scores]))
+    # AI-generated video detector on the same frames (off without its trained head).
+    aivideo_info = None
+    try:
+        aivideo_info = score_video_frames([frames_pil[i][1] for i in scene_idx])
+    except Exception as exc:
+        logger.warning("AI-video detector failed on job %s: %s", job_id, exc)
+    if aivideo_info is not None:
+        aivideo_info = {**{k: round(x, 4) for k, x in aivideo_info.items()}, "in_verdict": settings.aivideo_in_verdict}
     else:
         logger.warning("No scene detector available for video job %s; scene AI score omitted.", job_id)
 
@@ -385,6 +394,7 @@ def analyze_video(
         rppg_info=rppg_info,
         spatiotemporal_info=spatiotemporal_info,
         lip_forensics_info=lip_forensics_info,
+        aivideo_info=aivideo_info,
     )
 
     # ── Generate Visual Evidence Artifacts ───────────────────────────────────────
@@ -450,6 +460,7 @@ def analyze_video(
             "lip_forensics": lip_forensics_info,
             "vit_genai_prob": round(vit_genai_prob, 4),
             "scene_frame_scores": scene_frame_scores,
+            "aivideo": aivideo_info,
             "gend_face_mean": None if gend_face_mean is None else round(gend_face_mean, 4),
             "gend_face_max": None if gend_face_max is None else round(gend_face_max, 4),
             "gend_faces_scored": len(gend_scores),

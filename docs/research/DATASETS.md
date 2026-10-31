@@ -76,6 +76,18 @@ Every count below is read from the file named next to it.
 - **Source and licence:** Hugging Face `34data/gen-videos-veo3` and `34data/gen-videos-hunyuanvideo`. Their
   licence was not checked; used for evaluation only, nothing is redistributed.
 
+### AI-video detector training data (round 3)
+
+- **Role:** training and validation of the AI-video detector (`ml/training/train_aivideo.py`,
+  `evaluation/AIVIDEO-01`); manifest written by the round-3 build step, splits by recording.
+- **AI-generated:** Hugging Face `34data/gen-videos-hunyuanvideo`, `34data/gen-videos-kling` (data_001),
+  `34data/gen-videos-fastwan2` (data_002); up to 400 clips each, seed 0. Veo 3 (`34data/gen-videos-veo3`) is
+  test only.
+- **Real:** Hugging Face `34data/ucf50` (UCF50 action clips, split by original-video group `_gNN`),
+  `34data/vidor` (data_001, user videos), and the DFD real videos not in `DFD_heldout80` (split by actor).
+- **Licences:** not checked for any of these copies; the trained head is a derived artefact, so check the
+  licences before any commercial deployment.
+
 ### LibriSpeech dev-clean (genuine speech)
 
 - **Role:** extra bona fide training clips for the rejected second audio fine-tune (`evaluation/AUDIO-FT2-01`).

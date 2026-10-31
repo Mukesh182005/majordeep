@@ -87,7 +87,8 @@ def _record(media: str, item: dict, result, latency_s: float) -> dict:
                    legacy_face_mean=float(sum(legacy) / len(legacy)) if legacy else None,
                    legacy_face_max=max(legacy) if legacy else None,
                    face_frames=sum(1 for f in frames if f.get("face_detected")), frames=len(frames),
-                   scene_ai=ev.get("vit_genai_prob"), scene_frames=len(ev.get("scene_frame_scores") or []))
+                   scene_ai=ev.get("vit_genai_prob"), scene_frames=len(ev.get("scene_frame_scores") or []),
+                   aivideo=ev.get("aivideo"))
     else:
         mo = ev.get("models_output") or {}
         rec["codec"] = item.get("codec")

@@ -110,6 +110,9 @@ class Settings(BaseSettings):
     # 2026-10-29 although it exceeds the pre-set +2-point limit by one video.
     gend_in_verdict: bool = True
     video_scene_frames: int = 8  # frames scored by the scene AI detectors per video (was 1)
+    # AI-generated video detector (app/ml/aivideo.py): runs when checkpoints/aivideo_clip/head.json
+    # exists; decides the verdict only when this is true (evaluation/ROUND3-RULES.md).
+    aivideo_in_verdict: bool = False
     # Audio model stage. "lcnn_asvspoof" (default): the ASVspoof 2019 LA-trained
     # LCNN chosen on dev, with the dev-fitted calibration and checkpoint hash in
     # audio_lcnn_calibration_file and the verdict rule frozen on dev in

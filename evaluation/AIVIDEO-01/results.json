@@ -1,0 +1,56 @@
+{
+ "threshold": 0.37464654445648193,
+ "n_test": 442,
+ "auc": 1.0,
+ "real_flagged": 0.0,
+ "fake_flagged": 0.9962406015037594,
+ "flagged_by_source": {
+  "dfd_real": {
+   "n": 47,
+   "flagged": 0.0
+  },
+  "ucf50": {
+   "n": 72,
+   "flagged": 0.0
+  },
+  "veo3": {
+   "n": 266,
+   "flagged": 0.9962406015037594
+  },
+  "vidor": {
+   "n": 57,
+   "flagged": 0.0
+  }
+ },
+ "head_metadata": {
+  "encoder": "openai/clip-vit-large-patch14",
+  "features": "mean, std, mean |consecutive diff| of L2-normalised frame embeddings",
+  "weight_decay": 0.0001,
+  "val_auc": 0.9999255176523164,
+  "val_fake_flagged": 0.9948979591836735,
+  "val_real_flagged": 0.014598540145985401,
+  "val_flagged_by_source": {
+   "dfd_real": 0.0,
+   "fastwan2": 0.9859154929577465,
+   "hunyuanvideo": 1.0,
+   "kling": 1.0,
+   "ucf50": 0.0,
+   "vidor": 0.03278688524590164
+  },
+  "max_real_val": 0.02,
+  "n_train": 1506,
+  "n_val": 333,
+  "train_sources": [
+   "dfd_real",
+   "fastwan2",
+   "hunyuanvideo",
+   "kling",
+   "ucf50",
+   "vidor"
+  ],
+  "features_files": [
+   "C:\\deepsentinel_data\\AIVID_train\\features.npz"
+  ],
+  "git_commit": "de835ec082ccfc9c0053ad24a2c1fbb92ee9b280"
+ }
+}

@@ -128,4 +128,12 @@ describe('VideoForensicsView with GenD', () => {
     render(<VideoForensicsView result={result} activeSubTab="summary" setActiveSubTab={() => {}} />)
     expect(screen.getByTestId('gend-face-score')).toHaveTextContent(/No face found: not applicable/)
   })
+
+  it('shows the AI-video detector score and whether it is in the verdict', () => {
+    const evidence = { ...realVideoFaceswapResult.evidence, aivideo: { probability: 0.91, threshold: 0.37, in_verdict: false } }
+    render(<VideoForensicsView result={{ ...realVideoFaceswapResult, evidence }} activeSubTab="summary" setActiveSubTab={() => {}} />)
+    const row = screen.getByTestId('aivideo-score')
+    expect(row).toHaveTextContent(/AI-video detector \(shown only\)/)
+    expect(row).toHaveTextContent('91% (threshold 37%)')
+  })
 })

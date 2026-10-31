@@ -241,6 +241,21 @@ MANIPULATED 14/80 (Veo 3 10/40, HunyuanVideo 4/40), INCONCLUSIVE 11/80; verdict 
 reliably detect fully generated video: GenD only scores faces, and the scene detectors are image models. The real
 and AI clips come from different sources, so these numbers are indicative only.
 
+**AI-video detector** (round 3, `evaluation/AIVIDEO-01/`; rules in `evaluation/ROUND3-RULES.md`): a logistic
+regression on CLIP ViT-L/14 features of 8 frames, trained on HunyuanVideo, Kling and FastWan 2 clips against UCF50,
+vidor and DFD real clips; Veo 3 is held out. Model level (`results.json`, test split): Veo 3 265/266 flagged; real
+test clips 0/176 (UCF50 0/72, vidor 0/57, DFD 0/47); AUC 1.000. Full pipeline with `AIVIDEO_IN_VERDICT=true`
+(`summary.json`):
+
+| Set | Called MANIPULATED, detector on | Detector off |
+|---|---|---|
+| Veo 3 (40, unseen generator) | 40 / 40 | 10 / 40 |
+| Real DFD held-out (40) | 2 / 40 | 1 / 40 |
+| DFD face swaps (40) | 30 / 40 | 29 / 40 |
+
+The rule allowed at most 1 of 40 real videos flagged, so the detector is shown on every result but not in the
+verdict by default. All AI clips come from one collection; real-world AI video may differ.
+
 Not measured: real videos from phones or WhatsApp.
 
 ## 7. Audio: pellav2 compared with the LCNN

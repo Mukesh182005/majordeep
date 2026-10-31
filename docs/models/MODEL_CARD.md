@@ -117,6 +117,7 @@ Glottal-flow, voice-quality, mains-hum (ENF), splice-timeline, container and wat
 | **Face crop** | MTCNN detection box, enlarged 1.3x and squared, as the authors crop (`app/ml/gend.py`) |
 | **Face score** | Mean GenD P(fake) over the sampled face frames (the paper's video protocol); the worst frame is shown, not used |
 | **Scene AI** | The image scene detectors on 8 evenly spaced frames, averaged |
+| **AI-video detector** | Logistic regression on CLIP ViT-L/14 features of the same 8 frames, trained here (`ml/training/train_aivideo.py`) on HunyuanVideo, Kling, FastWan 2 and real UCF50 / vidor / DFD clips. Held-out Veo 3: 265 of 266 flagged, 0 of 176 real test videos (`evaluation/AIVIDEO-01/results.json`). Shown, not in the verdict by default: in the full pipeline it flagged 2 of 40 real DFD clips against a rule of at most 1 (`AIVIDEO_IN_VERDICT`) |
 | **Input** | Video sampled at 1 fps (default), up to 32 frames |
 | **Evaluation** | `docs/research/EVALUATION.md` section 6: face AUC 0.941 on 400 DFD videos; verdicts on 80 held-out DFD videos: 72.5 % of face swaps and 2.5 % of real videos called MANIPULATED |
 | **Not used in verdicts** | rPPG, LipForensics, generator profile match, optical flow and the StyleGAN face checkpoint are shown as unvalidated context |

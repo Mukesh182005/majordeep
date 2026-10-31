@@ -136,8 +136,15 @@ def fuse_video_forensics(
     rppg_info: dict[str, Any] | None = None,
     spatiotemporal_info: dict[str, Any] | None = None,
     lip_forensics_info: dict[str, Any] | None = None,
+    aivideo_info: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Execute multi-modal evidence fusion across all spatial, acoustic, temporal, biometric, and attribution layers."""
+    """Execute multi-modal evidence fusion across all spatial, acoustic, temporal, biometric, and attribution layers.
+
+    ``aivideo_info`` is the AI-generated video detector (app/ml/aivideo.py): ``probability``,
+    ``threshold`` and ``in_verdict``. It decides only when ``in_verdict`` is set.
+    """
+    aivideo_flag = bool(aivideo_info and aivideo_info.get("in_verdict")
+                        and aivideo_info["probability"] >= aivideo_info["threshold"])
     motion_score = float(motion_metrics.get("mean_motion_anomaly", 0.0))
     facial_jitter = float(facial_dynamics.get("landmark_jitter_score", 0.0))
     lipsync_anomaly = float(lipsync_info.get("lip_sync_anomaly_score", 0.0))
@@ -192,6 +199,11 @@ def fuse_video_forensics(
 
     if vit_genai_prob >= 0.65:
         signals.append(f"Full-scene Vision Transformer flagged generative AI raster on keyframes ({round(vit_genai_prob * 100, 1)}%)")
+
+    if aivideo_info:
+        signals.append(f"AI-video detector (CLIP frame features, trained here): {round(aivideo_info['probability'] * 100, 1)}% "
+                       f"(threshold {round(aivideo_info['threshold'] * 100, 1)}%"
+                       f"{'' if aivideo_info.get('in_verdict') else ', shown only, not in the verdict'})")
 
     if spatial_prob >= 0.70:
         signals.append(f"Spatial neural classifier flagged facial synthesis on keyframe crops ({round(spatial_prob * 100, 1)}%)")
@@ -254,7 +266,12 @@ def fuse_video_forensics(
     is_synthetic_ai = bool(ai_tool) or vit_genai_prob >= 0.75
     profile_says_ai = bool(attribution_info and attribution_info.get("is_ai_generated"))
 
-    if is_synthetic_ai:
+    if aivideo_flag and not bool(ai_tool):
+        dominant_threat = "AI-Generated Video Media (AI-video detector)"
+        threat_code = "AI_GENERATED_VIDEO"
+        category_name = "AI Generated Video"
+        final_prob = max(final_prob, 0.88)
+    elif is_synthetic_ai:
         dominant_threat = (f"AI-Generated Video Media (scene detectors, not validated on video; "
                            f"unvalidated profile match: {predicted_platform})")
         threat_code = "AI_GENERATED_VIDEO"
@@ -368,7 +385,7 @@ def fuse_video_forensics(
         notes.append(f"Corroborating indicators: {'; '.join(signals[:3])}")
     # Fully generated video has no labelled test set here (KNOWN_ISSUES #19): say so whenever the
     # scene detectors, measured on still images, are what the verdict rests on.
-    if vit_genai_prob >= 0.50 and spatial_prob < 0.50:
+    if vit_genai_prob >= 0.50 and spatial_prob < 0.50 and not aivideo_flag:
         notes.append(
             "AI-generated video detection rests on the image scene detectors averaged over sampled frames; "
             "they were measured on still images, not on video, so this result is not validated for video."

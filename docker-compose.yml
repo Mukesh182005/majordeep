@@ -92,6 +92,7 @@ services:
       GEND_ENABLED: ${GEND_ENABLED:-true}
       GEND_IN_VERDICT: ${GEND_IN_VERDICT:-true}
       VIDEO_SCENE_FRAMES: ${VIDEO_SCENE_FRAMES:-8}
+      AIVIDEO_IN_VERDICT: ${AIVIDEO_IN_VERDICT:-false}
       TRUFOR_CACHE_DIR: /app/.cache/huggingface/trufor
     volumes:
       # Shared with the worker: the API writes uploads, the worker reads them

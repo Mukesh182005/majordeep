@@ -83,6 +83,7 @@ test.describe('analysis @slow', () => {
     expect(result.evidence.frames_analysed).toBeGreaterThan(0)
     expect(result.evidence.scene_frame_scores.length).toBeGreaterThan(1)
     expect(result.evidence).toHaveProperty('gend_face_mean') // null when no face is found (synthetic clip)
+    expect(result.evidence).toHaveProperty('aivideo') // null without checkpoints/aivideo_clip/head.json
   })
 
   test('signed-in history lists and deletes a job, and its files are gone', async ({ page }) => {

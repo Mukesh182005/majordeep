@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased] — 2026-10-31
+
+Every number below is from a file in `evaluation/`; rules fixed before training in `evaluation/ROUND3-RULES.md`.
+
+### Added
+- Video: AI-generated video detector (CLIP ViT-L/14 frame features + logistic regression, trained here). On the
+  held-out generator Veo 3 it flags 265 of 266 clips and 0 of 176 real test clips (`evaluation/AIVIDEO-01`).
+  Its score is shown on every video result. In the full pipeline it raised Veo 3 called MANIPULATED from 10/40 to
+  40/40 and face swaps 29/40 -> 30/40, but real DFD clips 1/40 -> 2/40, which fails the rule (at most 1/40), so it
+  is not in the verdict by default (`AIVIDEO_IN_VERDICT=false`).
+- The end-to-end evaluator records the AI-video detector score per video.
+
+### Not done this round
+- Image fine-tune v5: not enough disk for new real photos plus the newest-generator images it needs.
+- Audio: no change (no phone recordings of the user's own to test against).
+
 ## [Unreleased] — 2026-10-29
 
 Every number below is from a file in `evaluation/`; details in `docs/research/EVALUATION.md`.

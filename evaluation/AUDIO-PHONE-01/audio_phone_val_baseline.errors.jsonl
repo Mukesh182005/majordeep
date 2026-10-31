@@ -1,0 +1,103 @@
+{"id": "real/commonvoice/common_voice_de_38039822.mp3", "error": "MemoryError((513, 688), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38039885.mp3", "error": "MemoryError((513, 872), dtype('float32'))"}
+{"id": "real/commonvoice/common_voice_de_38039899.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38039943.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38039975.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38040004.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38040051.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38040063.mp3", "error": "MemoryError((156672,), dtype('float32'))"}
+{"id": "real/commonvoice/common_voice_de_38092063.mp3", "error": "MemoryError((1025, 221), dtype('float64'))"}
+{"id": "real/commonvoice/common_voice_de_38092072.mp3", "error": "MemoryError((1025, 155), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38092073.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38092076.mp3", "error": "MemoryError((1025, 204), dtype('float64'))"}
+{"id": "real/commonvoice/common_voice_de_38092095.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38092100.mp3", "error": "MemoryError((1025, 185), dtype('float64'))"}
+{"id": "real/commonvoice/common_voice_de_38094367.mp3", "error": "MemoryError((800, 340), dtype('float32'))"}
+{"id": "real/commonvoice/common_voice_de_38094378.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38094388.mp3", "error": "MemoryError((1025, 172), dtype('float64'))"}
+{"id": "real/commonvoice/common_voice_de_38094401.mp3", "error": "MemoryError((1025, 174), dtype('float64'))"}
+{"id": "real/commonvoice/common_voice_de_38094491.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38094505.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38094512.mp3", "error": "MemoryError((1025, 165), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38094523.mp3", "error": "MemoryError((1025, 185), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38094535.mp3", "error": "MemoryError((1025, 205), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38094542.mp3", "error": "MemoryError((1025, 253), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38094554.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38094561.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38094573.mp3", "error": "MemoryError((130, 1025), dtype('float64'))"}
+{"id": "real/commonvoice/common_voice_de_38094600.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38094601.mp3", "error": "MemoryError((513, 410), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38094634.mp3", "error": "MemoryError((4096, 115), dtype('float32'))"}
+{"id": "real/commonvoice/common_voice_de_38094638.mp3", "error": "MemoryError((1025, 191), dtype('complex64'))"}
+{"id": "real/commonvoice/common_voice_de_38094798.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38098677.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38098761.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38098772.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38098791.mp3", "error": "MemoryError()"}
+{"id": "real/commonvoice/common_voice_de_38099324.mp3", "error": "MemoryError((130, 1025), dtype('float64'))"}
+{"id": "real/nisqa/1_1080_2_7_001-ch6-speaker_seg17.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/1_1235_2_7_001-ch6-speaker_seg18.wav", "error": "MemoryError((576000,), dtype('float32'))"}
+{"id": "real/nisqa/1_1274_2_7_001-ch6-speaker_seg84.wav", "error": "MemoryError((576000,), dtype('float32'))"}
+{"id": "real/nisqa/1_1303_2_7_001-ch6-speaker_seg62.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/1_1356_2_7_001-ch6-speaker_seg82.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/1_1364_2_7_001-ch6-speaker_seg47.wav", "error": "MemoryError((384000,), dtype('float32'))"}
+{"id": "real/nisqa/1_283_2_7_001B-ch6-speaker_seg2.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/1_301_2_7_001-ch6-speaker_seg89.wav", "error": "MemoryError((384000,), dtype('float32'))"}
+{"id": "real/nisqa/1_413_2_7_001-ch6-speaker_seg29.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/1_460_2_7_001B-ch6-speaker_seg11.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/1_574_2_7_001-ch6-speaker_seg13.wav", "error": "MemoryError((384000,), dtype('float32'))"}
+{"id": "real/nisqa/1_69_2_7_001B-ch6-speaker_seg36.wav", "error": "MemoryError((576000,), dtype('float32'))"}
+{"id": "real/nisqa/1_702_2_7_001-ch6-speaker_seg62.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/1_794_2_7_001-ch6-speaker_seg71.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/1_802_2_7_001-ch6-speaker_seg65.wav", "error": "MemoryError((576000,), dtype('float32'))"}
+{"id": "real/nisqa/1_816_2_7_001-ch6-speaker_seg66.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/1_929_2_7_001-ch6-speaker_seg42.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/1_936_2_7_001-ch6-speaker_seg22.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/1_964_2_7_001-ch6-speaker_seg50.wav", "error": "MemoryError((384000,), dtype('float32'))"}
+{"id": "real/nisqa/1_982_2_7_001-ch6-speaker_seg27.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/1_987_2_7_001-ch6-speaker_seg29.wav", "error": "MemoryError((576000,), dtype('float32'))"}
+{"id": "real/nisqa/2_1067_2_7_001-ch6-speaker_seg17.wav", "error": "MemoryError((576000,), dtype('float32'))"}
+{"id": "real/nisqa/2_113_2_7_001-ch6-speaker_seg55.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_1202_2_7_001-ch6-speaker_seg107.wav", "error": "MemoryError((288000,), dtype('float32'))"}
+{"id": "real/nisqa/2_1329_2_7_001-ch6-speaker_seg11.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/2_1336_2_7_001-ch6-speaker_seg3.wav", "error": "MemoryError((384000,), dtype('float32'))"}
+{"id": "real/nisqa/2_16_2_7_001-ch6-speaker_seg41.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/2_17_2_7_001-ch6-speaker_seg113.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/2_1_2_7_001-ch6-speaker_seg93.wav", "error": "MemoryError((384000,), dtype('float32'))"}
+{"id": "real/nisqa/2_283_2_7_001-ch6-speaker_seg48.wav", "error": "MemoryError((576000,), dtype('float32'))"}
+{"id": "real/nisqa/2_29_2_7_001-ch6-speaker_seg37.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/2_389_2_7_001-ch6-speaker_seg61.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_464_2_7_001-ch6-speaker_seg97.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/2_467_2_7_001-ch6-speaker_seg47.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_616_2_7_001-ch6-speaker_seg61.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/2_708_2_7_001-ch6-speaker_seg1.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/2_708_2_7_001-ch6-speaker_seg15.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/2_727_2_7_001-ch6-speaker_seg46.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_750_2_7_001-ch6-speaker_seg23.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_918_2_7_001-ch6-speaker_seg66.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/2_959_2_7_001-ch6-speaker_seg75.wav", "error": "MemoryError((384000,), dtype('float32'))"}
+{"id": "real/nisqa/3_1035_2_7_001-ch6-speaker_seg23.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/3_1035_2_7_001-ch6-speaker_seg64.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/3_109_2_7_001-ch6-speaker_seg32.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/3_1262_2_7_001-ch6-speaker_seg13.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_1329_2_7_001-ch6-speaker_seg11.wav", "error": "MemoryError((1025, 219), dtype('float64'))"}
+{"id": "real/nisqa/2_1336_2_7_001-ch6-speaker_seg3.wav", "error": "MemoryError((2049, 251), dtype('complex64'))"}
+{"id": "real/nisqa/2_1_2_7_001-ch6-speaker_seg93.wav", "error": "MemoryError()"}
+{"id": "real/nisqa/2_283_2_7_001-ch6-speaker_seg48.wav", "error": "MemoryError()"}
+{"id": "real/nisqa/2_29_2_7_001-ch6-speaker_seg37.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/2_389_2_7_001-ch6-speaker_seg61.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_464_2_7_001-ch6-speaker_seg97.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/2_467_2_7_001-ch6-speaker_seg47.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/2_616_2_7_001-ch6-speaker_seg61.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/2_708_2_7_001-ch6-speaker_seg1.wav", "error": "MemoryError((432000,), dtype('float32'))"}
+{"id": "real/nisqa/2_708_2_7_001-ch6-speaker_seg15.wav", "error": "MemoryError((144000,), dtype('float64'))"}
+{"id": "real/nisqa/2_727_2_7_001-ch6-speaker_seg46.wav", "error": "MemoryError((160000,), dtype('float64'))"}
+{"id": "real/nisqa/2_750_2_7_001-ch6-speaker_seg23.wav", "error": "MemoryError((513, 626), dtype('float64'))"}
+{"id": "real/nisqa/2_918_2_7_001-ch6-speaker_seg66.wav", "error": "MemoryError((528000,), dtype('float32'))"}
+{"id": "real/nisqa/2_959_2_7_001-ch6-speaker_seg75.wav", "error": "MemoryError((1025, 251), dtype('complex64'))"}
+{"id": "real/nisqa/3_1035_2_7_001-ch6-speaker_seg23.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/3_1035_2_7_001-ch6-speaker_seg64.wav", "error": "MemoryError((336000,), dtype('float32'))"}
+{"id": "real/nisqa/3_109_2_7_001-ch6-speaker_seg32.wav", "error": "MemoryError((480000,), dtype('float32'))"}
+{"id": "real/nisqa/3_1262_2_7_001-ch6-speaker_seg13.wav", "error": "MemoryError()"}
+{"id": "real/nisqa/3_128_2_7_001-ch6-speaker_seg58.wav", "error": "MemoryError((1025, 251), dtype('float64'))"}
+{"id": "real/nisqa/3_132_2_7_001-ch6-speaker_seg152.wav", "error": "MemoryError((176000,), dtype('float64'))"}

@@ -1,0 +1,434 @@
+{
+ "script": "backend/scripts/eval_end_to_end.py",
+ "provenance": {
+  "utc_time": "2026-10-31T10:09:00+00:00",
+  "git_commit": "9068445fe581b1e68651123a7b8bc676d86dee86",
+  "git_branch": "feat/accuracy-round4",
+  "tracked_changes": true,
+  "python": "3.11.9",
+  "torch": "2.12.0.dev20260408+cu128",
+  "device": "cpu",
+  "gpu": "NVIDIA GeForce RTX 5070",
+  "settings": {
+   "commfor_enabled": true,
+   "commfor_weight": 4.0,
+   "face_model_in_verdict": false,
+   "audio_pellav2_in_verdict": true,
+   "audio_model_source": "lcnn_asvspoof",
+   "fake_threshold": 0.5,
+   "uncertain_band": 0.08
+  }
+ },
+ "sets": {
+  "audio_phone_test_baseline": {
+   "n_real": 561,
+   "n_fake": 377,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 554,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 4
+    },
+    "fake": {
+     "AUTHENTIC": 42,
+     "INCONCLUSIVE": 30,
+     "MANIPULATED": 305
+    }
+   },
+   "real_called_authentic": {
+    "k": 554,
+    "n": 561,
+    "rate": 0.9875222816399287,
+    "ci95": [
+     0.9745,
+     0.9939
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 4,
+    "n": 561,
+    "rate": 0.0071301247771836,
+    "ci95": [
+     0.0028,
+     0.0182
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 305,
+    "n": 377,
+    "rate": 0.8090185676392573,
+    "ci95": [
+     0.7663,
+     0.8455
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 42,
+    "n": 377,
+    "rate": 0.11140583554376658,
+    "ci95": [
+     0.0835,
+     0.1472
+    ]
+   },
+   "inconclusive": {
+    "k": 33,
+    "n": 938,
+    "rate": 0.035181236673773986,
+    "ci95": [
+     0.0252,
+     0.049
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 859,
+    "n": 905,
+    "rate": 0.949171270718232,
+    "ci95": [
+     0.9329,
+     0.9617
+    ]
+   },
+   "accuracy_all": {
+    "k": 859,
+    "n": 938,
+    "rate": 0.9157782515991472,
+    "ci95": [
+     0.8963,
+     0.9319
+    ]
+   },
+   "latency_s": {
+    "p50": 3.888,
+    "p95": 7.2365
+   },
+   "auc_final_probability": {
+    "auc": 0.9690704832692663,
+    "ci95": [
+     0.9562814129751248,
+     0.9803890244306066
+    ]
+   },
+   "per_group": {
+    "fake/asmini_cosyvoice": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 7,
+     "MANIPULATED": 197,
+     "n": 205
+    },
+    "fake/commonvoice_clone": {
+     "label": 1,
+     "AUTHENTIC": 41,
+     "INCONCLUSIVE": 23,
+     "MANIPULATED": 108,
+     "n": 172
+    },
+    "real/asmini": {
+     "label": 0,
+     "AUTHENTIC": 202,
+     "INCONCLUSIVE": 2,
+     "MANIPULATED": 0,
+     "n": 204
+    },
+    "real/commonvoice": {
+     "label": 0,
+     "AUTHENTIC": 178,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0,
+     "n": 178
+    },
+    "real/nisqa": {
+     "label": 0,
+     "AUTHENTIC": 174,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 4,
+     "n": 179
+    }
+   },
+   "stage_diagnosis": {
+    "1: File Hashes": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: Audio File DNA & Container Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Signal Intelligence & Acoustic Telemetry": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "4: Physiological Glottal Flow & VoiceRadar Physics": {
+     "flagged_real": 0.0392156862745098,
+     "flagged_fake": 0.04509283819628647,
+     "balanced_accuracy": 0.5029385759608883,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "5: Content & Phonemic Coarticulation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "6: Model Stage": {
+     "flagged_real": 0.0071301247771836,
+     "flagged_fake": 0.8090185676392573,
+     "balanced_accuracy": 0.9009442214310368,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "7: Environmental & ENF Grid Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "8: Risk and Verdict": {
+     "flagged_real": 0.0071301247771836,
+     "flagged_fake": 0.8090185676392573,
+     "balanced_accuracy": 0.9009442214310368,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "null": 561
+    },
+    "fake": {
+     "null": 377
+    }
+   },
+   "errors_unresolved": 0
+  },
+  "audio_phone_val_baseline": {
+   "n_real": 325,
+   "n_fake": 223,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 322,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 2
+    },
+    "fake": {
+     "AUTHENTIC": 34,
+     "INCONCLUSIVE": 21,
+     "MANIPULATED": 168
+    }
+   },
+   "real_called_authentic": {
+    "k": 322,
+    "n": 325,
+    "rate": 0.9907692307692307,
+    "ci95": [
+     0.9732,
+     0.9969
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 2,
+    "n": 325,
+    "rate": 0.006153846153846154,
+    "ci95": [
+     0.0017,
+     0.0222
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 168,
+    "n": 223,
+    "rate": 0.7533632286995515,
+    "ci95": [
+     0.6928,
+     0.8053
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 34,
+    "n": 223,
+    "rate": 0.15246636771300448,
+    "ci95": [
+     0.1112,
+     0.2055
+    ]
+   },
+   "inconclusive": {
+    "k": 22,
+    "n": 548,
+    "rate": 0.040145985401459854,
+    "ci95": [
+     0.0267,
+     0.06
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 490,
+    "n": 526,
+    "rate": 0.9315589353612167,
+    "ci95": [
+     0.9067,
+     0.9502
+    ]
+   },
+   "accuracy_all": {
+    "k": 490,
+    "n": 548,
+    "rate": 0.8941605839416058,
+    "ci95": [
+     0.8656,
+     0.9172
+    ]
+   },
+   "latency_s": {
+    "p50": 3.9305000000000003,
+    "p95": 8.561349999999997
+   },
+   "auc_final_probability": {
+    "auc": 0.9735288030355295,
+    "ci95": [
+     0.9606900655398414,
+     0.9857126595377717
+    ]
+   },
+   "per_group": {
+    "fake/asmini_cosyvoice": {
+     "label": 1,
+     "AUTHENTIC": 4,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 88,
+     "n": 95
+    },
+    "fake/commonvoice_clone": {
+     "label": 1,
+     "AUTHENTIC": 30,
+     "INCONCLUSIVE": 18,
+     "MANIPULATED": 80,
+     "n": 128
+    },
+    "real/asmini": {
+     "label": 0,
+     "AUTHENTIC": 81,
+     "INCONCLUSIVE": 1,
+     "MANIPULATED": 0,
+     "n": 82
+    },
+    "real/commonvoice": {
+     "label": 0,
+     "AUTHENTIC": 122,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0,
+     "n": 122
+    },
+    "real/nisqa": {
+     "label": 0,
+     "AUTHENTIC": 119,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 2,
+     "n": 121
+    }
+   },
+   "stage_diagnosis": {
+    "1: File Hashes": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: Audio File DNA & Container Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Signal Intelligence & Acoustic Telemetry": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "4: Physiological Glottal Flow & VoiceRadar Physics": {
+     "flagged_real": 0.046153846153846156,
+     "flagged_fake": 0.053811659192825115,
+     "balanced_accuracy": 0.5038289065194894,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "5: Content & Phonemic Coarticulation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "6: Model Stage": {
+     "flagged_real": 0.006153846153846154,
+     "flagged_fake": 0.7533632286995515,
+     "balanced_accuracy": 0.8736046912728527,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "7: Environmental & ENF Grid Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "8: Risk and Verdict": {
+     "flagged_real": 0.006153846153846154,
+     "flagged_fake": 0.7533632286995515,
+     "balanced_accuracy": 0.8736046912728527,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "null": 325
+    },
+    "fake": {
+     "null": 223
+    }
+   },
+   "errors_unresolved": 0
+  }
+ }
+}

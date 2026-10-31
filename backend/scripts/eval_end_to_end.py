@@ -121,7 +121,8 @@ def score(media: str, items: list[dict], out_dir: Path, name: str, shard: str | 
         items = [i for i in items if _shard_of(i["id"], n) == k]
         suffix = f".s{k}"
     out, errors = out_dir / f"{name}{suffix}.jsonl", out_dir / f"{name}{suffix}.errors.jsonl"
-    done = set().union(*(_done(f) for f in [out_dir / f"{name}.jsonl", *out_dir.glob(f"{name}.s*.jsonl")]))
+    shards = [f for f in out_dir.glob(f"{name}.s*.jsonl") if not f.name.endswith(".errors.jsonl")]  # failures are retried
+    done = set().union(*(_done(f) for f in [out_dir / f"{name}.jsonl", *shards]))
     todo = [i for i in items if i["id"] not in done]
     print(f"{name}: {len(items)} items, {len(done)} already scored, {len(todo)} to score", flush=True)
     kind = {"image": MediaType.IMAGE, "audio": MediaType.AUDIO, "video": MediaType.VIDEO}[media]

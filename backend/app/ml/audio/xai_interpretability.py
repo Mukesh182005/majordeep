@@ -57,6 +57,7 @@ def generate_audio_xai_explanations(
 
     # Save Grad-CAM visualization
     heatmap_filename = None
+    _figs_before = set(plt.get_fignums())
     try:
         heatmap_path = evidence_dir / f"{job_id}_gradcam_heatmap.png"
         fig, ax = plt.subplots(figsize=(11, 4.0), dpi=150)
@@ -83,6 +84,9 @@ def generate_audio_xai_explanations(
         heatmap_filename = heatmap_path.name
     except Exception as exc:
         logger.warning("Failed to render audio Grad-CAM for %s: %s", job_id, exc)
+    finally:  # a failed savefig used to leave the figure open
+        for num in set(plt.get_fignums()) - _figs_before:
+            plt.close(num)
 
     # 2. APEX Prototype Explanations
     apex_explanations = {

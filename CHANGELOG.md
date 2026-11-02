@@ -18,6 +18,11 @@ Rules fixed before scoring in `evaluation/ROUND4-RULES.md` and `evaluation/ROUND
 ### Fixed
 - Audio evidence charts leaked memory when saving failed.
 - The evaluator now retries failed items in split (sharded) runs.
+- Docker (first run of the full stack, 2026-11-02): every upload failed with a 500 on PostgreSQL (enum
+  columns vs string values; new Alembic migration); every Hugging Face model failed to load because the
+  model cache volume was root-owned (two image detectors, pellav2, GenD and TruFor silently fell back);
+  nginx kept a stale API address after the API container was recreated (502 on every request); the
+  frontend and beat health checks could never pass.
 
 ### Measured
 - Audio on phone-quality and crowd-recorded speech: real called MANIPULATED 0.7 %, AI 80.9 %

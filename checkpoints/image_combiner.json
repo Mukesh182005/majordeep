@@ -5,22 +5,18 @@
   "commfor_ft_v3/model.safetensors"
  ],
  "coef": [
-  0.01741623550641052,
-  0.044858797100943884,
-  0.12557084092376758
+  0.08569469079005929,
+  0.22072282758030265,
+  0.6178576524903557
  ],
- "intercept": 0.6321576507334785,
+ "intercept": 2.4921464334187955,
+ "z_authentic": -2.206487805036222,
+ "z_manipulated": 0.9698548707457707,
  "metadata": {
   "fitted_on": "C:\\deepsentinel_data\\UPLOAD_SET\\manifest.csv",
   "split": "tune",
   "max_ai_authentic": 0.01,
   "max_real_flagged": 0.02,
-  "raw_coef": [
-   0.08569469079005929,
-   0.22072282758030265,
-   0.6178576524903557
-  ],
-  "raw_intercept": 2.4921464334187955,
-  "git_commit": "8d14bf0ff8b3c7d9fd24391186b7f75cf35382dc"
+  "git_commit": "509af815340857bfeb33df28494e40abd6df80d6"
  }
 }

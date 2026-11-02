@@ -2,9 +2,10 @@
 
 A logistic regression on each detector's log-odds, fitted on held-out images in upload-like
 versions (original, WhatsApp-style, screenshot, small) by ``ml/training/fit_image_combiner.py``
-(evaluation/IMAGE-COMBINER-01). The file stores the coefficients already rescaled so that the
-AUTHENTIC and MANIPULATED cut-offs chosen on the tuning split fall exactly on the app's verdict
-band (``settings.fake_threshold`` +/- ``settings.uncertain_band``), so ``classify`` applies them.
+(evaluation/IMAGE-COMBINER-01). The file stores the raw coefficients and the two cut-offs chosen on
+the tuning split (``z_authentic``, ``z_manipulated``, in log-odds); ``combine`` maps them onto whatever
+verdict band is configured (``settings.fake_threshold`` +/- ``settings.uncertain_band``), so
+``classify`` applies exactly the measured cut-offs.
 
 ``combine`` returns ``None`` when the file is missing or a detector it needs did not score; the
 caller then falls back to the hand-set weights.
@@ -62,4 +63,8 @@ def combine(model_scores: dict[str, float]) -> float | None:
         if s is None:
             return None
         z += w * _logit(s)
+    low = settings.fake_threshold - settings.uncertain_band
+    high = settings.fake_threshold + settings.uncertain_band
+    lo, hi = math.log(low / (1 - low)), math.log(high / (1 - high))
+    z = lo + (z - c["z_authentic"]) * (hi - lo) / (c["z_manipulated"] - c["z_authentic"])
     return 1.0 / (1.0 + math.exp(-z))

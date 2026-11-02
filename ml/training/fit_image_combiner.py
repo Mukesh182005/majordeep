@@ -6,8 +6,8 @@
 Inputs: the upload-like manifest (path,label,source,variant,image_id,split) and per-detector scores
 (score_upload_set.py). Fit on split=tune only: class-balanced logistic regression on each
 detector's log-odds. Cut-offs, also on tune: AUTHENTIC at most --max-ai-authentic of tune AI images,
-MANIPULATED at most --max-real-flagged of tune real images. The coefficients are rescaled so these
-cut-offs land on the app's verdict band. Test numbers (split=test) are written for every variant
+MANIPULATED at most --max-real-flagged of tune real images, stored as log-odds cut-offs so these
+cut-offs can be mapped onto the app's verdict band at run time. Test numbers (split=test) are written for every variant
 and source, next to the current hand-set fusion under the same band.
 """
 
@@ -95,11 +95,10 @@ def main() -> int:
     z_high = zr[int(math.ceil((1 - args.max_real_flagged) * len(zr))) - 1] + 1e-9  # real at or above: <= max share
     if z_low >= z_high:  # well separated: put the band between the two cut-offs
         z_low, z_high = (z_low + z_high) / 2 - 1e-6, (z_low + z_high) / 2 + 1e-6
+    # The app maps [z_low, z_high] onto its configured band; evaluate on the default band.
     a = (math.log(HIGH / (1 - HIGH)) - math.log(LOW / (1 - LOW))) / (z_high - z_low)
     c = math.log(LOW / (1 - LOW)) - a * z_low
-    coef, intercept = (a * w).tolist(), float(a * b + c)
-
-    p_new = 1 / (1 + np.exp(-(X @ np.array(coef) + intercept)))
+    p_new = 1 / (1 + np.exp(-(a * (X @ w + b) + c)))
     cw = np.array([CURRENT.get(m, 0.0) for m in args.models])
     p_cur = 1 / (1 + np.exp(-(X @ cw) / cw.sum()))
     v_new, v_cur = verdicts(p_new), verdicts(p_cur)
@@ -116,9 +115,10 @@ def main() -> int:
     except OSError:
         commit = ""
     meta = {"fitted_on": str(args.manifest), "split": "tune", "max_ai_authentic": args.max_ai_authentic,
-            "max_real_flagged": args.max_real_flagged, "raw_coef": w.tolist(), "raw_intercept": float(b), "git_commit": commit}
+            "max_real_flagged": args.max_real_flagged, "git_commit": commit}
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps({"models": args.models, "coef": coef, "intercept": intercept, "metadata": meta}, indent=1), encoding="utf-8")
+    args.out.write_text(json.dumps({"models": args.models, "coef": w.tolist(), "intercept": float(b), "z_authentic": float(z_low),
+                                    "z_manipulated": float(z_high), "metadata": meta}, indent=1), encoding="utf-8")
     args.results.parent.mkdir(parents=True, exist_ok=True)
     args.results.write_text(json.dumps(res, indent=1), encoding="utf-8")
     t = res["test"]["all"]

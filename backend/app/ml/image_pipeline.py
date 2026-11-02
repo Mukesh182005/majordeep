@@ -34,6 +34,7 @@ from app.config import settings
 from app.ml.base import AnalysisResult, classify, resolve_device
 from app.ml.faces import extract_faces
 from app.ml.forensics import run_comprehensive_forensics
+from app.ml.image_combiner import combine
 from app.ml.forensics.recapture import crop_recapture_borders
 from app.ml.gradcam import compute_gradcam, overlay_heatmap
 from app.ml.preprocessing import preprocess_image
@@ -186,7 +187,10 @@ def score_scene(image: Image.Image) -> dict[str, Any]:
         weighted += detector.spec.weight * _logit(p_ai)
         weight_total += detector.spec.weight
     fused = 1.0 / (1.0 + math.exp(-weighted / weight_total)) if weight_total else None
-    return {"scene_ai_prob": fused, "model_scores": model_scores}
+    learned = combine(model_scores)
+    if learned is not None:
+        return {"scene_ai_prob": learned, "model_scores": model_scores, "combiner": "learned"}
+    return {"scene_ai_prob": fused, "model_scores": model_scores, "combiner": "hand_set_weights"}
 
 
 def _face_fake_probability(loaded, tensor) -> float | None:
@@ -364,7 +368,8 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     tampering_res = forensics.get("tampering", {})
     synthetic_matte = tampering_res.get("synthetic_matte_detected", False)
 
-    updated_scores = forensics.get("updated_ai_scores", ai_metrics_prelim)
+    # The forensics engine's own scores (M28 heuristic) count only with IMAGE_HEURISTICS_IN_VERDICT.
+    updated_scores = forensics.get("updated_ai_scores", ai_metrics_prelim) if settings.image_heuristics_in_verdict else {}
     scene_ai_prob = updated_scores.get("scene_ai_prob", scene_ai_prob)
     if face_model_counts:
         ensemble_ai_prob = max(face_fake_prob, scene_ai_prob, updated_scores.get("ensemble_fake_prob", 0.0))
@@ -388,12 +393,17 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         final_fake_prob = max(final_fake_prob, 0.93)
         notes.append(f"Generator metadata found in file: {metadata_forensics.get('ai_generator_name')}.")
 
+    heuristic_floors = settings.image_heuristics_in_verdict
     if fusion["fusion_verdict"] == "MULTI_SIGNAL_CONSENSUS_MANIPULATION":
-        final_fake_prob = max(final_fake_prob, 0.88)
-        notes.append(f"Forensic consensus: {fusion['orthogonal_signals_count']} independent signals confirm manipulation / AI generation.")
+        if heuristic_floors:
+            final_fake_prob = max(final_fake_prob, 0.88)
+        notes.append(f"Forensic heuristics (unvalidated, {'in' if heuristic_floors else 'not in'} the verdict): "
+                     f"{fusion['orthogonal_signals_count']} signals point to manipulation.")
     elif fusion["fusion_verdict"] == "CORROBORATED_MANIPULATION":
-        final_fake_prob = max(final_fake_prob, 0.82)
-        notes.append(f"Corroborated manipulation: {'; '.join(fusion.get('corroborating_signals', []))}.")
+        if heuristic_floors:
+            final_fake_prob = max(final_fake_prob, 0.82)
+        notes.append(f"Forensic heuristics (unvalidated, {'in' if heuristic_floors else 'not in'} the verdict): "
+                     f"{'; '.join(fusion.get('corroborating_signals', []))}.")
 
     # A near-black/chroma matte fired on 2.0% of real photos and 1.8% of AI
     # images: it describes a detection, it does not add evidence for one.
@@ -404,7 +414,8 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     # tiles, icons), so on its own it asks for review rather than asserting
     # tampering.
     if tampering_res.get("copy_move_detected") and tampering_res.get("cloned_feature_pairs", 0) >= 12:
-        final_fake_prob = max(final_fake_prob, 0.55)
+        if heuristic_floors:
+            final_fake_prob = max(final_fake_prob, 0.55)
         notes.append(f"Possible cloning / copy-move: {tampering_res.get('cloned_feature_pairs')} keypoints share one displacement; repeated real structure can also cause this, so review the region.")
 
     # Incorporate anomalies from file security and metadata
@@ -485,11 +496,24 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
     verdict_override = None
     verdict_basis = "detector_score"
     would_be_authentic = classify(final_fake_prob) is Verdict.AUTHENTIC
+    learned_cutoffs = scene.get("combiner") == "learned"
     if would_be_authentic and not scene_available:
         verdict_override = Verdict.INCONCLUSIVE
         verdict_basis = "scene_detectors_unavailable"
         dominant_threat = "Insufficient Evidence (AI-generation detectors unavailable)"
         threat_code = "INSUFFICIENT_EVIDENCE"
+    elif would_be_authentic and learned_cutoffs:
+        # The learned cut-offs were chosen on screenshots, WhatsApp copies and files without camera
+        # metadata, so they apply here; the wording still says only what was found.
+        verdict_basis = "learned_combination"
+        if not camera_metadata:
+            dominant_threat = "No AI Generation Detected (origin unverified: no camera metadata)"
+            threat_code = "NO_MANIPULATION_DETECTED"
+            notes.append(
+                "The AI detectors' combined score is below the cut-off chosen on held-out real and AI "
+                "images, including screenshots and WhatsApp copies. The file has no camera metadata, so "
+                "this is absence of detected AI generation, not proof that it is a camera photograph."
+            )
     elif would_be_authentic and recapture["framed"] and not camera_metadata:
         verdict_override = Verdict.INCONCLUSIVE
         verdict_basis = "screen_recapture"
@@ -539,6 +563,13 @@ def analyze_image(path: str | Path, evidence_dir: str | Path, job_id: str) -> An
         f"{_display_name(model_id)}{' (unvalidated, not in verdict)' if model_id in unweighted else ''}: {round(p * 100, 1)}%"
         for model_id, p in scene["model_scores"].items()
     ) or "unavailable"
+    detector_ps = list(scene["model_scores"].values())
+    if detector_ps and max(detector_ps) >= 0.9 and min(detector_ps) <= 0.1:
+        notes.append(
+            f"The AI detectors disagree ({model_summary}). The verdict uses their "
+            f"{'learned combination, fitted on held-out images' if scene.get('combiner') == 'learned' else 'weighted combination'}; "
+            "treat it with extra caution."
+        )
     for mod in forensics.get("pipeline_modules", []):
         if mod.get("stage") == 5 and trufor_res:
             in_verdict = "" if settings.trufor_in_verdict else ", unvalidated, not in verdict"

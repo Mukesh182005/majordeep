@@ -1,0 +1,617 @@
+{
+ "script": "backend/scripts/eval_end_to_end.py",
+ "provenance": {
+  "utc_time": "2026-11-02T08:45:25+00:00",
+  "git_commit": "8d14bf0ff8b3c7d9fd24391186b7f75cf35382dc",
+  "git_branch": "feat/accuracy-round4",
+  "tracked_changes": true,
+  "python": "3.11.9",
+  "torch": "2.12.0.dev20260408+cu128",
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5070",
+  "settings": {
+   "commfor_enabled": true,
+   "commfor_weight": 4.0,
+   "face_model_in_verdict": false,
+   "audio_pellav2_in_verdict": true,
+   "audio_model_source": "lcnn_asvspoof",
+   "fake_threshold": 0.5,
+   "uncertain_band": 0.08
+  }
+ },
+ "sets": {
+  "accuracy_test_learned": {
+   "n_real": 60,
+   "n_fake": 60,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 52,
+     "INCONCLUSIVE": 8,
+     "MANIPULATED": 0
+    },
+    "fake": {
+     "AUTHENTIC": 11,
+     "INCONCLUSIVE": 26,
+     "MANIPULATED": 23
+    }
+   },
+   "real_called_authentic": {
+    "k": 52,
+    "n": 60,
+    "rate": 0.8666666666666667,
+    "ci95": [
+     0.7583,
+     0.9309
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 0,
+    "n": 60,
+    "rate": 0.0,
+    "ci95": [
+     0.0,
+     0.0602
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 23,
+    "n": 60,
+    "rate": 0.38333333333333336,
+    "ci95": [
+     0.2709,
+     0.5098
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 11,
+    "n": 60,
+    "rate": 0.18333333333333332,
+    "ci95": [
+     0.1056,
+     0.2992
+    ]
+   },
+   "inconclusive": {
+    "k": 34,
+    "n": 120,
+    "rate": 0.2833333333333333,
+    "ci95": [
+     0.2104,
+     0.3697
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 75,
+    "n": 86,
+    "rate": 0.872093023255814,
+    "ci95": [
+     0.7853,
+     0.9271
+    ]
+   },
+   "accuracy_all": {
+    "k": 75,
+    "n": 120,
+    "rate": 0.625,
+    "ci95": [
+     0.5358,
+     0.7065
+    ]
+   },
+   "latency_s": {
+    "p50": 0.3085,
+    "p95": 0.35555
+   },
+   "auc_final_probability": {
+    "auc": 0.8983333333333333,
+    "ci95": [
+     0.8355347222222224,
+     0.9494791666666667
+    ]
+   },
+   "per_group": {
+    "fake/100_ai": {
+     "label": 1,
+     "AUTHENTIC": 10,
+     "INCONCLUSIVE": 10,
+     "MANIPULATED": 20,
+     "n": 40
+    },
+    "fake/100_ai_processed": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 16,
+     "MANIPULATED": 3,
+     "n": 20
+    },
+    "real/100_real": {
+     "label": 0,
+     "AUTHENTIC": 18,
+     "INCONCLUSIVE": 2,
+     "MANIPULATED": 0,
+     "n": 20
+    },
+    "real/100_real_edited": {
+     "label": 0,
+     "AUTHENTIC": 14,
+     "INCONCLUSIVE": 6,
+     "MANIPULATED": 0,
+     "n": 20
+    },
+    "real/100_real_whatsapp": {
+     "label": 0,
+     "AUTHENTIC": 20,
+     "INCONCLUSIVE": 0,
+     "MANIPULATED": 0,
+     "n": 20
+    }
+   },
+   "stage_diagnosis": {
+    "1: Secure Ingestion & Validation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: File Container & Cryptographic Ledger": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Metadata & Digital Timeline Forensics": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "4: Frequency & Signal Forensics (FFT / DCT / ELA)": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "5: Tampering & Watermark Engine": {
+     "flagged_real": 0.1,
+     "flagged_fake": 0.08333333333333333,
+     "balanced_accuracy": 0.4916666666666667,
+     "statuses": [
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "6: AI & Deepfake Detection Engine (Neural + M28 Forensic)": {
+     "flagged_real": 0.4166666666666667,
+     "flagged_fake": 0.9166666666666666,
+     "balanced_accuracy": 0.75,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "7: Steganography & Provenance Authentication": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "8: Evidence Fusion & Calibrated Risk Engine": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "CONSENSUS_REACHED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "NO_MANIPULATION_DETECTED": 52,
+     "INCONCLUSIVE_INDICATORS": 6,
+     "SYNTHETIC_AI_GENERATION": 2
+    },
+    "fake": {
+     "SYNTHETIC_AI_GENERATION": 36,
+     "INCONCLUSIVE_INDICATORS": 13,
+     "NO_MANIPULATION_DETECTED": 11
+    }
+   },
+   "errors_unresolved": 0
+  },
+  "user_check_current": {
+   "n_real": 17,
+   "n_fake": 11,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 11,
+     "INCONCLUSIVE": 5,
+     "MANIPULATED": 1
+    },
+    "fake": {
+     "AUTHENTIC": 2,
+     "INCONCLUSIVE": 4,
+     "MANIPULATED": 5
+    }
+   },
+   "real_called_authentic": {
+    "k": 11,
+    "n": 17,
+    "rate": 0.6470588235294118,
+    "ci95": [
+     0.413,
+     0.8269
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 1,
+    "n": 17,
+    "rate": 0.058823529411764705,
+    "ci95": [
+     0.0105,
+     0.2698
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 5,
+    "n": 11,
+    "rate": 0.45454545454545453,
+    "ci95": [
+     0.2127,
+     0.7199
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 2,
+    "n": 11,
+    "rate": 0.18181818181818182,
+    "ci95": [
+     0.0514,
+     0.477
+    ]
+   },
+   "inconclusive": {
+    "k": 9,
+    "n": 28,
+    "rate": 0.32142857142857145,
+    "ci95": [
+     0.1793,
+     0.5066
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 16,
+    "n": 19,
+    "rate": 0.8421052631578947,
+    "ci95": [
+     0.6243,
+     0.9448
+    ]
+   },
+   "accuracy_all": {
+    "k": 16,
+    "n": 28,
+    "rate": 0.5714285714285714,
+    "ci95": [
+     0.3907,
+     0.7349
+    ]
+   },
+   "latency_s": {
+    "p50": 1.0705,
+    "p95": 28.533199999999987
+   },
+   "auc_final_probability": {
+    "auc": 0.7754010695187166,
+    "ci95": [
+     0.5987967914438502,
+     0.9358288770053476
+    ]
+   },
+   "per_group": {
+    "fake/user": {
+     "label": 1,
+     "AUTHENTIC": 2,
+     "INCONCLUSIVE": 4,
+     "MANIPULATED": 5,
+     "n": 11
+    },
+    "real/user": {
+     "label": 0,
+     "AUTHENTIC": 11,
+     "INCONCLUSIVE": 5,
+     "MANIPULATED": 1,
+     "n": 17
+    }
+   },
+   "stage_diagnosis": {
+    "1: Secure Ingestion & Validation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: File Container & Cryptographic Ledger": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Metadata & Digital Timeline Forensics": {
+     "flagged_real": 0.11764705882352941,
+     "flagged_fake": 0.09090909090909091,
+     "balanced_accuracy": 0.48663101604278075,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "4: Frequency & Signal Forensics (FFT / DCT / ELA)": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "5: Tampering & Watermark Engine": {
+     "flagged_real": 0.47058823529411764,
+     "flagged_fake": 0.2727272727272727,
+     "balanced_accuracy": 0.40106951871657753,
+     "statuses": [
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "6: AI & Deepfake Detection Engine (Neural + M28 Forensic)": {
+     "flagged_real": 0.35294117647058826,
+     "flagged_fake": 0.8181818181818182,
+     "balanced_accuracy": 0.732620320855615,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "7: Steganography & Provenance Authentication": {
+     "flagged_real": 0.058823529411764705,
+     "flagged_fake": 0.09090909090909091,
+     "balanced_accuracy": 0.516042780748663,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED"
+     ]
+    },
+    "8: Evidence Fusion & Calibrated Risk Engine": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "CONSENSUS_REACHED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "NO_MANIPULATION_DETECTED": 9,
+     "INCONCLUSIVE_UNVERIFIED_ORIGIN": 3,
+     "SYNTHETIC_AI_GENERATION": 3,
+     "AUTHENTIC_PHOTOGRAPH": 2
+    },
+    "fake": {
+     "INCONCLUSIVE_UNVERIFIED_ORIGIN": 4,
+     "SYNTHETIC_AI_GENERATION": 4,
+     "NO_MANIPULATION_DETECTED": 2,
+     "SYNTHETIC_BACKGROUND_REPLACEMENT": 1
+    }
+   },
+   "errors_unresolved": 0
+  },
+  "user_check_learned": {
+   "n_real": 17,
+   "n_fake": 11,
+   "confusion": {
+    "real": {
+     "AUTHENTIC": 8,
+     "INCONCLUSIVE": 5,
+     "MANIPULATED": 4
+    },
+    "fake": {
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 7
+    }
+   },
+   "real_called_authentic": {
+    "k": 8,
+    "n": 17,
+    "rate": 0.47058823529411764,
+    "ci95": [
+     0.2616,
+     0.6904
+    ]
+   },
+   "real_called_manipulated": {
+    "k": 4,
+    "n": 17,
+    "rate": 0.23529411764705882,
+    "ci95": [
+     0.0955,
+     0.4726
+    ]
+   },
+   "fake_called_manipulated": {
+    "k": 7,
+    "n": 11,
+    "rate": 0.6363636363636364,
+    "ci95": [
+     0.3538,
+     0.8483
+    ]
+   },
+   "fake_called_authentic": {
+    "k": 1,
+    "n": 11,
+    "rate": 0.09090909090909091,
+    "ci95": [
+     0.0162,
+     0.3774
+    ]
+   },
+   "inconclusive": {
+    "k": 8,
+    "n": 28,
+    "rate": 0.2857142857142857,
+    "ci95": [
+     0.1525,
+     0.4706
+    ]
+   },
+   "accuracy_on_decided": {
+    "k": 15,
+    "n": 20,
+    "rate": 0.75,
+    "ci95": [
+     0.5313,
+     0.8881
+    ]
+   },
+   "accuracy_all": {
+    "k": 15,
+    "n": 28,
+    "rate": 0.5357142857142857,
+    "ci95": [
+     0.3581,
+     0.7047
+    ]
+   },
+   "latency_s": {
+    "p50": 0.8315,
+    "p95": 20.78979999999999
+   },
+   "auc_final_probability": {
+    "auc": 0.7459893048128342,
+    "ci95": [
+     0.5347593582887701,
+     0.9251336898395722
+    ]
+   },
+   "per_group": {
+    "fake/user": {
+     "label": 1,
+     "AUTHENTIC": 1,
+     "INCONCLUSIVE": 3,
+     "MANIPULATED": 7,
+     "n": 11
+    },
+    "real/user": {
+     "label": 0,
+     "AUTHENTIC": 8,
+     "INCONCLUSIVE": 5,
+     "MANIPULATED": 4,
+     "n": 17
+    }
+   },
+   "stage_diagnosis": {
+    "1: Secure Ingestion & Validation": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "2: File Container & Cryptographic Ledger": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "3: Metadata & Digital Timeline Forensics": {
+     "flagged_real": 0.11764705882352941,
+     "flagged_fake": 0.09090909090909091,
+     "balanced_accuracy": 0.48663101604278075,
+     "statuses": [
+      "ANOMALY_DETECTED",
+      "PASSED"
+     ]
+    },
+    "4: Frequency & Signal Forensics (FFT / DCT / ELA)": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "PASSED"
+     ]
+    },
+    "5: Tampering & Watermark Engine": {
+     "flagged_real": 0.47058823529411764,
+     "flagged_fake": 0.2727272727272727,
+     "balanced_accuracy": 0.40106951871657753,
+     "statuses": [
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "6: AI & Deepfake Detection Engine (Neural + M28 Forensic)": {
+     "flagged_real": 0.8823529411764706,
+     "flagged_fake": 0.9090909090909091,
+     "balanced_accuracy": 0.5133689839572193,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED",
+      "SUSPICIOUS"
+     ]
+    },
+    "7: Steganography & Provenance Authentication": {
+     "flagged_real": 0.058823529411764705,
+     "flagged_fake": 0.09090909090909091,
+     "balanced_accuracy": 0.516042780748663,
+     "statuses": [
+      "AI_FLAGGED",
+      "PASSED"
+     ]
+    },
+    "8: Evidence Fusion & Calibrated Risk Engine": {
+     "flagged_real": 0.0,
+     "flagged_fake": 0.0,
+     "balanced_accuracy": 0.5,
+     "statuses": [
+      "CONSENSUS_REACHED"
+     ]
+    }
+   },
+   "threat_codes": {
+    "real": {
+     "NO_MANIPULATION_DETECTED": 7,
+     "SYNTHETIC_AI_GENERATION": 6,
+     "INCONCLUSIVE_INDICATORS": 3,
+     "AUTHENTIC_PHOTOGRAPH": 1
+    },
+    "fake": {
+     "SYNTHETIC_AI_GENERATION": 7,
+     "INCONCLUSIVE_INDICATORS": 2,
+     "SYNTHETIC_BACKGROUND_REPLACEMENT": 1,
+     "NO_MANIPULATION_DETECTED": 1
+    }
+   },
+   "errors_unresolved": 0
+  }
+ }
+}

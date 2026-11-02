@@ -132,7 +132,6 @@ services:
       timeout: 15s
       retries: 3
       start_period: 600s  # first start downloads and warms up the models
-      start_period: 60s
     restart: unless-stopped
 
   # Sends the hourly retention purge (guest jobs older than RETENTION_HOURS)

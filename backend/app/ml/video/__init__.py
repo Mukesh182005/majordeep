@@ -182,9 +182,11 @@ def analyze_video(
         except Exception as exc:
             logger.warning("Scene AI detection on video frame %s failed: %s", i, exc)
             continue
-        if scene["scene_ai_prob"] is not None:
+        # The video rules were set on the hand-set fusion, not on the image verdict's learned combination.
+        frame_p = scene.get("hand_set_ai_prob", scene["scene_ai_prob"])
+        if frame_p is not None:
             scene_frame_scores.append({"frame_index": i, "timestamp_s": round(frames_pil[i][0], 3),
-                                       "scene_ai_prob": round(float(scene["scene_ai_prob"]), 4)})
+                                       "scene_ai_prob": round(float(frame_p), 4)})
     if scene_frame_scores:
         vit_genai_prob = float(np.mean([s["scene_ai_prob"] for s in scene_frame_scores]))
     # AI-generated video detector on the same frames (off without its trained head).

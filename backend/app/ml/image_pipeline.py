@@ -187,10 +187,12 @@ def score_scene(image: Image.Image) -> dict[str, Any]:
         weighted += detector.spec.weight * _logit(p_ai)
         weight_total += detector.spec.weight
     fused = 1.0 / (1.0 + math.exp(-weighted / weight_total)) if weight_total else None
+    # hand_set_ai_prob: the weighted fusion the video rules (thresholds 0.35 / 0.45 / 0.75) were set on;
+    # the learned combination is fitted for still-image verdicts and has a different scale.
     learned = combine(model_scores)
     if learned is not None:
-        return {"scene_ai_prob": learned, "model_scores": model_scores, "combiner": "learned"}
-    return {"scene_ai_prob": fused, "model_scores": model_scores, "combiner": "hand_set_weights"}
+        return {"scene_ai_prob": learned, "hand_set_ai_prob": fused, "model_scores": model_scores, "combiner": "learned"}
+    return {"scene_ai_prob": fused, "hand_set_ai_prob": fused, "model_scores": model_scores, "combiner": "hand_set_weights"}
 
 
 def _face_fake_probability(loaded, tensor) -> float | None:

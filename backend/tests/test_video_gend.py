@@ -153,3 +153,20 @@ def test_scene_only_ai_video_is_labelled_not_validated(tmp_path, monkeypatch):
     assert result.evidence["threat_code"] == "AI_GENERATED_VIDEO"
     assert "not validated on video" in result.evidence["dominant_threat"]
     assert any("not validated for video" in n for n in result.evidence["notes"])
+
+
+def test_video_uses_the_hand_set_scene_score_not_the_learned_image_combination(tmp_path, monkeypatch):
+    """The video rules were set on the hand-set fusion; the learned image combination has another scale
+    (on DFD face swaps it moved frame scores from about 0.07 to 0.6 and turned verdicts INCONCLUSIVE)."""
+    cv2 = pytest.importorskip("cv2")
+    import app.ml.video as video
+
+    monkeypatch.setattr(video, "score_scene", lambda image: {"scene_ai_prob": 0.6, "hand_set_ai_prob": 0.05,
+                                                            "model_scores": {"t": 0.05}, "combiner": "learned"})
+    clip = tmp_path / "plain.avi"
+    writer = cv2.VideoWriter(str(clip), cv2.VideoWriter_fourcc(*"MJPG"), 10.0, (96, 96))
+    for i in range(10):
+        writer.write(np.full((96, 96, 3), 30 + i, dtype=np.uint8))
+    writer.release()
+    result = video.analyze_video(clip, tmp_path / "ev", "plain-job")
+    assert result.evidence["vit_genai_prob"] == pytest.approx(0.05, abs=1e-3)

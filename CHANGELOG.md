@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased] — 2026-11-02
+
+Rules fixed before scoring in `evaluation/ROUND4-RULES.md` and `evaluation/ROUND5-RULES.md`.
+
+### Changed
+- Images: a learned combination of the three AI detectors replaces the hand-set weights, with cut-offs
+  chosen on screenshots, WhatsApp copies and small images (`evaluation/IMAGE-COMBINER-01`). Upload-like
+  test split: AI called MANIPULATED 60.7 % -> 91.6 %, AI called AUTHENTIC 7.3 % -> 1.5 %, real called
+  MANIPULATED 0.1 % -> 1.9 %; GPT Image 2 caught 42 % -> 91 %, Nano Banana 2 16 % -> 68 %.
+- Images: untested forensic floors (multi-signal consensus, corroboration, copy-move, the M28 score) no
+  longer raise the verdict (`IMAGE_HEURISTICS_IN_VERDICT=false`); they are shown as notes.
+- Results say when the detectors strongly disagree.
+
+### Fixed
+- Audio evidence charts leaked memory when saving failed.
+- The evaluator now retries failed items in split (sharded) runs.
+
+### Measured
+- Audio on phone-quality and crowd-recorded speech: real called MANIPULATED 0.7 %, AI 80.9 %
+  (`evaluation/AUDIO-PHONE-01`); no audio change.
+
 ## [Unreleased] — 2026-10-31
 
 Every number below is from a file in `evaluation/`; rules fixed before training in `evaluation/ROUND3-RULES.md`.

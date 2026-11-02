@@ -14,6 +14,7 @@ evidence vault:
 
 from __future__ import annotations
 
+import functools
 import logging
 from pathlib import Path
 from typing import Any
@@ -26,6 +27,19 @@ import scipy.signal
 import scipy.fft
 
 logger = logging.getLogger(__name__)
+
+
+def _closes_figures(render):
+    """Close every figure ``render`` opens, also when saving fails (a failed savefig used to leak it)."""
+    @functools.wraps(render)
+    def wrapper(*args, **kwargs):
+        before = set(plt.get_fignums())
+        try:
+            return render(*args, **kwargs)
+        finally:
+            for num in set(plt.get_fignums()) - before:
+                plt.close(num)
+    return wrapper
 
 
 def generate_signal_lab_plates(
@@ -89,6 +103,7 @@ def generate_signal_lab_plates(
     return generated_files
 
 
+@_closes_figures
 def _render_log_mel_spectrogram(
     x: np.ndarray,
     sr: int,
@@ -145,6 +160,7 @@ def _render_log_mel_spectrogram(
     plt.close(fig)
 
 
+@_closes_figures
 def _render_lfcc_scalogram(x: np.ndarray, sr: int, duration_s: float, out_path: Path) -> None:
     """Render Linear Frequency Cepstral Coefficients (LFCC) scalogram."""
     n_lfcc = 30
@@ -185,6 +201,7 @@ def _render_lfcc_scalogram(x: np.ndarray, sr: int, duration_s: float, out_path: 
     plt.close(fig)
 
 
+@_closes_figures
 def _render_cqt_scalogram(x: np.ndarray, sr: int, duration_s: float, out_path: Path) -> None:
     """Render Constant-Q Transform (CQT) geometric scalogram."""
     cqt = np.abs(librosa.cqt(x, sr=sr, n_bins=72, bins_per_octave=12, hop_length=256))
@@ -214,6 +231,7 @@ def _render_cqt_scalogram(x: np.ndarray, sr: int, duration_s: float, out_path: P
     plt.close(fig)
 
 
+@_closes_figures
 def _render_waveform_profile(x: np.ndarray, sr: int, duration_s: float, out_path: Path) -> None:
     """Render waveform with RMS envelope, clipping markers, and silence baseline."""
     fig, ax = plt.subplots(figsize=(10, 2.8), dpi=150)
@@ -243,6 +261,7 @@ def _render_waveform_profile(x: np.ndarray, sr: int, duration_s: float, out_path
     plt.close(fig)
 
 
+@_closes_figures
 def _render_master_diagnostic_plate(
     x: np.ndarray,
     sr: int,

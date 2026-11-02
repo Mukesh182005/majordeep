@@ -166,6 +166,15 @@ class Settings(BaseSettings):
     # this; between it and the decision band the verdict is INCONCLUSIVE. Chosen on the
     # same dev half at COMMFOR_WEIGHT=4: 99.0 % of real photos stay below it, 0.7 % of AI images.
     image_authentic_max_prob_without_camera: float = 0.02
+    # Learned combination of the scene detectors (app/ml/image_combiner.py, checkpoints/image_combiner.json),
+    # fitted and given its cut-offs on upload-like images (evaluation/IMAGE-COMBINER-01). When it applies,
+    # its cut-offs replace the camera-metadata rule above and the screenshot rule.
+    image_combiner_enabled: bool = True
+    # Hand-set forensic floors (multi-signal consensus 0.88, corroboration 0.82, copy-move 0.55) and the
+    # M28 heuristic score: no stage other than the AI detectors separated real from AI images
+    # (evaluation/E2E-01 stage diagnosis), and they flagged real stock photos. Shown as notes; they
+    # raise the verdict only when this is true.
+    image_heuristics_in_verdict: bool = False
     # TruFor splice / edit localisation (app/ml/trufor.py). Nonprofit use only (its licence);
     # set false for any commercial deployment. Shown as an unvalidated signal; it changes the
     # verdict only with TRUFOR_IN_VERDICT=true, which needs a measured threshold first.

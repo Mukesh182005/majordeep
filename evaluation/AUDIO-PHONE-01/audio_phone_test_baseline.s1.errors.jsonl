@@ -1,0 +1,10 @@
+{"id": "real/asmini/37_5460_20170910132113.wav", "error": "MemoryError((513, 769), dtype('complex64'))"}
+{"id": "real/asmini/37_5460_20170910144851.wav", "error": "MemoryError((513, 333), dtype('complex64'))"}
+{"id": "real/asmini/37_5460_20170910151431.wav", "error": "MemoryError()"}
+{"id": "real/asmini/37_5460_20170910152001.wav", "error": "MemoryError((130, 1025), dtype('float64'))"}
+{"id": "real/asmini/38_5709_20170914202640.wav", "error": "MemoryError((1025, 163), dtype('complex64'))"}
+{"id": "fake/commonvoice_clone/fake_000373.mp3", "error": "MemoryError()"}
+{"id": "fake/commonvoice_clone/fake_000392.mp3", "error": "MemoryError((130, 1025), dtype('float64'))"}
+{"id": "fake/commonvoice_clone/fake_000403.mp3", "error": "MemoryError()"}
+{"id": "fake/commonvoice_clone/fake_000478.mp3", "error": "MemoryError((1025, 190), dtype('complex64'))"}
+{"id": "fake/commonvoice_clone/fake_000542.mp3", "error": "MemoryError((108288,), dtype('float64'))"}

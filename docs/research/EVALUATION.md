@@ -207,6 +207,16 @@ stays the default. The fine-tuned checkpoint was deleted to free disk space; `fi
 MANIPULATED 77.0 % -> 62.7 %, AUC 0.894 -> 0.914. Detection fell by more than the 5 points the rule allows, so the
 original pellav2 stays; ASVspoof 2019 was not run for this checkpoint.
 
+### 5b. Learned combination on upload-like images (current default, 2026-11-02)
+
+`evaluation/IMAGE-COMBINER-01/README.md`: the three detectors are combined by a logistic regression
+fitted on held-out images in upload-like versions (original, WhatsApp-style, screenshot-style, small),
+with cut-offs chosen on the tuning half. Test half (2,144 real, 3,200 AI files): AI called MANIPULATED
+60.7 % -> 91.6 %, AI called AUTHENTIC 7.3 % -> 1.5 %, real called AUTHENTIC 95.4 % -> 82.5 %, real
+called MANIPULATED 0.1 % -> 1.9 %. `accuracy_test`: real called MANIPULATED 0 / 60, AI 23 / 60 (unchanged).
+Untested forensic floors no longer raise image verdicts. The numbers in section 5 above describe the
+earlier hand-set weights.
+
 ## 6. Video
 
 Test data: the Google/Jigsaw DeepFake Detection (DFD) videos, 200 real and 200 face-swapped clips of paid,

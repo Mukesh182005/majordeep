@@ -131,6 +131,7 @@ services:
       interval: 60s
       timeout: 15s
       retries: 3
+      start_period: 600s  # first start downloads and warms up the models
       start_period: 60s
     restart: unless-stopped
 
@@ -143,6 +144,9 @@ services:
     environment: *backend_env
     depends_on:
       redis: { condition: service_healthy }
+    # The image's healthcheck probes the API on :8000, which the scheduler does not serve.
+    healthcheck:
+      disable: true
     restart: unless-stopped
 
   frontend:
@@ -150,7 +154,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - api
+      api: { condition: service_healthy }
     networks:
       default:
         # Fixed so the API can trust X-Real-IP from this container alone

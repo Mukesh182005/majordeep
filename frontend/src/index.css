@@ -982,6 +982,111 @@
   color: var(--acid);
 }
 
+/* Verdict page (calm mode, set by Layout on /jobs/*): gentle motion only.
+   Kept: the one-time fade-up of panels (animate-in / animate-fade-in), the soft
+   pulse on status dots, loading spinners and waiting dots, and short colour and
+   opacity transitions. Everything else that loops or decorates stops.
+   :where() keeps this rule's weight low so the gentle rules below can override it. */
+[data-calm] main :where(*:not(.animate-spin, .animate-bounce, .animate-pulse, .animate-in, .animate-fade-in)),
+[data-calm] main *::before,
+[data-calm] main *::after {
+  animation: none !important;
+}
+
+[data-calm] main * {
+  transition-property: color, background-color, border-color, opacity !important;
+  transition-duration: .2s !important;
+  transition-timing-function: ease-out !important;
+}
+
+/* Calm mode is visually quieter too: flat cards, no grid paper behind the page. */
+[data-calm] {
+  background-color: var(--surface-page);
+}
+
+[data-calm] main *,
+[data-calm] main *::before,
+[data-calm] main *::after {
+  box-shadow: none !important;
+}
+
+/* A gentler pulse for status dots on this page. */
+[data-calm] .animate-pulse {
+  animation: calm-pulse 2.4s ease-in-out infinite !important;
+}
+
+@keyframes calm-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}
+
+/* Calm typography: regular-width headings, normal letter spacing, no blur or glow. */
+[data-calm] main h1,
+[data-calm] main h2,
+[data-calm] main h3,
+[data-calm] main h4,
+[data-calm] main .wide {
+  font-stretch: 100% !important;
+  letter-spacing: -0.01em !important;
+}
+
+[data-calm] main .tracking-widest,
+[data-calm] main .tracking-wider,
+[data-calm] main [class*="tracking-[0."] {
+  letter-spacing: 0.03em !important;
+}
+
+[data-calm] main * {
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  text-shadow: none !important;
+}
+
+/* Hover: a small 2 px lift instead of the big jump used elsewhere. */
+[data-calm] main .btn:hover,
+[data-calm] main .btn-primary:hover,
+[data-calm] main .btn-secondary:hover,
+[data-calm] main .btn-glow:hover,
+[data-calm] main .btn-neon:hover,
+[data-calm] main .card-hover:hover,
+[data-calm] main .spotlight:hover,
+[data-calm] main .media-panel:hover,
+[data-calm] main .card:hover {
+  transform: translateY(-2px) !important;
+}
+
+[data-calm] main .btn,
+[data-calm] main .btn-primary,
+[data-calm] main .btn-secondary,
+[data-calm] main .card {
+  transition-property: color, background-color, border-color, opacity, transform !important;
+}
+
+/* The page's top-level blocks rise in one after another, once. */
+[data-calm] main .printable-dossier > *,
+[data-calm] main .printable-dossier section > div > * {
+  animation: calm-rise .5s cubic-bezier(.2, .9, .3, 1) both !important;
+}
+[data-calm] main .printable-dossier > *:nth-child(2) { animation-delay: .08s !important; }
+[data-calm] main .printable-dossier > *:nth-child(3) { animation-delay: .16s !important; }
+[data-calm] main .printable-dossier > *:nth-child(4) { animation-delay: .24s !important; }
+[data-calm] main .printable-dossier section > div > *:nth-child(2) { animation-delay: .1s !important; }
+[data-calm] main .printable-dossier section > div > *:nth-child(3) { animation-delay: .2s !important; }
+
+@keyframes calm-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Warning lights and the small waveform bars come back, slower and softer. */
+[data-calm] main .led-critical {
+  animation: calm-pulse 2.4s ease-in-out infinite !important;
+}
+[data-calm] main .waveform-bar {
+  animation: wave-bounce 2.4s ease-in-out infinite !important;
+}
+
 /* Light pulse travelling down a flowchart wire. */
 .flow-pulse {
   animation: flow-pulse 1.6s linear infinite;

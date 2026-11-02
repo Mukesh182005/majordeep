@@ -37,7 +37,10 @@ export async function uploadAndWait(page, file) {
   await page.locator('#btn-start-analysis').click()
   await page.waitForURL(/\/jobs\/[0-9a-f-]+$/, { timeout: 60 * 1000 })
   const jobId = page.url().split('/jobs/')[1]
-  // Scoped to <main>: the site footer also contains the word "inconclusive".
+  // Wait for the finished result page itself: the waiting screen's tips and the footer
+  // also mention "inconclusive", and pages load lazily, so verdict words alone could
+  // match before the analysis is done.
+  await expect(page.getByTestId('result-ready')).toBeVisible({ timeout: 9 * 60 * 1000 })
   const verdict = page.locator('main').getByText(/No manipulation detected|Likely manipulated|Likely AI-generated|Inconclusive/i).first()
   await expect(verdict).toBeVisible({ timeout: 9 * 60 * 1000 })
   return jobId

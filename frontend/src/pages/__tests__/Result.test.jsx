@@ -5,6 +5,7 @@ import Result from '../Result'
 import realAudioResult from '../../components/__tests__/fixtures/real_audio_result.json'
 import realVideoFaceswapResult from '../../components/__tests__/fixtures/real_video_faceswap_result.json'
 import realVideoNofaceResult from '../../components/__tests__/fixtures/real_video_noface_result.json'
+import { ROUTER_FUTURE } from '../../lib/router'
 
 const mockVideoResult = {
   id: 'job-vid-999',
@@ -51,7 +52,7 @@ vi.mock('../../lib/api', () => ({
 describe('Result page video pipeline rendering', () => {
   it('renders Pipeline Stages in top tabs and pipeline preview card in Analysis tab', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-vid-999']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-vid-999']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -80,7 +81,7 @@ describe('Result page video pipeline rendering', () => {
 
   it('renders audio result page for real ml/audio-wire response with trained model score and per-window timeline', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-audio-real-1']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-audio-real-1']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -113,7 +114,7 @@ describe('Result page video pipeline rendering', () => {
 
   it('renders video result page for real ml/faceswap-wire response with per-track scores and timeline', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-video-faceswap-real']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-video-faceswap-real']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -137,7 +138,7 @@ describe('Result page video pipeline rendering', () => {
 
   it('renders "No face found: face-swap check not applicable." on video without face tracks', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-video-noface-real']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-video-noface-real']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>

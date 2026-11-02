@@ -1,10 +1,8 @@
-import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import Result from '../Result'
-import * as apiModule from '../../lib/api'
-
+import { ROUTER_FUTURE } from '../../lib/router'
 // Mock API with WhatsApp photograph payload (e6ce9b117fbb441b90e4792010fc90b4 telemetry)
 vi.mock('../../lib/api', () => ({
   api: {
@@ -120,7 +118,7 @@ vi.mock('../../lib/api', () => ({
 describe('Phase 31.6 Forensic Result UI Redesign & Evidentiary Parity', () => {
   it('renders Level 1 Forensic Assessment with INCONCLUSIVE verdict and honest blurb', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-inconclusive']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-inconclusive']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -140,7 +138,7 @@ describe('Phase 31.6 Forensic Result UI Redesign & Evidentiary Parity', () => {
 
   it('separates raw model signals from final forensic assessment (Mandatory Distinction)', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-inconclusive']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-inconclusive']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -162,7 +160,7 @@ describe('Phase 31.6 Forensic Result UI Redesign & Evidentiary Parity', () => {
 
   it('displays Corroboration-First panel and signals discrepancy / limited corroboration', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-inconclusive']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-inconclusive']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -186,7 +184,7 @@ describe('Phase 31.6 Forensic Result UI Redesign & Evidentiary Parity', () => {
 
   it('treats missing metadata and social-media compression as reliability context rather than manipulation', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-inconclusive']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-inconclusive']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -206,7 +204,7 @@ describe('Phase 31.6 Forensic Result UI Redesign & Evidentiary Parity', () => {
 
   it('decouples provenance from model score: origin is Inconclusive, not AI-generated', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-inconclusive']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-inconclusive']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -227,7 +225,7 @@ describe('Phase 31.6 Forensic Result UI Redesign & Evidentiary Parity', () => {
 
   it('renders "Why This Result?" structured evidence and "What This Result Does Not Establish"', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-inconclusive']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-inconclusive']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>
@@ -252,7 +250,7 @@ describe('Phase 31.6 Forensic Result UI Redesign & Evidentiary Parity', () => {
 
   it('renders Forensic Evidence Matrix with genuine backend measurements', async () => {
     render(
-      <MemoryRouter initialEntries={['/jobs/job-inconclusive']}>
+      <MemoryRouter future={ROUTER_FUTURE} initialEntries={['/jobs/job-inconclusive']}>
         <Routes>
           <Route path="/jobs/:jobId" element={<Result />} />
         </Routes>

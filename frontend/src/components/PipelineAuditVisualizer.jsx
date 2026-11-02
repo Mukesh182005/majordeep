@@ -1,13 +1,9 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts'
-import {
-  ShieldCheck, ShieldAlert, ShieldQuestion, FileText, Hash, Lock,
-  Activity, Check, Alert, Info, Eye, Download, Image as ImageIcon,
-  Zap, ArrowRight, Sparkles
-} from './ui/Icons'
+import { ShieldCheck, Activity, Eye, Download, ArrowRight } from './ui/Icons'
 import { CopyButton } from './ui'
 
 export const IMAGE_PHASES = [
@@ -510,7 +506,7 @@ export default function PipelineAuditVisualizer({
                     return null
                   }}
                 />
-                <Bar dataKey="duration" radius={[0, 6, 6, 0]}>
+                <Bar animationDuration={700} animationEasing="ease-out" dataKey="duration" radius={[0, 6, 6, 0]}>
                   {waterfallData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
@@ -550,7 +546,7 @@ export default function PipelineAuditVisualizer({
                 <PolarGrid stroke="var(--border-subtle)" strokeOpacity={0.6} />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 'bold' }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="var(--border-subtle)" tick={{ fill: 'var(--text-muted)', fontSize: 8 }} />
-                <Radar name="Visual Severity" dataKey="score" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} />
+                <Radar animationDuration={700} animationEasing="ease-out" name="Visual Severity" dataKey="score" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {

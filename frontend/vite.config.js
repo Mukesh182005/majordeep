@@ -37,6 +37,7 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           charts: ['recharts'],
+          motion: ['framer-motion'],
         },
       },
     },

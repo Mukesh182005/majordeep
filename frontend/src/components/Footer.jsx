@@ -36,7 +36,7 @@ function StatusPanel() {
 
   const online = health && health.status === 'ok'
   return (
-    <div className="self-start rounded-xl border-2 border-[#191919] p-5" style={{ background: "#191919", boxShadow: "6px 6px 0 var(--acid)" }}>
+    <div className="min-w-0 self-start rounded-xl border-2 border-[#191919] p-5" style={{ background: "#191919", boxShadow: "6px 6px 0 var(--acid)" }}>
       <div className="flex items-center justify-between">
         <span className="mono text-[0.6875rem] font-bold uppercase text-[#a7a7ab]">System status · live</span>
         <span className="mono flex items-center gap-2 text-[0.75rem] font-bold uppercase"
@@ -63,7 +63,7 @@ function StatusPanel() {
                     <span className="grid h-7 w-7 shrink-0 place-items-center rounded-sm bg-[var(--acid)] text-[#191919]"><Icon size={14} /></span>
                     <span className="min-w-0">
                       <span className="mono block text-[0.6875rem] font-bold uppercase text-[var(--acid)]">{k}</span>
-                      <span className={`block text-[0.75rem] leading-snug text-[#a7e1c5] ${open === k ? '' : 'truncate'}`}>{desc}</span>
+                      <span className={`block text-[0.75rem] leading-snug text-[#a7e1c5] ${open === k ? 'break-all' : 'truncate'}`}>{desc}</span>
                     </span>
                   </button>
                 </li>
@@ -83,12 +83,15 @@ function StatusPanel() {
 export default function Footer() {
   const { user } = useAuth()
   // The landing page ends with its own call to action; skip the band there.
-  const showCta = useLocation().pathname !== '/'
+  const { pathname } = useLocation()
+  const showCta = pathname !== '/'
+  // On a verdict page the footer stays still: no ticker, no call-to-action band.
+  const calm = /^\/jobs\//.test(pathname)
 
   return (
     <footer className="relative mt-16" style={{ color: '#ececed' }}>
       {/* ── CTA band ── */}
-      {showCta && <div className="relative overflow-hidden border-y-2 border-[#191919]" style={{ background: 'var(--acid)', color: '#191919' }}>
+      {showCta && !calm && <div className="relative overflow-hidden border-y-2 border-[#191919]" style={{ background: 'var(--acid)', color: '#191919' }}>
         <div className="pointer-events-none absolute inset-0 opacity-25"
              style={{ backgroundImage: 'radial-gradient(#191919 1.2px, transparent 1.2px)', backgroundSize: '18px 18px' }} aria-hidden="true" />
         <div className="relative mx-auto flex max-w-content flex-col items-start justify-between gap-6 px-4 py-12 sm:px-6 md:flex-row md:items-center lg:px-10">
@@ -110,11 +113,11 @@ export default function Footer() {
         </div>
       </div>}
 
-      <Marquee items={['Image', 'Audio', 'Video', 'SHA-256', 'Inconclusive is an answer', 'Delete any scan', 'Look closer']} tone="ink" />
+      {!calm && <Marquee items={['Image', 'Audio', 'Video', 'SHA-256', 'Inconclusive is an answer', 'Delete any scan', 'Look closer']} tone="ink" />}
 
       {/* ── main grid ── */}
       <div style={{ background: 'var(--pine)' }}>
-        <div className="mx-auto grid max-w-content gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[0.95fr_2.5fr_1.15fr] lg:px-10">
+        <div className="mx-auto grid max-w-content gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,2.5fr)_minmax(0,1.15fr)] lg:px-10">
           <div>
             <Link to="/" className="group inline-flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-md border-2 border-[#191919] transition-transform group-hover:-rotate-6"

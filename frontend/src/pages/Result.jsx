@@ -1,20 +1,31 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api, connectJobWs } from '../lib/api'
-import { formatBytes, percent, verdictMeta, formatDate } from '../lib/format'
+import { formatBytes, percent, verdictMeta } from '../lib/format'
 import AuthedImage from '../components/AuthedImage'
 import { CopyButton, Notice } from '../components/ui'
-import { 
-  Activity, CheckCircle, Cpu, FileText, Sparkles, Upload, Clock, Info, Loader2, AlertTriangle, Hash,
-  Globe, Search, Zap, Shield, ShieldCheck, ShieldAlert, ShieldQuestion, Eye, Download, Check, Alert,
-  ChevronDown, ChevronUp
+import {
+  Activity,
+  Cpu,
+  FileText,
+  Upload,
+  Info,
+  AlertTriangle,
+  Globe,
+  Zap,
+  Shield,
+  ShieldQuestion,
+  Eye,
+  Download,
+  ChevronDown,
+  ChevronUp,
 } from '../components/ui/Icons'
-
 import AudioForensicsView from '../components/AudioForensicsView'
 import VideoForensicsView, { VIDEO_PIPELINE_STAGES } from '../components/VideoForensicsView'
 import ImageForensicsView from '../components/ImageForensicsView'
 import OriginView from '../components/OriginView'
-import VerdictHero from '../components/VerdictHero'
+import AnalysisProgress from '../components/AnalysisProgress'
+import VerdictBasis from '../components/VerdictBasis'
 
 function TerminalLogStream({ pipeline, evidence }) {
   const [logs, setLogs] = useState([])
@@ -117,7 +128,6 @@ export default function Result() {
 
   // Phase 31.6: Interactive Workbench state
   const [showModelDetails, setShowModelDetails] = useState(false)
-  const [activeWhyItem, setActiveWhyItem] = useState('all')
   const [imageZoom, setImageZoom] = useState(1)
   const [activePlateKind, setActivePlateKind] = useState('combined')
   const [reportUrl, setReportUrl] = useState('')
@@ -163,45 +173,7 @@ export default function Result() {
   }
 
   if (!result) {
-    const pct = liveStatus.progress_pct ?? 0
-    return (
-      <div className="mx-auto max-w-4xl animate-in space-y-6">
-        <div className="card overflow-hidden border-2 transition-colors duration-500"
-             style={{ borderColor: pct === 100 ? 'var(--status-good)' : 'var(--accent-ring)' }}>
-          <div className="relative overflow-hidden p-8 text-center" style={{ background: 'var(--surface-1)' }}>
-            <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
-                 style={{ background: 'radial-gradient(circle at 50% -20%, var(--accent), transparent 70%)' }} />
-            <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink-primary">{liveStatus.message}</h2>
-            <div className="mb-8 flex items-center justify-center gap-1.5 text-sm text-ink-muted">
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: '0ms' }} />
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: '150ms' }} />
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: '300ms' }} />
-              <span className="ml-1">Extracting multi-modal forensic telemetry&hellip;</span>
-            </div>
-            <div className="relative mx-auto max-w-lg">
-              <div className="mb-2 flex justify-between px-1 text-xs font-medium text-ink-muted">
-                <span>{pct === 100 ? 'Finalizing calibrated assessment' : 'Extracting physical and neural evidence'}</span>
-                <span className="tnum">{pct}%</span>
-              </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full shadow-inner bg-surface-3">
-                <div className="relative h-full rounded-full transition-all duration-700 ease-out"
-                  style={{ width: `${pct}%`, background: pct === 100 ? 'var(--status-good)' : 'linear-gradient(90deg, var(--accent), #818cf8)' }}>
-                  <div className="absolute inset-0 animate-pulse bg-white/20" />
-                </div>
-              </div>
-            </div>
-            <div className="mt-8 text-left bg-black text-[#00ff00] p-4 rounded-xl font-mono text-xs overflow-hidden border border-[#333] shadow-inner h-32 flex flex-col justify-end">
-              {pct > 5  && <div className="opacity-50">[{new Date(Date.now()-4000).toISOString().split('T')[1].split('.')[0]}] Initializing Celery Forensic Worker...</div>}
-              {pct > 15 && <div className="opacity-60">[{new Date(Date.now()-3000).toISOString().split('T')[1].split('.')[0]}] Ingesting file container & computing cryptohash ledger...</div>}
-              {pct > 30 && <div className="opacity-70">[{new Date(Date.now()-2000).toISOString().split('T')[1].split('.')[0]}] Executing CFA demosaicing and sensor noise extraction...</div>}
-              {pct > 50 && <div className="opacity-80">[{new Date(Date.now()-1000).toISOString().split('T')[1].split('.')[0]}] Running Vision Transformer & CNN backbones...</div>}
-              {pct > 75 && <div className="opacity-90">[{new Date(Date.now()-500).toISOString().split('T')[1].split('.')[0]}] Evaluating orthogonal evidence corroboration...</div>}
-              {pct >= 95 && <div className="text-white">[{new Date().toISOString().split('T')[1].split('.')[0]}] Calibrated forensic assessment complete. Finalizing...</div>}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <AnalysisProgress liveStatus={liveStatus} />
   }
 
   const handleExportJSON = () => {
@@ -241,7 +213,6 @@ export default function Result() {
   
   // Corroboration Metrics
   const orthogonalCount = evidenceFusion.orthogonal_signals_count ?? (evidenceFusion.corroborating_signals?.length ?? 1)
-  const corroboratingSignalsList = evidenceFusion.corroborating_signals || (rawModelScore >= 0.5 ? ['AI Generative Pattern (ViT / Diffusion Probe)'] : [])
   const isSingleSignal = orthogonalCount <= 1 && rawModelScore >= 0.5
 
   // Conflicting Evidence Detection
@@ -311,7 +282,7 @@ export default function Result() {
   }
 
   return (
-    <div className="mx-auto max-w-[1440px] animate-in pb-16 printable-dossier px-4 mt-6">
+    <div className="mx-auto max-w-[1440px] animate-in pb-16 printable-dossier px-4 mt-6" data-testid="result-ready">
       <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-500 flex items-center gap-2 mb-4">
         <AlertTriangle size={18} />
         <span>Automated assessment only. Not forensic or legal evidence.</span>
@@ -323,14 +294,7 @@ export default function Result() {
         </Notice>
       )}
 
-      <VerdictHero
-        result={result}
-        meta={meta}
-        mediaLabel={isAudio ? 'Audio' : isVideo ? 'Video' : 'Image'}
-        reportUrl={reportUrl}
-        onExportJSON={handleExportJSON}
-        experimental={isExperimentalAudio}
-      />
+      <VerdictBasis evidence={evidence} />
 
       {/* ── TOP WORKBENCH HEADER & CASE AUDIT BAR ── */}
       <div className="rounded-t-2xl border-t border-x px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-surface-2"

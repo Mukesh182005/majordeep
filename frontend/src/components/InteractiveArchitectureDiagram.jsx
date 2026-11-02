@@ -1,9 +1,5 @@
-import React, { useState } from 'react'
-import {
-  Shield, Cpu, Eye, Waveform, Video, Activity, FileText, CheckCircle,
-  Lock, ArrowRight, Sparkles, Zap, Network, ChevronRight, X
-} from './ui/Icons'
-
+import { useState } from 'react'
+import { CheckCircle, ArrowRight, Zap, ChevronRight, X } from './ui/Icons'
 export function InteractiveArchitectureDiagram() {
   const [selectedSubsystem, setSelectedSubsystem] = useState('all') // 'all' | 'image' | 'audio' | 'video' | 'custody'
   const [selectedNode, setSelectedNode] = useState(null)

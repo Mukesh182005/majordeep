@@ -1,11 +1,8 @@
 import { useState } from 'react'
-import { Card, CopyButton, SplitLoupeOverlay } from './ui'
+import { Card, SplitLoupeOverlay } from './ui'
 import AuthedImage from './AuthedImage'
-import {
-  Activity, Alert, Check, CheckCircle, Cpu, Download, Eye, FileText, Hash,
-  Info, Lock, ShieldAlert, ShieldCheck, ShieldQuestion, Sparkles, Image as ImageIcon
-} from './ui/Icons'
-import { percent, formatBytes } from '../lib/format'
+import { Download, Image as ImageIcon } from './ui/Icons'
+import { percent } from '../lib/format'
 import { api } from '../lib/api'
 import PipelineAuditVisualizer from './PipelineAuditVisualizer'
 

@@ -7,6 +7,9 @@ All notable changes to this project are documented in this file.
 Rules fixed before scoring in `evaluation/ROUND4-RULES.md` and `evaluation/ROUND5-RULES.md`.
 
 ### Changed
+- Video: the AI-generated video detector now decides the verdict (project owner's decision, against the
+  rule of at most 1/40 real flagged): Veo 3 called MANIPULATED 10/40 -> 40/40, real DFD 1/40 -> 2/40
+  (`evaluation/AIVIDEO-01`).
 - Images: a learned combination of the three AI detectors replaces the hand-set weights, with cut-offs
   chosen on screenshots, WhatsApp copies and small images (`evaluation/IMAGE-COMBINER-01`). Upload-like
   test split: AI called MANIPULATED 60.7 % -> 91.6 %, AI called AUTHENTIC 7.3 % -> 1.5 %, real called

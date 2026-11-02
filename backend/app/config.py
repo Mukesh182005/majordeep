@@ -111,8 +111,10 @@ class Settings(BaseSettings):
     gend_in_verdict: bool = True
     video_scene_frames: int = 8  # frames scored by the scene AI detectors per video (was 1)
     # AI-generated video detector (app/ml/aivideo.py): runs when checkpoints/aivideo_clip/head.json
-    # exists; decides the verdict only when this is true (evaluation/ROUND3-RULES.md).
-    aivideo_in_verdict: bool = False
+    # exists; decides the verdict only when this is true. On by the project owner's decision (2026-11-02):
+    # held-out Veo 3 40/40 caught, but 2/40 real DFD videos flagged against a rule of at most 1/40
+    # (evaluation/AIVIDEO-01).
+    aivideo_in_verdict: bool = True
     # Audio model stage. "lcnn_asvspoof" (default): the ASVspoof 2019 LA-trained
     # LCNN chosen on dev, with the dev-fitted calibration and checkpoint hash in
     # audio_lcnn_calibration_file and the verdict rule frozen on dev in

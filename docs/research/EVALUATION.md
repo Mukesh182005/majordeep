@@ -263,8 +263,9 @@ test clips 0/176 (UCF50 0/72, vidor 0/57, DFD 0/47); AUC 1.000. Full pipeline wi
 | Real DFD held-out (40) | 2 / 40 | 1 / 40 |
 | DFD face swaps (40) | 30 / 40 | 29 / 40 |
 
-The rule allowed at most 1 of 40 real videos flagged, so the detector is shown on every result but not in the
-verdict by default. All AI clips come from one collection; real-world AI video may differ.
+The rule allowed at most 1 of 40 real videos flagged, so by the rule the detector stays out of the verdict.
+On 2026-11-02 the project owner accepted the extra false alarm and put it in the verdict
+(`AIVIDEO_IN_VERDICT=true`), as was done for GenD. All AI clips come from one collection; real-world AI video may differ.
 
 Not measured: real videos from phones or WhatsApp.
 

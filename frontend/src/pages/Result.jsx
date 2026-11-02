@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { api, connectJobWs } from '../lib/api'
 import { formatBytes, percent, verdictMeta } from '../lib/format'
 import AuthedImage from '../components/AuthedImage'
+import CountUp from '../components/fx/CountUp'
+import { motion } from 'framer-motion'
 import { CopyButton, Notice } from '../components/ui'
 import {
   Activity,
@@ -358,7 +360,7 @@ export default function Result() {
                   </span>
                 )}
               </div>
-              <h1 className="text-3xl font-black tracking-tight" style={{ color: meta.color }}>
+              <h1 className="verdict-reveal text-3xl font-black tracking-tight" style={{ color: meta.color, '--verdict': meta.color }}>
                 {meta.label.toUpperCase()}
               </h1>
               <p className="text-xs text-ink-secondary mt-2 leading-relaxed">
@@ -407,7 +409,7 @@ export default function Result() {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[0.625rem] font-black uppercase tracking-widest text-ink-muted block">System Confidence</span>
-                  <span className="text-2xl font-black font-mono text-ink-primary">{confidencePct}</span>
+                  <span className="text-2xl font-black font-mono text-ink-primary"><CountUp value={confidencePct} /></span>
                 </div>
                 <div className="text-right">
                   <span className="text-[0.6rem] uppercase font-bold text-ink-muted block">Metric Type</span>
@@ -425,7 +427,7 @@ export default function Result() {
                 <div>
                   <span className="text-[0.625rem] font-black uppercase tracking-widest text-ink-muted block">Forensic Risk Indicator</span>
                   <span className="text-2xl font-black font-mono" style={{ color: riskColor }}>
-                    {riskScore} <span className="text-xs font-normal text-ink-muted">/ 100</span>
+                    <CountUp value={riskScore} /> <span className="text-xs font-normal text-ink-muted">/ 100</span>
                   </span>
                 </div>
                 <span className="text-[0.65rem] font-extrabold uppercase px-2 py-0.5 rounded"
@@ -511,6 +513,8 @@ export default function Result() {
 
           {/* Tab Body */}
           <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            <motion.div key={activeTab} className="space-y-8" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, ease: [0.2, 0.9, 0.3, 1] }}>
             
             {/* ══════════════════════════════════════════════════════════ */}
             {/* TAB 1: FORENSIC WORKBENCH & ANALYSIS                    */}
@@ -1251,6 +1255,7 @@ export default function Result() {
             {/* TAB 4: ORIGIN & PROVENANCE                               */}
             {/* ══════════════════════════════════════════════════════════ */}
             {activeTab === 'origin' && <OriginView mopci={mopci} />}
+            </motion.div>
           </div>
 
           {/* Telemetry Console — always visible at bottom */}

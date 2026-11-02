@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { AlertTriangle, Info } from './ui/Icons'
 
 /**
@@ -38,15 +39,17 @@ export default function VerdictBasis({ evidence = {} }) {
         <div className="mt-5">
           <p className="mono text-[0.6875rem] font-bold uppercase tracking-wider text-ink-muted">Each detector&apos;s own score (probability of AI generation)</p>
           <ul className="mt-3 space-y-3">
-            {scores.map(([name, p]) => (
+            {scores.map(([name, p], i) => (
               <li key={name}>
                 <div className="flex items-baseline justify-between gap-3 text-[0.875rem]">
                   <span className="font-semibold text-ink-primary">{name}</span>
                   <span className="mono tnum font-bold text-ink-primary">{(p * 100).toFixed(1)}%</span>
                 </div>
                 <div className="mt-1 h-2.5 overflow-hidden rounded-full" style={{ background: 'var(--surface-3)' }}>
-                  <div className="h-full rounded-full"
-                       style={{ width: `${Math.max(1, p * 100)}%`, background: p >= 0.58 ? 'var(--status-critical)' : p > 0.42 ? 'var(--status-warn)' : 'var(--status-good)' }} />
+                  <motion.div className="h-full rounded-full"
+                       initial={{ width: 0 }} animate={{ width: `${Math.max(1, p * 100)}%` }}
+                       transition={{ duration: 0.8, delay: 0.15 + i * 0.12, ease: [0.2, 0.9, 0.3, 1] }}
+                       style={{ background: p >= 0.58 ? 'var(--status-critical)' : p > 0.42 ? 'var(--status-warn)' : 'var(--status-good)' }} />
                 </div>
               </li>
             ))}

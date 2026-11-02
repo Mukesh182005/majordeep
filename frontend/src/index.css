@@ -1079,6 +1079,54 @@
   to { opacity: 1; transform: none; }
 }
 
+/* Verdict reveal: the verdict wipes in left to right once, then a bar in the
+   verdict's colour sweeps in underneath it. */
+[data-calm] main .verdict-reveal {
+  position: relative;
+  padding-bottom: .35rem;
+  animation: verdict-wipe .7s cubic-bezier(.2, .9, .3, 1) .25s both !important;
+}
+
+[data-calm] main .verdict-reveal::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--verdict, var(--acid));
+  transform-origin: left;
+  animation: verdict-underline .6s cubic-bezier(.2, .9, .3, 1) .85s both !important;
+}
+
+@keyframes verdict-wipe {
+  from { clip-path: inset(0 100% 0 0); opacity: .3; }
+  to { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+@keyframes verdict-underline {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Scroll reveal: panels further down fade and rise as they scroll into view.
+   Uses scroll-driven animations where the browser supports them; elsewhere the
+   panels simply show. */
+@supports (animation-timeline: view()) {
+  [data-calm] main .printable-dossier [class*="rounded-2xl"][class*="border"],
+  [data-calm] main .printable-dossier .card {
+    animation: calm-reveal linear both !important;
+    animation-timeline: view() !important;
+    animation-range: entry 0% entry 40% !important;
+  }
+}
+
+@keyframes calm-reveal {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* Warning lights and the small waveform bars come back, slower and softer. */
 [data-calm] main .led-critical {
   animation: calm-pulse 2.4s ease-in-out infinite !important;

@@ -36,7 +36,7 @@ export default function VerdictBasis({ evidence = {} }) {
 
       {scores.length > 0 && (
         <div className="mt-5">
-          <p className="mono text-[0.6875rem] font-bold uppercase tracking-wider text-ink-muted">Each detector's own score (probability of AI generation)</p>
+          <p className="mono text-[0.6875rem] font-bold uppercase tracking-wider text-ink-muted">Each detector&apos;s own score (probability of AI generation)</p>
           <ul className="mt-3 space-y-3">
             {scores.map(([name, p]) => (
               <li key={name}>

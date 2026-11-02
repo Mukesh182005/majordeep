@@ -31,7 +31,7 @@ COPY . .
 # Run as a non-root user: this service accepts arbitrary uploads from the
 # internet, so the process should not own the filesystem it writes to.
 RUN useradd --create-home --uid 10001 appuser \
-    && mkdir -p /app/storage /app/checkpoints \
+    && mkdir -p /app/storage /app/checkpoints /app/.cache/huggingface \
     && chown -R appuser:appuser /app
 USER appuser
 

@@ -33,6 +33,10 @@ os.environ.update(
         "MAX_UPLOAD_MB": "5",
         "UPLOAD_RATE_LIMIT_PER_HOUR": "50",
         "GUEST_RATE_LIMIT_PER_HOUR": "50",
+        # The test client talks plain http://testserver, so a Secure cookie would never
+        # be sent back. Pinned here so a developer's .env (AUTH_COOKIE_SECURE=true for an
+        # HTTPS tunnel) cannot change the outcome of the cookie-login tests.
+        "AUTH_COOKIE_SECURE": "false",
         # The default audio model stage is the ASVspoof LCNN, whose weights are
         # never committed. Tests use a random-weight LCNN with a matching
         # calibration and frozen verdict config (written by _test_audio_lcnn):

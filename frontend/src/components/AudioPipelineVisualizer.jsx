@@ -1,15 +1,9 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts'
-import {
-  Activity, Alert, Check, CheckCircle, Cpu, Eye, FileText,
-  Hash, Info, ShieldAlert, ShieldCheck, ShieldQuestion, Waveform, Zap,
-  Lock, ArrowRight, Download, Sparkles
-} from './ui/Icons'
-import { percent } from '../lib/format'
-
+import { Activity, ShieldCheck, ArrowRight, Download } from './ui/Icons'
 export const AUDIO_PHASES = [
   {
     phaseId: 1,
@@ -205,10 +199,7 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
 
   // 2. Data for Acoustic Forensic Risk Radar Profile (8 orthogonal axes)
   const fileDna = evidence.file_dna || forensics.file_dna || {}
-  const signalIntel = evidence.signal_intel || forensics.signal_intel || {}
   const glottal = evidence.glottal_physics || forensics.glottal_physics || {}
-  const modelsOutput = evidence.models_output || forensics.models_output || {}
-  const modelBranches = modelsOutput.model_branch_scores || {}
   const enf = evidence.enf_environment || forensics.enf_environment || {}
   const splicing = evidence.splicing_timeline || forensics.splicing_timeline || {}
   const semantics = evidence.speech_semantics || forensics.speech_semantics || {}
@@ -503,7 +494,7 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
                     return null
                   }}
                 />
-                <Bar dataKey="duration" radius={[0, 6, 6, 0]}>
+                <Bar animationDuration={700} animationEasing="ease-out" dataKey="duration" radius={[0, 6, 6, 0]}>
                   {waterfallData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
@@ -543,7 +534,7 @@ export default function AudioPipelineVisualizer({ result = {}, onSwitchSubTab })
                 <PolarGrid stroke="var(--border-subtle)" strokeOpacity={0.6} />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 'bold' }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="var(--border-subtle)" tick={{ fill: 'var(--text-muted)', fontSize: 8 }} />
-                <Radar name="Acoustic Severity" dataKey="score" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} />
+                <Radar animationDuration={700} animationEasing="ease-out" name="Acoustic Severity" dataKey="score" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {

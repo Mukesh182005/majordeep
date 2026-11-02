@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './index.css'
@@ -6,15 +6,19 @@ import Layout from './components/Layout'
 import LoadingRoute from './components/ui/LoadingRoute'
 import { AuthProvider, useAuth } from './lib/useAuth'
 import { ThemeProvider } from './lib/theme'
-import Landing from './pages/Landing'
-import UploadPage from './pages/Upload'
-import Result from './pages/Result'
-import Report from './pages/Report'
-import History from './pages/History'
-import HowItWorks from './pages/HowItWorks'
-import Login from './pages/Login'
-import Privacy from './pages/Privacy'
-import ReferencesPage from './pages/ReferencesPage'
+import { ROUTER_FUTURE } from './lib/router'
+
+// Each page is its own chunk, loaded when first visited (Layout shows a loader
+// meanwhile), so no single bundle has to carry every page.
+const Landing = lazy(() => import('./pages/Landing'))
+const UploadPage = lazy(() => import('./pages/Upload'))
+const Result = lazy(() => import('./pages/Result'))
+const Report = lazy(() => import('./pages/Report'))
+const History = lazy(() => import('./pages/History'))
+const HowItWorks = lazy(() => import('./pages/HowItWorks'))
+const Login = lazy(() => import('./pages/Login'))
+const Privacy = lazy(() => import('./pages/Privacy'))
+const ReferencesPage = lazy(() => import('./pages/ReferencesPage'))
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -26,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <BrowserRouter future={ROUTER_FUTURE}>
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Landing />} />

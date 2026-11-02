@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Cpu, Activity, Eye, Waveform
 } from './ui/Icons'

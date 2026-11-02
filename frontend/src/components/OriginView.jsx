@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
-import { Shield, Globe, CheckCircle } from './ui/Icons'
-
+import { Globe } from './ui/Icons'
 const ConfidencePill = ({ level }) => {
   const map = {
     HIGH:   { color: '#23f871', bg: 'rgba(35,248,113,0.1)' },
@@ -30,19 +29,14 @@ export default function OriginView({ mopci }) {
 
   // Phase 31.6: Provenance status is decoupled from raw detector predictions
   let provenanceStatus = 'ORIGIN INCONCLUSIVE'
-  let provenanceTone = 'neutral'
   if (prov.c2pa_present && prov.manifest_status === 'Valid') {
     provenanceStatus = 'VERIFIED PROVENANCE'
-    provenanceTone = 'good'
   } else if (srcDiscovery.candidates && srcDiscovery.candidates.length > 0) {
     provenanceStatus = 'SOURCE CANDIDATE'
-    provenanceTone = 'warn'
   } else if (srcDiscovery.status === 'NOT_FOUND') {
     provenanceStatus = 'NO SOURCE FOUND'
-    provenanceTone = 'neutral'
   } else if (!mopci.provenance && !mopci.generation_attribution) {
     provenanceStatus = 'PROVENANCE UNAVAILABLE'
-    provenanceTone = 'neutral'
   }
 
   return (

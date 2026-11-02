@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
+import { MotionConfig, motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import { api, clearSession } from '../lib/api'
 import { useAuth } from '../lib/useAuth'
 import { useTheme } from '../lib/theme'
 import Cursor from './fx/Cursor'
 import Footer from './Footer'
+import LoadingRoute from './ui/LoadingRoute'
 import { Moon, Sun } from './ui/Icons'
 
 function NavItem({ to, children }) {
@@ -62,6 +63,8 @@ export default function Layout() {
   const navigate = useNavigate()
   const location = useLocation()
   const reduceMotion = useReducedMotion()
+  // The verdict page is for reading results: no grain, custom cursor or page curtain there.
+  const calm = /^\/jobs\//.test(location.pathname)
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 })
 
@@ -97,9 +100,9 @@ export default function Layout() {
   )
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="grain" aria-hidden="true" />
-      <Cursor />
+    <div className="flex min-h-screen flex-col" data-calm={calm || undefined}>
+      {!calm && <div className="grain" aria-hidden="true" />}
+      {!calm && <Cursor />}
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 border-b-2"
@@ -154,16 +157,21 @@ export default function Layout() {
       {/* ── Main content ────────────────────────────────────────────── */}
       <main className="mx-auto w-full max-w-content flex-1 px-4 py-10 sm:px-6 lg:px-10">
         {/* Keyed by path so each page slides in on navigation. */}
+        {/* On the verdict page framer animations are short and soft, and the page only fades in. */}
+        <MotionConfig transition={calm ? { duration: 0.4, ease: 'easeOut' } : undefined}>
         <motion.div
           key={location.pathname}
-          initial={{ opacity: 0, y: 18 }}
+          initial={calm ? { opacity: 0 } : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.2, 0.9, 0.3, 1] }}
         >
-          <Outlet />
+          <Suspense fallback={<LoadingRoute />}>
+            <Outlet />
+          </Suspense>
         </motion.div>
+        </MotionConfig>
         {/* curtain: an acid panel that sweeps off the screen on each page change */}
-        {!reduceMotion && <motion.div
+        {!reduceMotion && !calm && <motion.div
           key={`curtain-${location.pathname}`}
           className="pointer-events-none fixed inset-0 z-[80] origin-top"
           style={{ background: 'var(--acid)' }}

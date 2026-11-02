@@ -1,15 +1,9 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts'
-import {
-  Activity, Alert, Check, CheckCircle, Cpu, Eye, FileText,
-  Hash, Info, ShieldAlert, ShieldCheck, ShieldQuestion, Video as VideoIcon, Zap,
-  Lock, ArrowRight, Download, Sparkles
-} from './ui/Icons'
-import { percent } from '../lib/format'
-
+import { Activity, ShieldAlert, Zap, ArrowRight } from './ui/Icons'
 export const VIDEO_PHASES = [
   {
     phaseId: 1,
@@ -179,7 +173,6 @@ export default function VideoPipelineVisualizer({
   const evidence = result.evidence || {}
   const container = evidence.container_forensics || {}
   const temporal = evidence.temporal_metrics || {}
-  const facial = evidence.facial_dynamics || {}
   const lipsync = evidence.crossmodal_lipsync || {}
   const attribution = evidence.generator_attribution || {}
   const imageForensics = evidence.image_forensics || {}
@@ -211,7 +204,6 @@ export default function VideoPipelineVisualizer({
 
   const [activeStageNum, setActiveStageNum] = useState(1)
   const [filterMode, setFilterMode] = useState('all') // 'all' | 'flagged' | 'passed'
-  const [chartView, setChartView] = useState('both') // 'both' | 'waterfall' | 'radar'
 
   const activeStage = stages.find(s => s.stage === activeStageNum) || stages[0]
 
@@ -395,7 +387,7 @@ export default function VideoPipelineVisualizer({
               <div className="absolute top-1/2 left-6 right-6 h-0.5 -translate-y-1/2 bg-surface-3 z-0" />
 
               <div className="flex items-center justify-between relative z-10 gap-2">
-                {stages.map((st, i) => {
+                {stages.map((st) => {
                   const isBad = ['AI_FLAGGED', 'ANOMALY_DETECTED', 'SUSPICIOUS', 'FAILED'].includes(st.status)
                   const isWarn = ['INCONCLUSIVE', 'INSUFFICIENT_FACE_FRAMES', 'INSUFFICIENT_FACE_SAMPLES', 'SKIPPED'].includes(st.status)
                   const isCurrent = activeStageNum === st.stage
@@ -483,7 +475,7 @@ export default function VideoPipelineVisualizer({
                     return null
                   }}
                 />
-                <Bar dataKey="duration" radius={[0, 6, 6, 0]}>
+                <Bar animationDuration={700} animationEasing="ease-out" dataKey="duration" radius={[0, 6, 6, 0]}>
                   {waterfallData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
@@ -523,7 +515,7 @@ export default function VideoPipelineVisualizer({
                 <PolarGrid stroke="var(--border-subtle)" strokeOpacity={0.6} />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 'bold' }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="var(--border-subtle)" tick={{ fill: 'var(--text-muted)', fontSize: 8 }} />
-                <Radar name="Anomaly Severity" dataKey="score" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} />
+                <Radar animationDuration={700} animationEasing="ease-out" name="Anomaly Severity" dataKey="score" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
